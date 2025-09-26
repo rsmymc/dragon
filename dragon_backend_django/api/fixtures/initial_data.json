@@ -1,0 +1,288 @@
+[
+  {
+    "model": "api.team",
+    "pk": "12345678-1234-5678-9abc-123456789abc",
+    "fields": {
+      "name": "Dragons FC",
+      "city": "New York",
+      "max_members": 22,
+      "created_at": "2025-01-01T10:00:00Z",
+      "updated_at": "2025-01-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "api.team",
+    "pk": "22345678-2234-5678-9abc-223456789abc",
+    "fields": {
+      "name": "Phoenix United",
+      "city": "Phoenix",
+      "max_members": 24,
+      "created_at": "2025-01-01T11:00:00Z",
+      "updated_at": "2025-01-01T11:00:00Z"
+    }
+  },
+  {
+    "model": "api.team",
+    "pk": "32345678-3234-5678-9abc-323456789abc",
+    "fields": {
+      "name": "Lightning Bolts",
+      "city": "Miami",
+      "max_members": 20,
+      "created_at": "2025-01-01T12:00:00Z",
+      "updated_at": "2025-01-01T12:00:00Z"
+    }
+  },
+  {
+    "model": "api.person",
+    "pk": "a1111111-1111-1111-1111-111111111111",
+    "fields": {
+      "name": "John Smith",
+      "phone": "+1-555-0101",
+      "height": 180,
+      "weight": 75,
+      "side": 1,
+      "profile_picture_url": "",
+      "created_at": "2025-01-01T10:00:00Z",
+      "updated_at": "2025-01-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "api.person",
+    "pk": "a2222222-2222-2222-2222-222222222222",
+    "fields": {
+      "name": "Mike Johnson",
+      "phone": "+1-555-0102",
+      "height": 175,
+      "weight": 70,
+      "side": 2,
+      "profile_picture_url": "",
+      "created_at": "2025-01-01T10:01:00Z",
+      "updated_at": "2025-01-01T10:01:00Z"
+    }
+  },
+  {
+    "model": "api.person",
+    "pk": "a3333333-3333-3333-3333-333333333333",
+    "fields": {
+      "name": "David Wilson",
+      "phone": "+1-555-0103",
+      "height": 170,
+      "weight": 68,
+      "side": 0,
+      "profile_picture_url": "",
+      "created_at": "2025-01-01T10:02:00Z",
+      "updated_at": "2025-01-01T10:02:00Z"
+    }
+  },
+  {
+    "model": "api.person",
+    "pk": "a4444444-4444-4444-4444-444444444444",
+    "fields": {
+      "name": "Chris Brown",
+      "phone": "+1-555-0104",
+      "height": 185,
+      "weight": 80,
+      "side": 1,
+      "profile_picture_url": "",
+      "created_at": "2025-01-01T10:03:00Z",
+      "updated_at": "2025-01-01T10:03:00Z"
+    }
+  },
+  {
+    "model": "api.person",
+    "pk": "a5555555-5555-5555-5555-555555555555",
+    "fields": {
+      "name": "Alex Davis",
+      "phone": "+1-555-0105",
+      "height": 178,
+      "weight": 73,
+      "side": 2,
+      "profile_picture_url": "",
+      "created_at": "2025-01-01T10:04:00Z",
+      "updated_at": "2025-01-01T10:04:00Z"
+    }
+  },
+  {
+    "model": "api.person",
+    "pk": "a6666666-6666-6666-6666-666666666666",
+    "fields": {
+      "name": "Ryan Miller",
+      "phone": "+1-555-0106",
+      "height": 182,
+      "weight": 77,
+      "side": 1,
+      "profile_picture_url": "",
+      "created_at": "2025-01-01T10:05:00Z",
+      "updated_at": "2025-01-01T10:05:00Z"
+    }
+  },
+  {
+    "model": "api.person",
+    "pk": "a7777777-7777-7777-7777-777777777777",
+    "fields": {
+      "name": "Kevin Garcia",
+      "phone": "+1-555-0107",
+      "height": 174,
+      "weight": 72,
+      "side": 0,
+      "profile_picture_url": "",
+      "created_at": "2025-01-01T10:06:00Z",
+      "updated_at": "2025-01-01T10:06:00Z"
+    }
+  },
+  {
+    "model": "api.person",
+    "pk": "a8888888-8888-8888-8888-888888888888",
+    "fields": {
+      "name": "Tom Martinez",
+      "phone": "+1-555-0108",
+      "height": 179,
+      "weight": 74,
+      "side": 2,
+      "profile_picture_url": "",
+      "created_at": "2025-01-01T10:07:00Z",
+      "updated_at": "2025-01-01T10:07:00Z"
+    }
+  },
+  {
+    "model": "api.person",
+    "pk": "a9999999-9999-9999-9999-999999999999",
+    "fields": {
+      "name": "Steve Anderson",
+      "phone": "+1-555-0109",
+      "height": 176,
+      "weight": 71,
+      "side": 1,
+      "profile_picture_url": "",
+      "created_at": "2025-01-01T10:08:00Z",
+      "updated_at": "2025-01-01T10:08:00Z"
+    }
+  },
+  {
+    "model": "api.person",
+    "pk": "a0000000-0000-0000-0000-000000000000",
+    "fields": {
+      "name": "Paul Taylor",
+      "phone": "+1-555-0110",
+      "height": 183,
+      "weight": 78,
+      "side": 2,
+      "profile_picture_url": "",
+      "created_at": "2025-01-01T10:09:00Z",
+      "updated_at": "2025-01-01T10:09:00Z"
+    }
+  },
+  {
+    "model": "api.membership",
+    "pk": "f1111111-1111-1111-1111-111111111111",
+    "fields": {
+      "person": "a1111111-1111-1111-1111-111111111111",
+      "team": "12345678-1234-5678-9abc-123456789abc",
+      "role": 2,
+      "created_at": "2025-01-01T10:00:00Z",
+      "updated_at": "2025-01-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "api.membership",
+    "pk": "f2222222-2222-2222-2222-222222222222",
+    "fields": {
+      "person": "a2222222-2222-2222-2222-222222222222",
+      "team": "12345678-1234-5678-9abc-123456789abc",
+      "role": 3,
+      "created_at": "2025-01-01T10:01:00Z",
+      "updated_at": "2025-01-01T10:01:00Z"
+    }
+  },
+  {
+    "model": "api.location",
+    "pk": 1,
+    "fields": {
+      "team": "12345678-1234-5678-9abc-123456789abc",
+      "lat": 40.7589,
+      "lon": -73.9851,
+      "name": "Central Park Field A",
+      "created_at": "2025-01-01T10:00:00Z",
+      "updated_at": "2025-01-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "api.location",
+    "pk": 2,
+    "fields": {
+      "team": "12345678-1234-5678-9abc-123456789abc",
+      "lat": 40.7505,
+      "lon": -73.9934,
+      "name": "Bryant Park Field",
+      "created_at": "2025-01-01T10:00:00Z",
+      "updated_at": "2025-01-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "api.training",
+    "pk": 1,
+    "fields": {
+      "team": "12345678-1234-5678-9abc-123456789abc",
+      "location": 1,
+      "start_at": "2025-09-20T16:00:00Z",
+      "created_at": "2025-01-01T10:00:00Z",
+      "updated_at": "2025-01-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "api.training",
+    "pk": 2,
+    "fields": {
+      "team": "12345678-1234-5678-9abc-123456789abc",
+      "location": 2,
+      "start_at": "2025-09-28T18:00:00Z",
+      "created_at": "2025-01-01T10:00:00Z",
+      "updated_at": "2025-01-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "api.training",
+    "pk": 3,
+    "fields": {
+      "team": "12345678-1234-5678-9abc-123456789abc",
+      "location": 1,
+      "start_at": "2025-10-05T16:00:00Z",
+      "created_at": "2025-01-01T10:00:00Z",
+      "updated_at": "2025-01-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "api.lineup",
+    "pk": 1,
+    "fields": {
+      "training": 1,
+      "state": 2,
+      "created_at": "2025-01-01T10:00:00Z",
+      "updated_at": "2025-01-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "api.lineupseat",
+    "pk": 1,
+    "fields": {
+      "lineup": 1,
+      "person": "a1111111-1111-1111-1111-111111111111",
+      "side": "L",
+      "seat_number": 1,
+      "created_at": "2025-01-01T10:00:00Z",
+      "updated_at": "2025-01-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "api.lineupseat",
+    "pk": 2,
+    "fields": {
+      "lineup": 1,
+      "person": "a2222222-2222-2222-2222-222222222222",
+      "side": "R",
+      "seat_number": 1,
+      "created_at": "2025-01-01T10:00:00Z",
+      "updated_at": "2025-01-01T10:00:00Z"
+    }
+  }
+]
