@@ -1,0 +1,55 @@
+# ----------------------------
+# Python / Django (keep migrations tracked!)
+# ----------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+build/
+dist/
+.coverage
+coverage.xml
+htmlcov/
+pytestcache/
+.pytest_cache/
+
+# Virtual environments
+.env
+.env.*
+.venv/
+venv/
+env/
+
+# Django runtime artifacts
+db.sqlite3
+media/
+staticfiles/          # collected static root (if you use collectstatic)
+celerybeat-schedule
+celerybeat.pid
+
+# Local settings you don’t want in git
+*.local.py
+*.dev.py
+*.secrets.py
+
+# Logs
+*.log
+logs/
+gunicorn*.log
+
+# IDE / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Docker (backend)
+# Keep Dockerfile/docker-compose.yml TRACKED; ignore clutter
+docker-data/
+docker-volume-*/
+.docker/

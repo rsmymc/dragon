@@ -1,0 +1,56 @@
+# ------------------------
+# Global ignores for monorepo
+# ------------------------
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Node / Vue frontend
+node_modules/
+dist/
+build/
+.npm/
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Python / Django backend
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+build/
+dist/
+.coverage
+coverage.xml
+htmlcov/
+pytestcache/
+.pytest_cache/
+
+.env
+.env.*
+.venv/
+venv/
+env/
+
+db.sqlite3
+media/
+staticfiles/
+celerybeat-schedule
+celerybeat.pid
+
+*.log
+logs/
+gunicorn*.log
+
+# Docker
+docker-data/
+docker-volume-*/
+.docker/
