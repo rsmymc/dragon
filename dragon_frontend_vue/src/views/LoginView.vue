@@ -84,7 +84,7 @@ async function onSubmit() {
     const tokens = await login(username.value.trim(), password.value);
     auth.setTokens(tokens, rememberMe.value, username.value);
 
-    // Redirect to dashboard or intended route
+    // Redirect to teams or intended route
     const redirectTo = router.currentRoute.value.query.redirect || '/teams';
     await router.push(redirectTo);
   } catch (e) {
@@ -207,6 +207,13 @@ async function onSubmit() {
           <span>{{ loading ? "Signing in..." : "Sign In" }}</span>
         </button>
       </form>
+      <div class="demo-help">
+        <p class="demo-text">
+          <strong>Demo credentials:</strong><br>
+          Username: <code>test_user</code><br>
+          Password: <code>test_user1234</code>
+        </p>
+      </div>
     </div>
   </div>
 </template>

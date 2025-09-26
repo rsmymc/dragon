@@ -15,18 +15,13 @@ const currentUser = computed(() => auth.username)
 // Navigation items
 const navigationItems = [
   {
-    name: 'Dashboard',
-    path: '/dashboard',
-    icon: 'M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z M3 7l9-4 9 4M5 10v10'
-  },
-  {
     name: 'Teams',
     path: '/teams',
     icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10'
   },
   {
-    name: 'Users',
-    path: '/users',
+    name: 'Persons',
+    path: '/persons',
     icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z'
   },
   {

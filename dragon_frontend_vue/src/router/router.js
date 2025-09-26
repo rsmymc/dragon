@@ -10,9 +10,8 @@ import EditPersonView from '@/views/teams/EditPersonView.vue'
 import CreateTrainingView from '@/views/trainings/CreateTrainingView.vue'
 import TeamTrainingsView from '@/views/trainings/TeamTrainingsView.vue'
 import TrainingDetailsView from '@/views/trainings/TrainingDetailsView.vue'
-
-// import UsersView from '@/views/UsersView.vue'
-import DashboardView from '@/views/DashboardView.vue'
+import PersonView from "@/views/PersonView.vue";
+import SettingsView from "@/views/SettingsView.vue";
 
 const routes = [
    // Auth Routes (Auth Layout)
@@ -28,16 +27,6 @@ const routes = [
       requiresAuth: false,
       layout: 'auth',
       redirectIfAuthenticated: true
-    }
-  },
-  // Protected Routes (App Layout)
-  {
-    path: '/dashboard',
-    name: 'dashboard',
-    component: DashboardView,
-    meta: {
-      requiresAuth: true,
-      layout: 'app'
     }
   },
   {
@@ -65,6 +54,12 @@ const routes = [
     meta: { requiresAuth: true, layout: 'app' }
   },
   {
+    path: '/persons',
+    name: 'person',
+    component: PersonView,
+    meta: { requiresAuth: true, layout: 'app' }
+  },
+  {
     path: '/persons/:id/edit',
     name: 'person-edit',
     component: EditPersonView,
@@ -86,6 +81,12 @@ const routes = [
     path: '/teams/:teamId/trainings/:id',
     name: 'trainings-detail',
     component: TrainingDetailsView,
+    meta: { requiresAuth: true, layout: 'app' }
+  },
+  {
+    path: '/settings',
+    name: 'settings',
+    component: SettingsView,
     meta: { requiresAuth: true, layout: 'app' }
   },
 ]
@@ -114,7 +115,7 @@ router.beforeEach(async (to, from, next) => {
     return
   }
 
-  // If going to root and authenticated, redirect to dashboard
+  // If going to root and authenticated, redirect to teams
   if (to.path === '/' && auth.isAuthenticated) {
     next({ name: 'teams' })
     return
