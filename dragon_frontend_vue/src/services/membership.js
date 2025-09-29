@@ -39,7 +39,7 @@ export async function fetchMembershipsByTeam(teamId, options = {}) {
   try {
     const params = {
       team: teamId,
-      ...options
+      ...options,
     }
 
     const response = await api.get(`${MEMBERSHIP_URL}/`, { params })
@@ -121,7 +121,7 @@ export async function fetchMembershipsByPerson(personId, options = {}) {
   try {
     const params = {
       person: personId,
-      ...options
+      ...options,
     }
 
     const response = await api.get(`${MEMBERSHIP_URL}/`, { params })
@@ -140,7 +140,7 @@ export async function fetchMembershipsByRole(role, options = {}) {
   try {
     const params = {
       role: role,
-      ...options
+      ...options,
     }
 
     const response = await api.get(`${MEMBERSHIP_URL}/`, { params })
@@ -150,7 +150,6 @@ export async function fetchMembershipsByRole(role, options = {}) {
     throw error
   }
 }
-
 
 // Export all functions as default for convenience
 export default {
@@ -162,5 +161,5 @@ export default {
   patchMembership,
   deleteMembership,
   fetchMembershipsByPerson,
-  fetchMembershipsByRole
+  fetchMembershipsByRole,
 }

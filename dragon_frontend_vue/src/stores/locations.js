@@ -6,17 +6,17 @@ export const useLocationsStore = defineStore('locations', {
     locations: [],
     currentLocation: null,
     isLoading: false,
-    error: null
+    error: null,
   }),
 
   getters: {
     getLocationsByTeam: (state) => (teamId) => {
-      return state.locations.filter(location => location.team === teamId)
+      return state.locations.filter((location) => location.team === teamId)
     },
 
     getLocationById: (state) => (id) => {
-      return state.locations.find(location => location.id === id)
-    }
+      return state.locations.find((location) => location.id === id)
+    },
   },
 
   actions: {
@@ -46,8 +46,8 @@ export const useLocationsStore = defineStore('locations', {
         const teamLocations = data.results || data || []
 
         // Update locations in store (merge with existing)
-        teamLocations.forEach(location => {
-          const existingIndex = this.locations.findIndex(l => l.id === location.id)
+        teamLocations.forEach((location) => {
+          const existingIndex = this.locations.findIndex((l) => l.id === location.id)
           if (existingIndex >= 0) {
             this.locations[existingIndex] = location
           } else {
@@ -74,7 +74,7 @@ export const useLocationsStore = defineStore('locations', {
         this.currentLocation = location
 
         // Update in locations array if it exists
-        const existingIndex = this.locations.findIndex(l => l.id === location.id)
+        const existingIndex = this.locations.findIndex((l) => l.id === location.id)
         if (existingIndex >= 0) {
           this.locations[existingIndex] = location
         } else {
@@ -116,7 +116,7 @@ export const useLocationsStore = defineStore('locations', {
         const updatedLocation = await locationsService.updateLocation(id, locationData)
 
         // Update in locations array
-        const existingIndex = this.locations.findIndex(l => l.id === id)
+        const existingIndex = this.locations.findIndex((l) => l.id === id)
         if (existingIndex >= 0) {
           this.locations[existingIndex] = updatedLocation
         }
@@ -144,7 +144,7 @@ export const useLocationsStore = defineStore('locations', {
         await locationsService.deleteLocation(id)
 
         // Remove from locations array
-        this.locations = this.locations.filter(l => l.id !== id)
+        this.locations = this.locations.filter((l) => l.id !== id)
 
         // Clear current location if it's the one being deleted
         if (this.currentLocation?.id === id) {
@@ -167,6 +167,6 @@ export const useLocationsStore = defineStore('locations', {
 
     clearCurrentLocation() {
       this.currentLocation = null
-    }
-  }
+    },
+  },
 })

@@ -1,0 +1,13 @@
+[
+  {
+    "model": "api.team",
+    "pk": "12345678-1234-5678-9abc-123456789abc",
+    "fields": {
+      "name": "Dragons FC",
+      "city": "New York",
+      "max_members": 22,
+      "created_at": "2025-01-01T10:00:00Z",
+      "updated_at": "2025-01-01T10:00:00Z"
+    }
+  }
+]

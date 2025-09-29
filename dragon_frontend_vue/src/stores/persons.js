@@ -1,20 +1,25 @@
 import { defineStore } from 'pinia'
-import { fetchPersons, fetchPerson, createPerson, updatePerson, deletePerson } from '@/services/persons'
+import {
+  fetchPersons,
+  fetchPerson,
+  createPerson,
+  updatePerson,
+  deletePerson,
+} from '@/services/persons'
 
 export const usePersonsStore = defineStore('persons', {
-
   state: () => ({
-    persons: [],             // List of all persons
-    currentPerson: null,     // Currently selected person
-    isLoading: false,        // Loading state
-    error: null,             // Error messages
+    persons: [], // List of all persons
+    currentPerson: null, // Currently selected person
+    isLoading: false, // Loading state
+    error: null, // Error messages
 
     // Filters and search for persons only
     searchQuery: '',
     filters: {
-      side: '',             // Filter by person side preference
-      sortBy: 'name'        // Sort by: name, height, weight, created_at
-    }
+      side: '', // Filter by person side preference
+      sortBy: 'name', // Sort by: name, height, weight, created_at
+    },
   }),
 
   getters: {
@@ -25,15 +30,16 @@ export const usePersonsStore = defineStore('persons', {
       // Apply search filter
       if (state.searchQuery) {
         const query = state.searchQuery.toLowerCase()
-        filtered = filtered.filter(person =>
-          person.name?.toLowerCase().includes(query) ||
-          (person.phone && person.phone.includes(query))
+        filtered = filtered.filter(
+          (person) =>
+            person.name?.toLowerCase().includes(query) ||
+            (person.phone && person.phone.includes(query)),
         )
       }
 
       // Apply side filter
       if (state.filters.side) {
-        filtered = filtered.filter(person => person.side === parseInt(state.filters.side))
+        filtered = filtered.filter((person) => person.side === parseInt(state.filters.side))
       }
 
       // Apply sorting
@@ -55,20 +61,19 @@ export const usePersonsStore = defineStore('persons', {
 
     // Get person by ID
     getPersonById: (state) => (id) => {
-      return state.persons.find(person => person.id === id)
+      return state.persons.find((person) => person.id === id)
     },
 
     // Statistics
     personsCount: (state) => state.persons.length,
 
     // Get persons by side
-    bothSidePersons: (state) => state.persons.filter(p => p.side === 0),
-    leftSidePersons: (state) => state.persons.filter(p => p.side === 1),
-    rightSidePersons: (state) => state.persons.filter(p => p.side === 2)
+    bothSidePersons: (state) => state.persons.filter((p) => p.side === 0),
+    leftSidePersons: (state) => state.persons.filter((p) => p.side === 1),
+    rightSidePersons: (state) => state.persons.filter((p) => p.side === 2),
   },
 
   actions: {
-
     // Fetch all persons
     async fetchPersons() {
       this.isLoading = true
@@ -113,7 +118,8 @@ export const usePersonsStore = defineStore('persons', {
         }
       } catch (error) {
         console.error('Failed to fetch person:', error)
-        this.error = error.response?.status === 404 ? 'Person not found' : 'Failed to load person details.'
+        this.error =
+          error.response?.status === 404 ? 'Person not found' : 'Failed to load person details.'
         this.currentPerson = null
         throw error
       } finally {
@@ -151,7 +157,7 @@ export const usePersonsStore = defineStore('persons', {
         const updatedPerson = await updatePerson(id, personData)
 
         // Update in persons list
-        const personIndex = this.persons.findIndex(p => p.id === id)
+        const personIndex = this.persons.findIndex((p) => p.id === id)
         if (personIndex !== -1) {
           this.persons[personIndex] = updatedPerson
         }
@@ -181,7 +187,7 @@ export const usePersonsStore = defineStore('persons', {
         console.log(`Deleting person ${id} via Person API...`)
         await deletePerson(id)
 
-        const personIndex = this.persons.findIndex(p => p.id === id)
+        const personIndex = this.persons.findIndex((p) => p.id === id)
         if (personIndex !== -1) {
           const personName = this.persons[personIndex].name
           this.persons.splice(personIndex, 1)
@@ -218,7 +224,7 @@ export const usePersonsStore = defineStore('persons', {
       this.searchQuery = ''
       this.filters = {
         side: '',
-        sortBy: 'name'
+        sortBy: 'name',
       }
     },
 
@@ -236,8 +242,8 @@ export const usePersonsStore = defineStore('persons', {
       this.searchQuery = ''
       this.filters = {
         side: '',
-        sortBy: 'name'
+        sortBy: 'name',
       }
-    }
-  }
+    },
+  },
 })

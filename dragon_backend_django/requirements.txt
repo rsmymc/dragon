@@ -5,3 +5,4 @@ django-cors-headers==4.8.0
 django-filter
 drf-spectacular
 djangorestframework-simplejwt
+gunicorn

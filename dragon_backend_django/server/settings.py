@@ -24,9 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "False").lower() in ("true", "1", "yes")
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(",")
 
 
 # Application definition
@@ -93,7 +93,9 @@ MIDDLEWARE = [
 #    "http://127.0.0.1:5173",
 #]
 
-CORS_ALLOW_ALL_ORIGINS = True   # DEV ONLY
+CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", "").split(",") if not os.getenv("CORS_ALLOW_ALL_ORIGINS") else []
+
+CORS_ALLOW_ALL_ORIGINS = os.getenv("CORS_ALLOW_ALL_ORIGINS", "False").lower() in ("true", "1", "yes")
 
 
 ROOT_URLCONF = 'server.urls'
@@ -122,11 +124,11 @@ WSGI_APPLICATION = 'server.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME', 'dragon'),
-        'USER': os.getenv('DB_USER', 'dragon_user'),
-        'PASSWORD': os.getenv('DB_PASSWORD', 'dragon_pass'),
-        'HOST': os.getenv('DB_HOST', 'db'),  # 'db' is the container name
-        'PORT': os.getenv('DB_PORT', '5432'),
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
     }
 }
 # Password validation

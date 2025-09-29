@@ -148,7 +148,9 @@
 }
 
 /* Loading, Error, Empty States */
-.loading-state, .error-state, .empty-state {
+.loading-state,
+.error-state,
+.empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -168,7 +170,8 @@
   margin-bottom: 1rem;
 }
 
-.error-icon, .empty-icon {
+.error-icon,
+.empty-icon {
   font-size: 3rem;
   margin-bottom: 1rem;
 }
@@ -413,8 +416,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Responsive Design */

@@ -1,15 +1,9 @@
 <template>
   <div class="settings-view">
     <div class="construction-container">
-      <div class="construction-icon">
-        ⚙️
-      </div>
-      <h1 class="construction-title">
-        Settings
-      </h1>
-      <p class="construction-message">
-        This page is currently under construction
-      </p>
+      <div class="construction-icon">⚙️</div>
+      <h1 class="construction-title">Settings</h1>
+      <p class="construction-message">This page is currently under construction</p>
       <div class="construction-details">
         <p>Coming soon:</p>
         <ul>
@@ -29,7 +23,7 @@ export default {
   name: 'SettingsView',
   mounted() {
     console.log('SettingsView component mounted - Under Construction')
-  }
+  },
 }
 </script>
 

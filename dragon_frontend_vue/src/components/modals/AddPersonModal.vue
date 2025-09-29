@@ -7,21 +7,20 @@ import {
   PERSON_SIDE_LABELS,
   DEFAULT_FORM_VALUES,
   MEMBERSHIP_ROLES,
-  PERSON_SIDES
+  PERSON_SIDES,
 } from '@/constants.js'
-import '@/assets/styles/add-person-to-team.css';
-
+import '@/assets/styles/add-person-to-team.css'
 
 // Props
 const props = defineProps({
   teamId: {
     type: String,
-    required: true
+    required: true,
   },
   teamName: {
     type: String,
-    required: true
-  }
+    required: true,
+  },
 })
 
 // Emits
@@ -50,9 +49,9 @@ const formErrors = ref({})
 // Computed
 const isFormValid = computed(() => {
   if (mode.value === 'create') {
-    return personForm.value.name.trim().length > 0 &&
-      !formErrors.value.name &&
-      !formErrors.value.phone
+    return (
+      personForm.value.name.trim().length > 0 && !formErrors.value.name && !formErrors.value.phone
+    )
   } else {
     return selectedPersonId.value !== ''
   }
@@ -62,9 +61,9 @@ const filteredPersons = computed(() => {
   if (!searchQuery.value) return availablePersons.value
 
   const query = searchQuery.value.toLowerCase()
-  return availablePersons.value.filter(person =>
-    person.name.toLowerCase().includes(query) ||
-    (person.phone && person.phone.includes(query))
+  return availablePersons.value.filter(
+    (person) =>
+      person.name.toLowerCase().includes(query) || (person.phone && person.phone.includes(query)),
   )
 })
 
@@ -84,12 +83,18 @@ const validateForm = () => {
     }
 
     // Validate height (if provided)
-    if (personForm.value.height && (personForm.value.height < 100 || personForm.value.height > 250)) {
+    if (
+      personForm.value.height &&
+      (personForm.value.height < 100 || personForm.value.height > 250)
+    ) {
       formErrors.value.height = 'Height should be between 100-250 cm'
     }
 
     // Validate weight (if provided)
-    if (personForm.value.weight && (personForm.value.weight < 30 || personForm.value.weight > 200)) {
+    if (
+      personForm.value.weight &&
+      (personForm.value.weight < 30 || personForm.value.weight > 200)
+    ) {
       formErrors.value.weight = 'Weight should be between 30-200 kg'
     }
   }
@@ -117,14 +122,14 @@ const submitForm = async () => {
       result = await membershipStore.createMembership({
         person: personResult.person.id,
         team: props.teamId,
-        role: membershipForm.value.role
+        role: membershipForm.value.role,
       })
     } else {
       // Add existing person to team via membership store
       result = await membershipStore.createMembership({
         person: selectedPersonId.value,
         team: props.teamId,
-        role: membershipForm.value.role
+        role: membershipForm.value.role,
       })
     }
 
@@ -133,7 +138,6 @@ const submitForm = async () => {
     } else {
       alert(`Failed to add person to team: ${result.error}`)
     }
-
   } catch (error) {
     console.error('Add person error:', error)
     alert('An unexpected error occurred while adding the person.')
@@ -161,10 +165,10 @@ const loadAvailablePersons = async () => {
     await personsStore.fetchPersons()
 
     // Filter persons who are not already on this team
-    const currentTeamMemberIds = membershipStore.teamMemberships.map(m => m.person.id)
+    const currentTeamMemberIds = membershipStore.teamMemberships.map((m) => m.person.id)
 
-    availablePersons.value = personsStore.persons.filter(person =>
-      !currentTeamMemberIds.includes(person.id)
+    availablePersons.value = personsStore.persons.filter(
+      (person) => !currentTeamMemberIds.includes(person.id),
     )
   } catch (error) {
     console.error('Failed to load available persons:', error)
@@ -192,7 +196,12 @@ onMounted(() => {
         <h2>Add Person to {{ teamName }}</h2>
         <button @click="closeModal" class="close-btn">
           <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
       </div>
@@ -220,7 +229,6 @@ onMounted(() => {
       <!-- Modal Body -->
       <div class="modal-body">
         <form @submit.prevent="submitForm">
-
           <!-- Create New Person Mode -->
           <div v-if="mode === 'create'" class="form-section">
             <h3>Person Details</h3>
@@ -291,9 +299,15 @@ onMounted(() => {
             <div class="form-group">
               <label for="side">Side Preference</label>
               <select id="side" v-model="personForm.side" class="form-select">
-                <option :value="PERSON_SIDES.BOTH">{{ PERSON_SIDE_LABELS[PERSON_SIDES.BOTH] }}</option>
-                <option :value="PERSON_SIDES.LEFT">{{ PERSON_SIDE_LABELS[PERSON_SIDES.LEFT] }}</option>
-                <option :value="PERSON_SIDES.RIGHT">{{ PERSON_SIDE_LABELS[PERSON_SIDES.RIGHT] }}</option>
+                <option :value="PERSON_SIDES.BOTH">
+                  {{ PERSON_SIDE_LABELS[PERSON_SIDES.BOTH] }}
+                </option>
+                <option :value="PERSON_SIDES.LEFT">
+                  {{ PERSON_SIDE_LABELS[PERSON_SIDES.LEFT] }}
+                </option>
+                <option :value="PERSON_SIDES.RIGHT">
+                  {{ PERSON_SIDE_LABELS[PERSON_SIDES.RIGHT] }}
+                </option>
               </select>
             </div>
           </div>
@@ -322,7 +336,13 @@ onMounted(() => {
               </div>
 
               <div v-else-if="filteredPersons.length === 0" class="empty-state">
-                <p>{{ searchQuery ? 'No people found matching your search.' : 'No available people to add.' }}</p>
+                <p>
+                  {{
+                    searchQuery
+                      ? 'No people found matching your search.'
+                      : 'No available people to add.'
+                  }}
+                </p>
               </div>
 
               <div v-else class="person-list">
@@ -356,8 +376,14 @@ onMounted(() => {
                   </div>
 
                   <div class="selection-indicator">
-                    <svg v-if="selectedPersonId == person.id" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                    <svg
+                      v-if="selectedPersonId == person.id"
+                      width="20"
+                      height="20"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
                     </svg>
                   </div>
                 </div>
@@ -373,25 +399,28 @@ onMounted(() => {
             <div class="form-group">
               <label for="role">Role</label>
               <select id="role" v-model="membershipForm.role" class="form-select">
-                <option :value="MEMBERSHIP_ROLES.PLAYER">{{ MEMBERSHIP_ROLE_LABELS[MEMBERSHIP_ROLES.PLAYER] }}</option>
-                <option :value="MEMBERSHIP_ROLES.CAPTAIN">{{ MEMBERSHIP_ROLE_LABELS[MEMBERSHIP_ROLES.CAPTAIN] }}</option>
-                <option :value="MEMBERSHIP_ROLES.COACH">{{ MEMBERSHIP_ROLE_LABELS[MEMBERSHIP_ROLES.COACH] }}</option>
-                <option :value="MEMBERSHIP_ROLES.MANAGER">{{ MEMBERSHIP_ROLE_LABELS[MEMBERSHIP_ROLES.MANAGER] }}</option>
+                <option :value="MEMBERSHIP_ROLES.PLAYER">
+                  {{ MEMBERSHIP_ROLE_LABELS[MEMBERSHIP_ROLES.PLAYER] }}
+                </option>
+                <option :value="MEMBERSHIP_ROLES.CAPTAIN">
+                  {{ MEMBERSHIP_ROLE_LABELS[MEMBERSHIP_ROLES.CAPTAIN] }}
+                </option>
+                <option :value="MEMBERSHIP_ROLES.COACH">
+                  {{ MEMBERSHIP_ROLE_LABELS[MEMBERSHIP_ROLES.COACH] }}
+                </option>
+                <option :value="MEMBERSHIP_ROLES.MANAGER">
+                  {{ MEMBERSHIP_ROLE_LABELS[MEMBERSHIP_ROLES.MANAGER] }}
+                </option>
               </select>
             </div>
           </div>
-
         </form>
       </div>
 
       <!-- Modal Footer -->
       <div class="modal-footer">
         <button @click="closeModal" class="btn-secondary">Cancel</button>
-        <button
-          @click="submitForm"
-          :disabled="!isFormValid || isSubmitting"
-          class="btn-primary"
-        >
+        <button @click="submitForm" :disabled="!isFormValid || isSubmitting" class="btn-primary">
           <span v-if="isSubmitting">Adding...</span>
           <span v-else>Add to Team</span>
         </button>

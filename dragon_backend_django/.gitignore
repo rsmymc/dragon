@@ -18,7 +18,7 @@ pytestcache/
 .pytest_cache/
 
 # Virtual environments
-.env
+.env.dev
 .env.*
 .venv/
 venv/

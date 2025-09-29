@@ -38,7 +38,7 @@ export async function fetchLocationsByTeam(teamId, options = {}) {
   try {
     const params = {
       team: teamId,
-      ...options
+      ...options,
     }
 
     const response = await api.get(`${LOCATION_URL}/`, { params })
@@ -121,5 +121,5 @@ export default {
   createLocation,
   updateLocation,
   patchLocation,
-  deleteLocation
+  deleteLocation,
 }

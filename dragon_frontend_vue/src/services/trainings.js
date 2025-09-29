@@ -38,7 +38,7 @@ export async function fetchTrainingsByTeam(teamId, options = {}) {
   try {
     const params = {
       team: teamId,
-      ...options
+      ...options,
     }
 
     const response = await api.get(`${TRAINING_URL}/`, { params })
@@ -57,7 +57,7 @@ export async function fetchTrainingsByLocation(locationId, options = {}) {
   try {
     const params = {
       location: locationId,
-      ...options
+      ...options,
     }
 
     const response = await api.get(`${TRAINING_URL}/`, { params })
@@ -77,7 +77,7 @@ export async function fetchTrainingsByDateRange(startDate, endDate, options = {}
     const params = {
       start_date: startDate,
       end_date: endDate,
-      ...options
+      ...options,
     }
 
     const response = await api.get(`${TRAINING_URL}/`, { params })
@@ -161,5 +161,5 @@ export default {
   createTraining,
   updateTraining,
   patchTraining,
-  deleteTraining
+  deleteTraining,
 }

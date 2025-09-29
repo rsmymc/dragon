@@ -8,11 +8,20 @@ echo "Running database migrations..."
 python manage.py migrate --noinput
 
 echo "Loading initial data fixtures..."
-if [ -f "/app/api/fixtures/initial_data.json" ]; then
-    python manage.py loaddata initial_data.json
-    echo "Initial data loaded"
+if [ "$DEBUG" = "True" ]; then
+  if [ -f "/app/api/fixtures/initial_data.json" ]; then
+      python manage.py loaddata initial_data.json
+      echo "Initial data loaded"
+  else
+      echo "No fixture file found"
+  fi
 else
-    echo "No fixture file found"
+   if [ -f "/app/api/fixtures/initial_data_prod.json" ]; then
+        python manage.py loaddata initial_data_prod.json
+        echo "Initial data loaded"
+    else
+        echo "No fixture file found"
+    fi
 fi
 
 echo "Creating default superuser..."
@@ -25,5 +34,10 @@ else:
     print('Superuser already exists')
 EOF
 
-echo "Starting Django development server..."
-python manage.py runserver 0.0.0.0:8000
+if [ "$DEBUG" = "True" ]; then
+    echo "Starting Django development server with hot reload..."
+    python manage.py runserver 0.0.0.0:8000
+else
+    echo "Starting Gunicorn..."
+    gunicorn server.wsgi:application --bind 0.0.0.0:8000
+fi

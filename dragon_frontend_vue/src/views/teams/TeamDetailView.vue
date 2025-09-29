@@ -83,14 +83,14 @@ const formatDate = (dateString) => {
   return date.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
-    day: 'numeric'
+    day: 'numeric',
   })
 }
 
 const getInitials = (name) => {
   return name
     .split(' ')
-    .map(word => word[0])
+    .map((word) => word[0])
     .join('')
     .toUpperCase()
     .slice(0, 2)
@@ -102,7 +102,9 @@ const editPerson = (membership) => {
 }
 
 const removePerson = async (membership) => {
-  const confirmed = confirm(`Remove "${membership.person.name}" from the team?\n\nThis action cannot be undone.`)
+  const confirmed = confirm(
+    `Remove "${membership.person.name}" from the team?\n\nThis action cannot be undone.`,
+  )
   if (confirmed) {
     try {
       const result = await membershipStore.removePersonFromTeam(team.value.id, membership.person.id)
@@ -179,7 +181,12 @@ onUnmounted(() => {
         <div class="header-content">
           <router-link to="/teams" class="back-link">
             <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
             Back to Teams
           </router-link>
@@ -196,7 +203,9 @@ onUnmounted(() => {
             <div class="team-stats">
               <div class="stat-item">
                 <span class="stat-label">Members</span>
-                <span class="stat-value">{{ currentMemberCount }}/{{ team.max_members || 22 }}</span>
+                <span class="stat-value"
+                  >{{ currentMemberCount }}/{{ team.max_members || 22 }}</span
+                >
               </div>
               <div v-if="team.city" class="stat-item">
                 <span class="stat-label">Location</span>
@@ -215,8 +224,8 @@ onUnmounted(() => {
                   class="progress-fill"
                   :style="{ width: `${memberProgress}%` }"
                   :class="{
-                    'full': isTeamFull,
-                    'almost-full': isAlmostFull
+                    full: isTeamFull,
+                    'almost-full': isAlmostFull,
                   }"
                 ></div>
               </div>
@@ -228,23 +237,34 @@ onUnmounted(() => {
           <div class="team-detail-actions">
             <router-link :to="`/teams/${team.id}/edit?from=detail`" class="btn-edit">
               <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                />
               </svg>
               Edit Team
             </router-link>
             <router-link :to="`/teams/${team.id}/trainings`" class="btn-trainings">
               <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
               View Trainings
             </router-link>
-            <button
-              @click="showAddPerson = true"
-              class="btn-primary"
-              :disabled="isTeamFull"
-            >
+            <button @click="showAddPerson = true" class="btn-primary" :disabled="isTeamFull">
               <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
               </svg>
               Add Person
             </button>
@@ -262,7 +282,12 @@ onUnmounted(() => {
               <!-- Search -->
               <div class="search-box">
                 <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
                 </svg>
                 <input
                   :value="membershipStore.searchQuery"
@@ -274,7 +299,11 @@ onUnmounted(() => {
               </div>
 
               <!-- Filter by Role -->
-              <select :value="membershipStore.filters.role" @change="handleRoleFilterChange" class="role-filter">
+              <select
+                :value="membershipStore.filters.role"
+                @change="handleRoleFilterChange"
+                class="role-filter"
+              >
                 <option value="">All Roles</option>
                 <option value="1">Player</option>
                 <option value="2">Captain</option>
@@ -301,11 +330,18 @@ onUnmounted(() => {
           <!-- Empty Members -->
           <div v-else-if="filteredMemberships.length === 0" class="empty-members">
             <div class="empty-icon">👥</div>
-            <h3>{{ membershipStore.searchQuery || membershipStore.filters.role ? 'No members found' : 'No members yet' }}</h3>
+            <h3>
+              {{
+                membershipStore.searchQuery || membershipStore.filters.role
+                  ? 'No members found'
+                  : 'No members yet'
+              }}
+            </h3>
             <p>
-              {{ membershipStore.searchQuery || membershipStore.filters.role
-              ? 'Try adjusting your search or filter'
-              : 'Start building your dragon boat team by adding members'
+              {{
+                membershipStore.searchQuery || membershipStore.filters.role
+                  ? 'Try adjusting your search or filter'
+                  : 'Start building your dragon boat team by adding members'
               }}
             </p>
             <button
@@ -319,11 +355,7 @@ onUnmounted(() => {
 
           <!-- Members Grid -->
           <div v-else class="members-grid">
-            <div
-              v-for="membership in filteredMemberships"
-              :key="membership.id"
-              class="member-card"
-            >
+            <div v-for="membership in filteredMemberships" :key="membership.id" class="member-card">
               <!-- Member Avatar/Initial -->
               <div class="member-avatar">
                 <img
@@ -351,9 +383,7 @@ onUnmounted(() => {
                   <span v-if="membership.person.weight" class="detail-item">
                     ⚖️ {{ membership.person.weight }}kg
                   </span>
-                  <span class="detail-item">
-                    🧭 {{ getSideLabel(membership.person.side) }}
-                  </span>
+                  <span class="detail-item"> 🧭 {{ getSideLabel(membership.person.side) }} </span>
                   <span v-if="membership.joined_at" class="detail-item">
                     📅 Joined {{ formatDate(membership.joined_at) }}
                   </span>
@@ -368,7 +398,12 @@ onUnmounted(() => {
                   title="Edit Person"
                 >
                   <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                    />
                   </svg>
                 </button>
                 <button
@@ -377,7 +412,12 @@ onUnmounted(() => {
                   title="Remove Person"
                 >
                   <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
                   </svg>
                 </button>
               </div>
@@ -385,7 +425,6 @@ onUnmounted(() => {
           </div>
         </div>
       </div>
-
     </div>
 
     <!-- Add Person Modal -->

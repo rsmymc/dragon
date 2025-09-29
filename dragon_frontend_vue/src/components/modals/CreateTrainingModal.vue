@@ -8,12 +8,12 @@ import { useTrainingsStore } from '@/stores/trainings.js'
 const props = defineProps({
   teamId: {
     type: String,
-    default: null
+    default: null,
   },
   teamName: {
     type: String,
-    default: ''
-  }
+    default: '',
+  },
 })
 
 // Emits
@@ -46,14 +46,14 @@ const formData = reactive({
   teamId: props.teamId || '',
   locationId: '',
   date: '',
-  time: '09:00'
+  time: '09:00',
 })
 
 const errors = reactive({
   teamId: '',
   locationId: '',
   date: '',
-  time: ''
+  time: '',
 })
 
 // Computed
@@ -67,30 +67,29 @@ const selectedTeamId = computed(() => {
 
 const filteredLocations = computed(() => {
   if (!selectedTeamId.value) return []
-  return locations.value.filter(location => location.team?.id === selectedTeamId.value)
+  return locations.value.filter((location) => location.team?.id === selectedTeamId.value)
 })
 
 const isLocationFormValid = computed(() => {
-  return newLocationName.value.trim() &&
-    newLocationLat.value &&
-    newLocationLon.value
+  return newLocationName.value.trim() && newLocationLat.value && newLocationLon.value
 })
 
 const isFormValid = computed(() => {
-  const valid = selectedTeamId.value &&
+  const valid =
+    selectedTeamId.value &&
     formData.locationId &&
     formData.date &&
     formData.time &&
-    !Object.values(errors).some(error => error)
+    !Object.values(errors).some((error) => error)
 
   console.log('Form validation debug:', {
     selectedTeamId: selectedTeamId.value,
     locationId: formData.locationId,
     date: formData.date,
     time: formData.time,
-    hasErrors: Object.values(errors).some(error => error),
+    hasErrors: Object.values(errors).some((error) => error),
     errors: errors,
-    isValid: valid
+    isValid: valid,
   })
 
   return valid
@@ -101,7 +100,7 @@ const validateForm = () => {
   console.log('validateForm called')
 
   // Reset errors
-  Object.keys(errors).forEach(key => errors[key] = '')
+  Object.keys(errors).forEach((key) => (errors[key] = ''))
 
   let isValid = true
 
@@ -137,15 +136,15 @@ const loadInitialData = async () => {
     // Load teams if not pre-selected
     if (!props.teamId) {
       teamsLoading.value = true
-      teams.value = await teamsStore.fetchTeams() || []
+      teams.value = (await teamsStore.fetchTeams()) || []
     }
 
     // Load locations
     locationsLoading.value = true
     if (selectedTeamId.value) {
-      locations.value = await locationsStore.fetchLocationsByTeam(selectedTeamId.value) || []
+      locations.value = (await locationsStore.fetchLocationsByTeam(selectedTeamId.value)) || []
     } else {
-      locations.value = await locationsStore.fetchLocations() || []
+      locations.value = (await locationsStore.fetchLocations()) || []
     }
 
     // Set default date to today
@@ -157,7 +156,6 @@ const loadInitialData = async () => {
     if (filteredLocations.value.length === 1) {
       formData.locationId = filteredLocations.value[0].id
     }
-
   } catch (error) {
     console.error('Error loading initial data:', error)
     submitError.value = 'Failed to load teams and locations'
@@ -228,7 +226,7 @@ const createLocation = async () => {
       name: newLocationName.value.trim(),
       team: selectedTeamId.value,
       lat: parseFloat(newLocationLat.value),
-      lon: parseFloat(newLocationLon.value)
+      lon: parseFloat(newLocationLon.value),
     }
 
     console.log('Location data to create:', locationData)
@@ -243,7 +241,6 @@ const createLocation = async () => {
 
     // Reset form
     cancelCreateLocation()
-
   } catch (error) {
     console.error('Error creating location:', error)
     newLocationError.value = error.message || 'Failed to create location'
@@ -292,7 +289,7 @@ const handleSubmit = async () => {
     const trainingData = {
       team: selectedTeamId.value,
       location: formData.locationId,
-      start_at: startAt.toISOString()
+      start_at: startAt.toISOString(),
     }
 
     console.log('Training data to submit:', trainingData)
@@ -301,7 +298,6 @@ const handleSubmit = async () => {
 
     emit('success', newTraining)
     handleClose()
-
   } catch (error) {
     console.error('Error creating training:', error)
     submitError.value = error.message || 'Failed to create training. Please try again.'
@@ -322,21 +318,33 @@ const handleOverlayClick = () => {
 }
 
 // Watchers
-watch(() => formData.teamId, () => {
-  if (errors.teamId) validateForm()
-})
+watch(
+  () => formData.teamId,
+  () => {
+    if (errors.teamId) validateForm()
+  },
+)
 
-watch(() => formData.locationId, () => {
-  if (errors.locationId) validateForm()
-})
+watch(
+  () => formData.locationId,
+  () => {
+    if (errors.locationId) validateForm()
+  },
+)
 
-watch(() => formData.date, () => {
-  if (errors.date) validateForm()
-})
+watch(
+  () => formData.date,
+  () => {
+    if (errors.date) validateForm()
+  },
+)
 
-watch(() => formData.time, () => {
-  if (errors.time) validateForm()
-})
+watch(
+  () => formData.time,
+  () => {
+    if (errors.time) validateForm()
+  },
+)
 
 // Debug watcher for isSubmitting
 watch(isSubmitting, (newVal, oldVal) => {
@@ -355,9 +363,7 @@ onMounted(() => {
       <!-- Modal Header -->
       <div class="modal-header">
         <h3>Create Training Session</h3>
-        <button @click="handleClose" class="modal-close" :disabled="isSubmitting">
-          ×
-        </button>
+        <button @click="handleClose" class="modal-close" :disabled="isSubmitting">×</button>
       </div>
 
       <!-- Modal Body -->
@@ -372,7 +378,7 @@ onMounted(() => {
               id="team-select"
               v-model="formData.teamId"
               class="form-input"
-              :class="{ 'error': errors.teamId }"
+              :class="{ error: errors.teamId }"
               :disabled="isSubmitting || teamsLoading"
               @change="onTeamChange"
             >
@@ -393,11 +399,17 @@ onMounted(() => {
               id="location-select"
               v-model="formData.locationId"
               class="form-input"
-              :class="{ 'error': errors.locationId }"
+              :class="{ error: errors.locationId }"
               :disabled="isSubmitting || !selectedTeamId || locationsLoading"
             >
               <option value="">
-                {{ !selectedTeamId ? 'Select a team first...' : locationsLoading ? 'Loading locations...' : 'Choose a location...' }}
+                {{
+                  !selectedTeamId
+                    ? 'Select a team first...'
+                    : locationsLoading
+                      ? 'Loading locations...'
+                      : 'Choose a location...'
+                }}
               </option>
               <option v-for="location in filteredLocations" :key="location.id" :value="location.id">
                 {{ location.name }}
@@ -406,7 +418,10 @@ onMounted(() => {
             <div v-if="errors.locationId" class="field-error">{{ errors.locationId }}</div>
 
             <!-- No Locations / Create Location Section -->
-            <div v-if="!filteredLocations.length && selectedTeamId && !locationsLoading" class="no-locations-section">
+            <div
+              v-if="!filteredLocations.length && selectedTeamId && !locationsLoading"
+              class="no-locations-section"
+            >
               <div class="field-help">No locations found for this team.</div>
               <button
                 type="button"
@@ -421,14 +436,12 @@ onMounted(() => {
             <!-- Quick Location Creation Form -->
             <div v-if="showCreateLocation" class="create-location-form">
               <div class="form-group">
-                <label class="form-label">
-                  Location Name <span class="required">*</span>
-                </label>
+                <label class="form-label"> Location Name <span class="required">*</span> </label>
                 <input
                   v-model="newLocationName"
                   type="text"
                   class="form-input"
-                  :class="{ 'error': newLocationError }"
+                  :class="{ error: newLocationError }"
                   placeholder="Enter location name..."
                   :disabled="isCreatingLocation"
                 />
@@ -437,35 +450,35 @@ onMounted(() => {
 
               <div class="form-row">
                 <div class="form-group">
-                  <label class="form-label">
-                    Latitude <span class="required">*</span>
-                  </label>
+                  <label class="form-label"> Latitude <span class="required">*</span> </label>
                   <input
                     v-model="newLocationLat"
                     type="number"
                     step="any"
                     class="form-input"
-                    :class="{ 'error': newLocationLatError }"
+                    :class="{ error: newLocationLatError }"
                     placeholder="e.g. 40.7128"
                     :disabled="isCreatingLocation"
                   />
-                  <div v-if="newLocationLatError" class="field-error">{{ newLocationLatError }}</div>
+                  <div v-if="newLocationLatError" class="field-error">
+                    {{ newLocationLatError }}
+                  </div>
                 </div>
 
                 <div class="form-group">
-                  <label class="form-label">
-                    Longitude <span class="required">*</span>
-                  </label>
+                  <label class="form-label"> Longitude <span class="required">*</span> </label>
                   <input
                     v-model="newLocationLon"
                     type="number"
                     step="any"
                     class="form-input"
-                    :class="{ 'error': newLocationLonError }"
+                    :class="{ error: newLocationLonError }"
                     placeholder="e.g. -74.0060"
                     :disabled="isCreatingLocation"
                   />
-                  <div v-if="newLocationLonError" class="field-error">{{ newLocationLonError }}</div>
+                  <div v-if="newLocationLonError" class="field-error">
+                    {{ newLocationLonError }}
+                  </div>
                 </div>
               </div>
 
@@ -494,15 +507,13 @@ onMounted(() => {
           <!-- Date and Time -->
           <div class="form-row">
             <div class="form-group">
-              <label for="date" class="form-label">
-                Date <span class="required">*</span>
-              </label>
+              <label for="date" class="form-label"> Date <span class="required">*</span> </label>
               <input
                 id="date"
                 v-model="formData.date"
                 type="date"
                 class="form-input"
-                :class="{ 'error': errors.date }"
+                :class="{ error: errors.date }"
                 :min="todayDate"
                 :disabled="isSubmitting"
               />
@@ -518,7 +529,7 @@ onMounted(() => {
                 v-model="formData.time"
                 type="time"
                 class="form-input"
-                :class="{ 'error': errors.time }"
+                :class="{ error: errors.time }"
                 :disabled="isSubmitting"
               />
               <div v-if="errors.time" class="field-error">{{ errors.time }}</div>
@@ -534,12 +545,7 @@ onMounted(() => {
 
       <!-- Modal Footer -->
       <div class="modal-footer">
-        <button
-          type="button"
-          @click="handleClose"
-          class="btn-cancel"
-          :disabled="isSubmitting"
-        >
+        <button type="button" @click="handleClose" class="btn-cancel" :disabled="isSubmitting">
           Cancel
         </button>
         <button
@@ -734,7 +740,8 @@ onMounted(() => {
   margin-top: 0.75rem;
 }
 
-.btn-cancel-small, .btn-create-small {
+.btn-cancel-small,
+.btn-create-small {
   padding: 0.5rem 1rem;
   border-radius: 4px;
   font-size: 0.875rem;
@@ -788,7 +795,8 @@ onMounted(() => {
   justify-content: flex-end;
 }
 
-.btn-cancel, .btn-primary {
+.btn-cancel,
+.btn-primary {
   padding: 0.75rem 1.5rem;
   border-radius: 6px;
   font-size: 1rem;
@@ -843,8 +851,12 @@ onMounted(() => {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Responsive Design */
@@ -865,7 +877,8 @@ onMounted(() => {
     flex-direction: column-reverse;
   }
 
-  .btn-cancel, .btn-primary {
+  .btn-cancel,
+  .btn-primary {
     width: 100%;
   }
 }

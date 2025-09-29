@@ -21,7 +21,12 @@
         <div class="header-content">
           <router-link :to="`/teams/${training.team.id}/trainings`" class="back-link">
             <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
             Back to Trainings
           </router-link>
@@ -33,7 +38,9 @@
                 <span v-if="isPastTraining" class="status-badge past">Completed</span>
                 <span v-else-if="isToday" class="status-badge today">Today</span>
                 <span v-else-if="isTomorrow" class="status-badge soon">Tomorrow</span>
-                <span v-if="lineup?.state === 2" class="status-badge published">Lineup Published</span>
+                <span v-if="lineup?.state === 2" class="status-badge published"
+                  >Lineup Published</span
+                >
                 <span v-else-if="lineup?.state === 1" class="status-badge draft">Draft Lineup</span>
                 <span v-if="hasUnsavedChanges" class="status-badge unsaved">Unsaved Changes</span>
               </div>
@@ -64,7 +71,12 @@
               :disabled="isUpdatingLineup"
             >
               <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
               Discard Changes
             </button>
@@ -75,7 +87,12 @@
               :disabled="isUpdatingLineup"
             >
               <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                />
               </svg>
               {{ hasUnsavedChanges ? 'Save & Publish Lineup' : 'Publish Lineup' }}
             </button>
@@ -86,7 +103,12 @@
               :disabled="isUpdatingLineup"
             >
               <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5"/>
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5"
+                />
               </svg>
               Edit Lineup
             </button>
@@ -114,7 +136,11 @@
 
           <!-- Drag and Drop Instructions -->
           <div v-if="!lineup || assignedSeatsCount === 0" class="instructions">
-            <p><strong>Drag & Drop:</strong> Drag team members from the left panel into boat seats on the right to create your lineup. You can also drag between seats to rearrange or swap positions. Changes are saved locally until you publish.</p>
+            <p>
+              <strong>Drag & Drop:</strong> Drag team members from the left panel into boat seats on
+              the right to create your lineup. You can also drag between seats to rearrange or swap
+              positions. Changes are saved locally until you publish.
+            </p>
           </div>
 
           <!-- Unsaved Changes Warning -->
@@ -122,7 +148,10 @@
             <div class="warning-icon">💾</div>
             <div class="warning-content">
               <p><strong>You have unsaved changes!</strong></p>
-              <p>Your lineup changes are saved locally. Click "Save & Publish Lineup" to make them permanent.</p>
+              <p>
+                Your lineup changes are saved locally. Click "Save & Publish Lineup" to make them
+                permanent.
+              </p>
             </div>
           </div>
 
@@ -145,7 +174,7 @@
                     draggable="true"
                     @dragstart="handleDragStart($event, member)"
                     @dragend="handleDragEnd"
-                    :class="{ 'dragging': dragActive && draggedMember?.id === member.id }"
+                    :class="{ dragging: dragActive && draggedMember?.id === member.id }"
                   >
                     <div class="member-avatar">
                       <img
@@ -164,7 +193,10 @@
                       <div class="member-stats">
                         <span v-if="member.height" class="stat-item">{{ member.height }}cm</span>
                         <span v-if="member.weight" class="stat-item">{{ member.weight }}kg</span>
-                        <span class="stat-item preferred-side" :class="`side-${member.side?.toLowerCase()}`">
+                        <span
+                          class="stat-item preferred-side"
+                          :class="`side-${member.side?.toLowerCase()}`"
+                        >
                           {{ getSideLabel(member.side) }}
                         </span>
                       </div>
@@ -220,15 +252,20 @@
                   <div class="boat-body-section">
                     <!-- Seat Rows -->
                     <div class="seat-rows">
-                      <div v-for="seatNum in maxSeatNumber" :key="seatNum" class="seat-row" :data-row="seatNum">
+                      <div
+                        v-for="seatNum in maxSeatNumber"
+                        :key="seatNum"
+                        class="seat-row"
+                        :data-row="seatNum"
+                      >
                         <!-- Left Seat (Port) -->
                         <div
                           class="boat-seat port-seat"
                           :class="{
-                            'occupied': getSeatPerson('L', seatNum),
+                            occupied: getSeatPerson('L', seatNum),
                             'drop-target': dragActive,
-                            'highlighted': highlightedSeat === `L${seatNum}`,
-                            'local-change': hasLocalSeatChange('L', seatNum)
+                            highlighted: highlightedSeat === `L${seatNum}`,
+                            'local-change': hasLocalSeatChange('L', seatNum),
                           }"
                           @dragover.prevent
                           @dragenter.prevent="handleDragEnter"
@@ -239,9 +276,11 @@
                             v-if="getSeatPerson('L', seatNum)"
                             class="seat-person"
                             draggable="true"
-                            @dragstart="handleSeatDragStart($event, getSeatPerson('L', seatNum), 'L', seatNum)"
+                            @dragstart="
+                              handleSeatDragStart($event, getSeatPerson('L', seatNum), 'L', seatNum)
+                            "
                             @dragend="handleDragEnd"
-                            :class="{ 'dragging': dragActive && draggedFromSeat === `L${seatNum}` }"
+                            :class="{ dragging: dragActive && draggedFromSeat === `L${seatNum}` }"
                           >
                             <div class="person-avatar">
                               {{ getInitials(getSeatPerson('L', seatNum).name) }}
@@ -272,10 +311,10 @@
                         <div
                           class="boat-seat starboard-seat"
                           :class="{
-                            'occupied': getSeatPerson('R', seatNum),
+                            occupied: getSeatPerson('R', seatNum),
                             'drop-target': dragActive,
-                            'highlighted': highlightedSeat === `R${seatNum}`,
-                            'local-change': hasLocalSeatChange('R', seatNum)
+                            highlighted: highlightedSeat === `R${seatNum}`,
+                            'local-change': hasLocalSeatChange('R', seatNum),
                           }"
                           @dragover.prevent
                           @dragenter.prevent="handleDragEnter"
@@ -286,9 +325,11 @@
                             v-if="getSeatPerson('R', seatNum)"
                             class="seat-person"
                             draggable="true"
-                            @dragstart="handleSeatDragStart($event, getSeatPerson('R', seatNum), 'R', seatNum)"
+                            @dragstart="
+                              handleSeatDragStart($event, getSeatPerson('R', seatNum), 'R', seatNum)
+                            "
                             @dragend="handleDragEnd"
-                            :class="{ 'dragging': dragActive && draggedFromSeat === `R${seatNum}` }"
+                            :class="{ dragging: dragActive && draggedFromSeat === `R${seatNum}` }"
                           >
                             <div class="person-avatar">
                               {{ getInitials(getSeatPerson('R', seatNum).name) }}
@@ -386,20 +427,18 @@ const isTomorrow = computed(() => {
 })
 
 const assignedSeatsCount = computed(() => {
-  return localLineupSeats.value.filter(seat => seat.person).length
+  return localLineupSeats.value.filter((seat) => seat.person).length
 })
 
 const availableMembers = computed(() => {
   const assignedPersonIds = localLineupSeats.value
-    .filter(seat => seat.person)
-    .map(seat => seat.person.id)
-  return members.value.filter(member => !assignedPersonIds.includes(member.id))
+    .filter((seat) => seat.person)
+    .map((seat) => seat.person.id)
+  return members.value.filter((member) => !assignedPersonIds.includes(member.id))
 })
 
 const assignedMembers = computed(() => {
-  return localLineupSeats.value
-    .filter(seat => seat.person)
-    .map(seat => seat.person)
+  return localLineupSeats.value.filter((seat) => seat.person).map((seat) => seat.person)
 })
 
 const maxSeatNumber = computed(() => {
@@ -408,14 +447,18 @@ const maxSeatNumber = computed(() => {
     return 8 // Default for dragon boat
   }
 
-  const maxSeat = Math.max(...lineup.value.seats.map(seat => seat.seat_number))
+  const maxSeat = Math.max(...lineup.value.seats.map((seat) => seat.seat_number))
   return Math.max(maxSeat, 8) // Ensure at least 8 rows are shown
 })
 
 // Watch for changes in local seats to detect unsaved changes
-watch(localLineupSeats, (newSeats) => {
-  checkForUnsavedChanges()
-}, { deep: true })
+watch(
+  localLineupSeats,
+  (newSeats) => {
+    checkForUnsavedChanges()
+  },
+  { deep: true },
+)
 
 // Methods
 const loadTraining = async () => {
@@ -429,15 +472,14 @@ const loadTraining = async () => {
     // Load team members
     if (training.value.team?.id) {
       await membershipStore.fetchTeamMemberships(training.value.team.id)
-      members.value = membershipStore.teamMemberships.map(m => ({
+      members.value = membershipStore.teamMemberships.map((m) => ({
         ...m.person,
-        role: m.role
+        role: m.role,
       }))
     }
 
     // Load or create lineup
     await loadLineup()
-
   } catch (err) {
     console.error('Error loading training:', err)
     error.value = err.message || 'Failed to load training details'
@@ -475,36 +517,48 @@ const initializeLocalState = () => {
 
 const checkForUnsavedChanges = () => {
   // Compare current local state with original snapshot
-  const currentState = JSON.stringify(localLineupSeats.value.map(seat => ({
-    side: seat.side,
-    seat_number: seat.seat_number,
-    person_id: seat.person?.id || null
-  })).sort((a, b) => `${a.side}${a.seat_number}`.localeCompare(`${b.side}${b.seat_number}`)))
+  const currentState = JSON.stringify(
+    localLineupSeats.value
+      .map((seat) => ({
+        side: seat.side,
+        seat_number: seat.seat_number,
+        person_id: seat.person?.id || null,
+      }))
+      .sort((a, b) => `${a.side}${a.seat_number}`.localeCompare(`${b.side}${b.seat_number}`)),
+  )
 
-  const originalState = JSON.stringify(originalSeatsSnapshot.value.map(seat => ({
-    side: seat.side,
-    seat_number: seat.seat_number,
-    person_id: seat.person?.id || null
-  })).sort((a, b) => `${a.side}${a.seat_number}`.localeCompare(`${b.side}${b.seat_number}`)))
+  const originalState = JSON.stringify(
+    originalSeatsSnapshot.value
+      .map((seat) => ({
+        side: seat.side,
+        seat_number: seat.seat_number,
+        person_id: seat.person?.id || null,
+      }))
+      .sort((a, b) => `${a.side}${a.seat_number}`.localeCompare(`${b.side}${b.seat_number}`)),
+  )
 
   hasUnsavedChanges.value = currentState !== originalState
 }
 
 const getSeatPerson = (side, seatNumber) => {
-  const seat = localLineupSeats.value.find(s => s.side === side && s.seat_number === seatNumber)
+  const seat = localLineupSeats.value.find((s) => s.side === side && s.seat_number === seatNumber)
   return seat?.person || null
 }
 
 const getSeatPosition = (personId) => {
-  const seat = localLineupSeats.value.find(s => s.person?.id === personId)
+  const seat = localLineupSeats.value.find((s) => s.person?.id === personId)
   return seat ? `${seat.side}${seat.seat_number}` : ''
 }
 
 const hasLocalSeatChange = (side, seatNumber) => {
   if (!hasUnsavedChanges.value) return false
 
-  const currentSeat = localLineupSeats.value.find(s => s.side === side && s.seat_number === seatNumber)
-  const originalSeat = originalSeatsSnapshot.value.find(s => s.side === side && s.seat_number === seatNumber)
+  const currentSeat = localLineupSeats.value.find(
+    (s) => s.side === side && s.seat_number === seatNumber,
+  )
+  const originalSeat = originalSeatsSnapshot.value.find(
+    (s) => s.side === side && s.seat_number === seatNumber,
+  )
 
   const currentPersonId = currentSeat?.person?.id || null
   const originalPersonId = originalSeat?.person?.id || null
@@ -598,39 +652,43 @@ const handleSeatToSeatMove = (dragData, toSide, toSeatNumber) => {
 }
 
 const assignSeatLocally = (side, seatNumber, personId) => {
-  const person = members.value.find(m => m.id === personId)
+  const person = members.value.find((m) => m.id === personId)
   if (!person) return
 
   // Remove person from any existing seat (person can only be in one seat)
-  localLineupSeats.value = localLineupSeats.value.map(seat =>
-    seat.person?.id === personId ? { ...seat, person: null } : seat
+  localLineupSeats.value = localLineupSeats.value.map((seat) =>
+    seat.person?.id === personId ? { ...seat, person: null } : seat,
   )
 
   // Find or create the target seat
-  const existingIndex = localLineupSeats.value.findIndex(s => s.side === side && s.seat_number === seatNumber)
+  const existingIndex = localLineupSeats.value.findIndex(
+    (s) => s.side === side && s.seat_number === seatNumber,
+  )
 
   if (existingIndex >= 0) {
     // Update existing seat
     localLineupSeats.value[existingIndex] = {
       ...localLineupSeats.value[existingIndex],
-      person: person
+      person: person,
     }
   } else {
     // Create new seat assignment
     localLineupSeats.value.push({
       side,
       seat_number: seatNumber,
-      person: person
+      person: person,
     })
   }
 }
 
 const removeSeatAssignment = (side, seatNumber) => {
-  const seatIndex = localLineupSeats.value.findIndex(s => s.side === side && s.seat_number === seatNumber)
+  const seatIndex = localLineupSeats.value.findIndex(
+    (s) => s.side === side && s.seat_number === seatNumber,
+  )
   if (seatIndex >= 0) {
     localLineupSeats.value[seatIndex] = {
       ...localLineupSeats.value[seatIndex],
-      person: null
+      person: null,
     }
   }
 }
@@ -640,9 +698,9 @@ const clearLineup = () => {
   if (!confirmed) return
 
   // Clear all person assignments in local state
-  localLineupSeats.value = localLineupSeats.value.map(seat => ({
+  localLineupSeats.value = localLineupSeats.value.map((seat) => ({
     ...seat,
-    person: null
+    person: null,
   }))
 }
 
@@ -678,7 +736,6 @@ const publishLineup = async () => {
     // Update our snapshots since changes are now saved
     originalSeatsSnapshot.value = JSON.parse(JSON.stringify(localLineupSeats.value))
     hasUnsavedChanges.value = false
-
   } catch (err) {
     console.error('Error publishing lineup:', err)
     alert('Failed to publish lineup. Please try again.')
@@ -704,7 +761,10 @@ const unpublishLineup = async () => {
 const syncLocalChangesToServer = async () => {
   console.log('🔄 Syncing local changes to server...')
   console.log('📋 Lineup ID:', lineup.value?.id)
-  console.log('💺 Local seats to sync:', localLineupSeats.value.filter(seat => seat.person))
+  console.log(
+    '💺 Local seats to sync:',
+    localLineupSeats.value.filter((seat) => seat.person),
+  )
 
   // Clear all existing seat assignments first
   if (lineup.value?.seats?.length > 0) {
@@ -713,10 +773,12 @@ const syncLocalChangesToServer = async () => {
   }
 
   // Then assign all seats that have people
-  const seatsToAssign = localLineupSeats.value.filter(seat => seat.person)
+  const seatsToAssign = localLineupSeats.value.filter((seat) => seat.person)
   console.log('✅ Assigning seats:', seatsToAssign)
 
-  const assignmentPromises = seatsToAssign.map(seat => lineupsStore.assignSeat(lineup.value.id, seat.side, seat.seat_number, seat.person.id))
+  const assignmentPromises = seatsToAssign.map((seat) =>
+    lineupsStore.assignSeat(lineup.value.id, seat.side, seat.seat_number, seat.person.id),
+  )
 
   await Promise.all(assignmentPromises)
 
@@ -733,13 +795,13 @@ const formatTrainingDateTime = (dateString) => {
     day: 'numeric',
     hour: 'numeric',
     minute: '2-digit',
-    hour12: true
+    hour12: true,
   })
 }
 const getInitials = (name) => {
   return name
     .split(' ')
-    .map(word => word[0])
+    .map((word) => word[0])
     .join('')
     .toUpperCase()
     .slice(0, 2)
@@ -766,7 +828,8 @@ onMounted(() => {
 }
 
 /* Loading & Error States */
-.loading-state, .error-state {
+.loading-state,
+.error-state {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -787,8 +850,12 @@ onMounted(() => {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .error-icon {
@@ -829,9 +896,9 @@ onMounted(() => {
   grid-template-rows: auto auto auto;
   gap: 0.5rem 2rem;
   grid-template-areas:
-    "back-link actions"
-    "title-and-badges actions"
-    "stats actions";
+    'back-link actions'
+    'title-and-badges actions'
+    'stats actions';
 }
 .back-link {
   grid-area: back-link;
@@ -914,8 +981,13 @@ onMounted(() => {
 }
 
 @keyframes pulse-orange {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
 }
 
 .training-stats {
@@ -953,7 +1025,8 @@ onMounted(() => {
   min-height: 120px; /* Reserve minimum space for actions */
 }
 
-.btn-publish, .btn-secondary {
+.btn-publish,
+.btn-secondary {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -988,7 +1061,8 @@ onMounted(() => {
   border-color: #ccc;
 }
 
-.btn-publish:disabled, .btn-secondary:disabled {
+.btn-publish:disabled,
+.btn-secondary:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
@@ -1386,7 +1460,8 @@ onMounted(() => {
   max-width: 500px;
 }
 
-.dragon-head-section, .drummer-section {
+.dragon-head-section,
+.drummer-section {
   text-align: center;
 }
 
@@ -1394,7 +1469,8 @@ onMounted(() => {
   font-size: 2rem;
 }
 
-.head-label, .drummer-label {
+.head-label,
+.drummer-label {
   font-weight: 600;
   color: #123157;
   font-size: 0.9rem;
@@ -1500,8 +1576,13 @@ onMounted(() => {
 }
 
 @keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
 }
 
 .seat-person {
@@ -1675,10 +1756,10 @@ onMounted(() => {
   .header-content {
     grid-template-columns: 1fr;
     grid-template-areas:
-      "back-link"
-      "title-and-badges"
-      "stats"
-      "actions";
+      'back-link'
+      'title-and-badges'
+      'stats'
+      'actions';
     gap: 1.5rem;
   }
 
@@ -1738,7 +1819,8 @@ onMounted(() => {
     font-size: 1rem;
   }
 
-  .dragon-head, .drummer-seat {
+  .dragon-head,
+  .drummer-seat {
     font-size: 2rem;
   }
 }

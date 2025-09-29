@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTeamsStore } from '@/stores/teams.js'
-import '@/assets/styles/create-team.css';
+import '@/assets/styles/create-team.css'
 
 const router = useRouter()
 const teamsStore = useTeamsStore()
@@ -11,7 +11,7 @@ const teamsStore = useTeamsStore()
 const formData = ref({
   name: '',
   city: '',
-  max_members: 22
+  max_members: 22,
 })
 
 // Form validation and UI state
@@ -85,7 +85,7 @@ const resetForm = () => {
   formData.value = {
     name: '',
     city: '',
-    max_members: 22
+    max_members: 22,
   }
   errors.value = {}
   showSuccess.value = false
@@ -93,9 +93,11 @@ const resetForm = () => {
 
 // Computed validation
 const isFormValid = computed(() => {
-  return formData.value.name.trim() &&
+  return (
+    formData.value.name.trim() &&
     formData.value.max_members > 0 &&
     Object.keys(errors.value).length === 0
+  )
 })
 </script>
 
@@ -106,7 +108,12 @@ const isFormValid = computed(() => {
       <div class="header-left">
         <button @click="handleCancel" class="back-button">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M15 19l-7-7 7-7"
+            />
           </svg>
           Back to Teams
         </button>
@@ -120,7 +127,12 @@ const isFormValid = computed(() => {
     <!-- Success Message -->
     <div v-if="showSuccess" class="success-banner">
       <svg class="success-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
       </svg>
       <div class="success-content">
         <h3>Team Created Successfully!</h3>
@@ -131,7 +143,6 @@ const isFormValid = computed(() => {
     <!-- Create Team Form -->
     <div class="form-container">
       <form @submit.prevent="handleSubmit" class="team-form">
-
         <!-- Team Information Section -->
         <div class="form-section">
           <h2 class="section-title">Team Information</h2>
@@ -149,7 +160,7 @@ const isFormValid = computed(() => {
               @blur="validateForm"
               type="text"
               class="form-input"
-              :class="{ 'error': errors.name }"
+              :class="{ error: errors.name }"
               placeholder="e.g., Dragon Warriors"
               maxlength="80"
               required
@@ -166,7 +177,7 @@ const isFormValid = computed(() => {
               @input="clearError('city')"
               type="text"
               class="form-input"
-              :class="{ 'error': errors.city }"
+              :class="{ error: errors.city }"
               placeholder="e.g., San Francisco"
               maxlength="80"
             />
@@ -187,7 +198,7 @@ const isFormValid = computed(() => {
               @blur="validateForm"
               type="number"
               class="form-input number-input"
-              :class="{ 'error': errors.max_members }"
+              :class="{ error: errors.max_members }"
               min="1"
               max="50"
               required
@@ -199,33 +210,30 @@ const isFormValid = computed(() => {
 
         <!-- Form Actions -->
         <div class="form-actions">
-          <button
-            type="button"
-            @click="handleCancel"
-            class="btn-secondary"
-            :disabled="isLoading"
-          >
+          <button type="button" @click="handleCancel" class="btn-secondary" :disabled="isLoading">
             Cancel
           </button>
 
           <div class="action-group">
-            <button
-              type="button"
-              @click="resetForm"
-              class="btn-outline"
-              :disabled="isLoading"
-            >
+            <button type="button" @click="resetForm" class="btn-outline" :disabled="isLoading">
               Reset Form
             </button>
 
-            <button
-              type="submit"
-              class="btn-primary"
-              :disabled="!isFormValid || isLoading"
-            >
+            <button type="submit" class="btn-primary" :disabled="!isFormValid || isLoading">
               <svg v-if="isLoading" class="loading-spinner" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                ></circle>
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
               </svg>
               <span>{{ isLoading ? 'Creating Team...' : 'Create Team' }}</span>
             </button>

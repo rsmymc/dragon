@@ -3,25 +3,24 @@ import {
   fetchMembershipsByTeam,
   createMembership,
   updateMembership,
-  deleteMembership
+  deleteMembership,
 } from '@/services/membership'
 
 export const useMembershipStore = defineStore('membership', {
-
   state: () => ({
-    memberships: [],         // All memberships
-    teamMemberships: [],     // Memberships for current team
+    memberships: [], // All memberships
+    teamMemberships: [], // Memberships for current team
     currentMembership: null, // Currently selected membership
-    isLoading: false,        // Loading state
-    error: null,             // Error messages
+    isLoading: false, // Loading state
+    error: null, // Error messages
 
     // Filters and search
     searchQuery: '',
     filters: {
-      role: '',             // Filter by role: Player, Captain, Coach, Manager
-      team: '',             // Filter by team
-      sortBy: 'name'        // Sort by: name, role
-    }
+      role: '', // Filter by role: Player, Captain, Coach, Manager
+      team: '', // Filter by team
+      sortBy: 'name', // Sort by: name, role
+    },
   }),
 
   getters: {
@@ -32,9 +31,10 @@ export const useMembershipStore = defineStore('membership', {
       // Apply search filter (search person name/phone)
       if (state.searchQuery) {
         const query = state.searchQuery.toLowerCase()
-        filtered = filtered.filter(membership =>
-          membership.person.name?.toLowerCase().includes(query) ||
-          (membership.person.phone && membership.person.phone.includes(query))
+        filtered = filtered.filter(
+          (membership) =>
+            membership.person.name?.toLowerCase().includes(query) ||
+            (membership.person.phone && membership.person.phone.includes(query)),
         )
       }
 
@@ -42,7 +42,7 @@ export const useMembershipStore = defineStore('membership', {
       if (state.filters.role) {
         console.log(state.filters.role)
         console.log(state.teamMemberships)
-        filtered = filtered.filter(membership => membership.role == state.filters.role)
+        filtered = filtered.filter((membership) => membership.role == state.filters.role)
       }
 
       // Apply sorting
@@ -60,21 +60,20 @@ export const useMembershipStore = defineStore('membership', {
 
     // Get membership by ID
     getMembershipById: (state) => (id) => {
-      return state.teamMemberships.find(membership => membership.id === id)
+      return state.teamMemberships.find((membership) => membership.id === id)
     },
 
     // Get memberships by role
-    players: (state) => state.teamMemberships.filter(m => m.role === 1),
-    captains: (state) => state.teamMemberships.filter(m => m.role === 2),
-    coaches: (state) => state.teamMemberships.filter(m => m.role === 3),
-    managers: (state) => state.teamMemberships.filter(m => m.role === 4),
+    players: (state) => state.teamMemberships.filter((m) => m.role === 1),
+    captains: (state) => state.teamMemberships.filter((m) => m.role === 2),
+    coaches: (state) => state.teamMemberships.filter((m) => m.role === 3),
+    managers: (state) => state.teamMemberships.filter((m) => m.role === 4),
 
     // Statistics
-    teamMembershipsCount: (state) => state.teamMemberships.length
+    teamMembershipsCount: (state) => state.teamMemberships.length,
   },
 
   actions: {
-
     // Fetch memberships for a specific team
     async fetchTeamMemberships(teamId) {
       this.isLoading = true
@@ -123,7 +122,7 @@ export const useMembershipStore = defineStore('membership', {
         const updatedMembership = await updateMembership(membershipId, membershipData)
 
         // Update in team memberships list
-        const membershipIndex = this.teamMemberships.findIndex(m => m.id === membershipId)
+        const membershipIndex = this.teamMemberships.findIndex((m) => m.id === membershipId)
         if (membershipIndex !== -1) {
           this.teamMemberships[membershipIndex] = updatedMembership
         }
@@ -148,7 +147,7 @@ export const useMembershipStore = defineStore('membership', {
         console.log(`Deleting membership ${membershipId}...`)
         await deleteMembership(membershipId)
 
-        const membershipIndex = this.teamMemberships.findIndex(m => m.id === membershipId)
+        const membershipIndex = this.teamMemberships.findIndex((m) => m.id === membershipId)
         if (membershipIndex !== -1) {
           const membershipName = this.teamMemberships[membershipIndex].person.name
           this.teamMemberships.splice(membershipIndex, 1)
@@ -167,7 +166,7 @@ export const useMembershipStore = defineStore('membership', {
 
     // Remove person from team by person ID (convenience method)
     async removePersonFromTeam(teamId, personId) {
-      const membership = this.teamMemberships.find(m => m.person.id === personId)
+      const membership = this.teamMemberships.find((m) => m.person.id === personId)
       if (!membership) {
         return { success: false, error: 'Membership not found' }
       }
@@ -190,7 +189,7 @@ export const useMembershipStore = defineStore('membership', {
       this.filters = {
         role: '',
         team: '',
-        sortBy: 'name'
+        sortBy: 'name',
       }
     },
 
@@ -215,8 +214,8 @@ export const useMembershipStore = defineStore('membership', {
       this.filters = {
         role: '',
         team: '',
-        sortBy: 'name'
+        sortBy: 'name',
       }
-    }
-  }
+    },
+  },
 })

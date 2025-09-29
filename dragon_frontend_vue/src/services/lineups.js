@@ -10,7 +10,7 @@ const LINEUP_URL = '/lineup'
 export async function fetchTrainingLineup(trainingId) {
   try {
     const response = await api.get(`${LINEUP_URL}/`, {
-      params: { training: trainingId }
+      params: { training: trainingId },
     })
     const data = response.data
     const lineups = data.results || data || []
@@ -56,7 +56,7 @@ export async function createLineup(trainingId) {
   try {
     const lineupData = {
       training: trainingId,
-      state: 1 // Default to Draft
+      state: 1, // Default to Draft
     }
 
     const response = await api.post(`${LINEUP_URL}/`, lineupData)
@@ -102,7 +102,7 @@ export async function deleteLineup(id) {
 export async function fetchLineupSeats(lineupId) {
   try {
     const response = await api.get('/lineup-seat/', {
-      params: { lineup: lineupId }
+      params: { lineup: lineupId },
     })
     return response.data
   } catch (error) {
@@ -129,7 +129,7 @@ export async function assignSeat(lineupId, side, seatNumber, personId) {
       lineup: lineupId,
       side: side,
       seat_number: seatNumber,
-      person: personId
+      person: personId,
     }
 
     const response = await api.post('/lineup-seat/', seatData)
@@ -196,8 +196,8 @@ export async function clearAllSeats(lineupId) {
     const seats = seatsResponse.results || seatsResponse || []
 
     const clearPromises = seats
-      .filter(seat => seat.person) // Only clear occupied seats
-      .map(seat => removeSeatAssignment(seat.id))
+      .filter((seat) => seat.person) // Only clear occupied seats
+      .map((seat) => removeSeatAssignment(seat.id))
 
     await Promise.all(clearPromises)
     return true
@@ -219,5 +219,5 @@ export default {
   updateSeatAssignment,
   removeSeatAssignment,
   deleteSeat,
-  clearAllSeats
+  clearAllSeats,
 }

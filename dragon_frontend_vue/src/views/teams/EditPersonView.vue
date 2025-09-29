@@ -3,7 +3,7 @@ import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePersonsStore } from '@/stores/persons'
 import { PERSON_SIDE_LABELS } from '@/constants'
-import '@/assets/styles/edit-person.css';
+import '@/assets/styles/edit-person.css'
 
 const route = useRoute()
 const router = useRouter()
@@ -29,20 +29,20 @@ const errors = reactive({
   phone: '',
   height: '',
   weight: '',
-  side: ''
+  side: '',
 })
 
 // Computed properties
 const personId = computed(() => route.params.id)
 
 const isFormValid = computed(() => {
-  return formData.name.trim() && !Object.values(errors).some(error => error)
+  return formData.name.trim() && !Object.values(errors).some((error) => error)
 })
 
 // Methods
 const validateForm = () => {
   // Reset errors
-  Object.keys(errors).forEach(key => errors[key] = '')
+  Object.keys(errors).forEach((key) => (errors[key] = ''))
 
   let isValid = true
 
@@ -122,7 +122,7 @@ const handleSubmit = async () => {
       phone: formData.phone?.trim() || null,
       height: formData.height || null,
       weight: formData.weight || null,
-      side: formData.side || null
+      side: formData.side || null,
     }
 
     await personsStore.updatePerson(personId.value, updateData)
@@ -154,36 +154,45 @@ const handleBack = () => {
 }
 
 // Watchers
-watch(() => formData.name, () => {
-  if (errors.name) validateForm()
-})
+watch(
+  () => formData.name,
+  () => {
+    if (errors.name) validateForm()
+  },
+)
 
-watch(() => formData.phone, () => {
-  if (errors.phone) validateForm()
-})
+watch(
+  () => formData.phone,
+  () => {
+    if (errors.phone) validateForm()
+  },
+)
 
-watch(() => formData.height, () => {
-  if (errors.height) validateForm()
-})
+watch(
+  () => formData.height,
+  () => {
+    if (errors.height) validateForm()
+  },
+)
 
-watch(() => formData.weight, () => {
-  if (errors.weight) validateForm()
-})
+watch(
+  () => formData.weight,
+  () => {
+    if (errors.weight) validateForm()
+  },
+)
 
 // Lifecycle
 onMounted(() => {
   loadPerson()
 })
-
 </script>
 
 <template>
   <div class="edit-person-view">
     <!-- Header -->
     <div class="header">
-      <button @click="handleBack" class="back-btn" :disabled="isLoading">
-        ← Back
-      </button>
+      <button @click="handleBack" class="back-btn" :disabled="isLoading">← Back</button>
       <h1 class="title">Edit Person</h1>
     </div>
 
@@ -207,15 +216,13 @@ onMounted(() => {
       <form @submit.prevent="handleSubmit" class="edit-form">
         <!-- Name Field -->
         <div class="form-group">
-          <label for="name" class="form-label">
-            Name <span class="required">*</span>
-          </label>
+          <label for="name" class="form-label"> Name <span class="required">*</span> </label>
           <input
             id="name"
             v-model.trim="formData.name"
             type="text"
             class="form-input"
-            :class="{ 'error': errors.name }"
+            :class="{ error: errors.name }"
             placeholder="Enter full name"
             maxlength="100"
             :disabled="isSubmitting"
@@ -231,7 +238,7 @@ onMounted(() => {
             v-model.trim="formData.phone"
             type="tel"
             class="form-input"
-            :class="{ 'error': errors.phone }"
+            :class="{ error: errors.phone }"
             placeholder="Enter phone number"
             maxlength="20"
             :disabled="isSubmitting"
@@ -247,7 +254,7 @@ onMounted(() => {
             v-model.number="formData.height"
             type="number"
             class="form-input"
-            :class="{ 'error': errors.height }"
+            :class="{ error: errors.height }"
             placeholder="Enter height in cm"
             min="100"
             max="250"
@@ -265,7 +272,7 @@ onMounted(() => {
             v-model.number="formData.weight"
             type="number"
             class="form-input"
-            :class="{ 'error': errors.weight }"
+            :class="{ error: errors.weight }"
             placeholder="Enter weight in kg"
             min="30"
             max="200"
@@ -282,7 +289,7 @@ onMounted(() => {
             id="side"
             v-model="formData.side"
             class="form-input"
-            :class="{ 'error': errors.side }"
+            :class="{ error: errors.side }"
             :disabled="isSubmitting"
           >
             <option value="">Select preferred side</option>
@@ -300,19 +307,10 @@ onMounted(() => {
 
         <!-- Form Actions -->
         <div class="form-actions">
-          <button
-            type="button"
-            @click="handleCancel"
-            class="cancel-btn"
-            :disabled="isSubmitting"
-          >
+          <button type="button" @click="handleCancel" class="cancel-btn" :disabled="isSubmitting">
             Cancel
           </button>
-          <button
-            type="submit"
-            class="save-btn"
-            :disabled="isSubmitting || !isFormValid"
-          >
+          <button type="submit" class="save-btn" :disabled="isSubmitting || !isFormValid">
             <span v-if="isSubmitting" class="btn-loading">
               <div class="btn-spinner"></div>
               Saving...

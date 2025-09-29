@@ -3,18 +3,17 @@ import { defineStore } from 'pinia'
 import { fetchTeams, fetchTeam, createTeam, updateTeam, deleteTeam } from '@/services/teams'
 
 export const useTeamsStore = defineStore('teams', {
-
   state: () => ({
-    teams: [],              // List of all teams
-    currentTeam: null,      // Currently selected team
-    isLoading: false,       // Loading state
-    error: null,            // Error messages
+    teams: [], // List of all teams
+    currentTeam: null, // Currently selected team
+    isLoading: false, // Loading state
+    error: null, // Error messages
 
     // Filters and search
     searchQuery: '',
     filters: {
-      sortBy: 'name'        // Sort by: name, created_date, member_count
-    }
+      sortBy: 'name', // Sort by: name, created_date, member_count
+    },
   }),
 
   getters: {
@@ -25,9 +24,10 @@ export const useTeamsStore = defineStore('teams', {
       // Apply search filter
       if (state.searchQuery) {
         const query = state.searchQuery.toLowerCase()
-        filtered = filtered.filter(team =>
-          team.name?.toLowerCase().includes(query) ||
-          (team.city && team.city.toLowerCase().includes(query))
+        filtered = filtered.filter(
+          (team) =>
+            team.name?.toLowerCase().includes(query) ||
+            (team.city && team.city.toLowerCase().includes(query)),
         )
       }
 
@@ -48,7 +48,7 @@ export const useTeamsStore = defineStore('teams', {
 
     // Get team by ID
     getTeamById: (state) => (id) => {
-      return state.teams.find(team => team.id === id)
+      return state.teams.find((team) => team.id === id)
     },
 
     // Get teams statistics
@@ -56,17 +56,15 @@ export const useTeamsStore = defineStore('teams', {
     totalMembers: (state) => state.teams.reduce((sum, team) => sum + (team.member_count || 0), 0),
 
     // Get teams by status
-    fullTeams: (state) => state.teams.filter(t =>
-      t.member_count >= (t.max_members || 22)
-    ),
-    almostFullTeams: (state) => state.teams.filter(t => {
-      const maxMembers = t.max_members || 22
-      return t.member_count > maxMembers * 0.8 && t.member_count < maxMembers
-    })
+    fullTeams: (state) => state.teams.filter((t) => t.member_count >= (t.max_members || 22)),
+    almostFullTeams: (state) =>
+      state.teams.filter((t) => {
+        const maxMembers = t.max_members || 22
+        return t.member_count > maxMembers * 0.8 && t.member_count < maxMembers
+      }),
   },
 
   actions: {
-
     async fetchTeams() {
       this.isLoading = true
       this.error = null
@@ -78,7 +76,6 @@ export const useTeamsStore = defineStore('teams', {
         this.teams = teams
 
         console.log('✅ Teams loaded:', this.teams.length)
-
       } catch (error) {
         console.error('❌ Failed to fetch teams:', error)
         this.error = 'Failed to load teams. Please check your connection and try again.'
@@ -113,7 +110,6 @@ export const useTeamsStore = defineStore('teams', {
         } else {
           throw new Error('Team not found')
         }
-
       } catch (error) {
         console.error('❌ Failed to fetch team:', error)
         this.error = 'Failed to load team details.'
@@ -135,7 +131,6 @@ export const useTeamsStore = defineStore('teams', {
         console.log('✅ Team created:', newTeam.name)
 
         return { success: true, team: newTeam }
-
       } catch (error) {
         console.error('❌ Failed to create team:', error)
         this.error = error.message || 'Failed to create team'
@@ -154,7 +149,7 @@ export const useTeamsStore = defineStore('teams', {
 
         const updatedTeam = await updateTeam(id, teamData)
 
-        const index = this.teams.findIndex(t => t.id === id)
+        const index = this.teams.findIndex((t) => t.id === id)
         if (index === -1) {
           throw new Error('Team not found')
         }
@@ -168,7 +163,6 @@ export const useTeamsStore = defineStore('teams', {
 
         console.log('✅ Team updated:', updatedTeam.name)
         return { success: true, team: updatedTeam }
-
       } catch (error) {
         console.error('❌ Failed to update team:', error)
         this.error = error.message || 'Failed to update team'
@@ -189,7 +183,7 @@ export const useTeamsStore = defineStore('teams', {
 
         console.log(`teams ${this.teams}`)
 
-        const teamIndex = this.teams.findIndex(t => t.id === id)
+        const teamIndex = this.teams.findIndex((t) => t.id === id)
         if (teamIndex === -1) {
           throw new Error('Team not found')
         }
@@ -204,7 +198,6 @@ export const useTeamsStore = defineStore('teams', {
 
         console.log('✅ Team deleted:', teamName)
         return { success: true }
-
       } catch (error) {
         console.error('❌ Failed to delete team:', error)
         this.error = error.message || 'Failed to delete team'
@@ -221,7 +214,7 @@ export const useTeamsStore = defineStore('teams', {
 
     // Update filters
     updateFilters(newFilters) {
-      console.log("new filters", newFilters)
+      console.log('new filters', newFilters)
       this.filters = { ...this.filters, ...newFilters }
     },
 
@@ -229,7 +222,7 @@ export const useTeamsStore = defineStore('teams', {
     clearFilters() {
       this.searchQuery = ''
       this.filters = {
-        sortBy: 'name'
+        sortBy: 'name',
       }
     },
 
@@ -247,8 +240,8 @@ export const useTeamsStore = defineStore('teams', {
       this.searchQuery = ''
       this.filters = {
         active: true,
-        sortBy: 'name'
+        sortBy: 'name',
       }
-    }
-  }
+    },
+  },
 })

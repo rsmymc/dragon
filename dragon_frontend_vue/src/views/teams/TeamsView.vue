@@ -3,7 +3,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTeamsStore } from '@/stores/teams.js'
 
-import '@/assets/styles/teams-list.css';
+import '@/assets/styles/teams-list.css'
 const router = useRouter()
 const teamsStore = useTeamsStore()
 
@@ -17,7 +17,7 @@ const isLoading = computed(() => teamsStore.isLoading)
 const error = computed(() => teamsStore.error)
 const searchQuery = computed({
   get: () => teamsStore.searchQuery,
-  set: (value) => teamsStore.setSearchQuery(value)
+  set: (value) => teamsStore.setSearchQuery(value),
 })
 
 // Load teams when component mounts
@@ -61,7 +61,8 @@ const deleteTeam = async (team) => {
 // Enhanced confirmation function
 const showDeleteConfirmation = (team) => {
   return new Promise((resolve) => {
-    const message = `Are you sure you want to delete "${team.name}"?\n\n` +
+    const message =
+      `Are you sure you want to delete "${team.name}"?\n\n` +
       `This action cannot be undone and will:\n` +
       `• Remove the team permanently\n` +
       `• Remove all associated data\n` +
@@ -94,7 +95,12 @@ const showNotification = (type, message) => {
       <div class="header-right">
         <button @click="createTeam" class="btn-primary">
           <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+            />
           </svg>
           Create Team
         </button>
@@ -106,7 +112,12 @@ const showNotification = (type, message) => {
       <div class="search-bar">
         <div class="search-input-container">
           <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
           </svg>
           <input
             v-model="searchQuery"
@@ -141,48 +152,63 @@ const showNotification = (type, message) => {
       <!-- Error State -->
       <div v-else-if="error" class="error-state">
         <svg class="error-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
         </svg>
         <h3>Error Loading Teams</h3>
         <p>{{ error }}</p>
-        <button @click="teamsStore.fetchTeams()" class="btn-secondary">
-          Try Again
-        </button>
+        <button @click="teamsStore.fetchTeams()" class="btn-secondary">Try Again</button>
       </div>
 
       <!-- Empty State -->
       <div v-else-if="teams.length === 0" class="empty-state">
         <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+          />
         </svg>
         <h3>No Teams Found</h3>
         <p v-if="searchQuery">No teams match your search criteria</p>
         <p v-else>Get started by creating your first dragon boat team</p>
-        <button @click="createTeam" class="btn-primary">
-          Create Your First Team
-        </button>
+        <button @click="createTeam" class="btn-primary">Create Your First Team</button>
       </div>
 
       <!-- Teams Grid -->
       <div v-else class="teams-grid">
-        <div
-          v-for="team in teams"
-          :key="team.id"
-          class="team-card"
-          @click="viewTeam(team.id)"
-        >
+        <div v-for="team in teams" :key="team.id" class="team-card" @click="viewTeam(team.id)">
           <!-- Team Card Header -->
           <div class="card-header">
             <h3 class="team-name">{{ team.name }}</h3>
             <div class="team-actions" @click.stop>
               <button @click="editTeam(team.id)" class="action-btn-team-list" title="Edit Team">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                  />
                 </svg>
               </button>
-              <button @click="deleteTeam(team)" class="action-btn-team-list delete" title="Delete Team">
+              <button
+                @click="deleteTeam(team)"
+                class="action-btn-team-list delete"
+                title="Delete Team"
+              >
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  />
                 </svg>
               </button>
             </div>
@@ -191,7 +217,9 @@ const showNotification = (type, message) => {
           <div class="team-stats">
             <div class="stat-item">
               <span class="stat-label">Members</span>
-              <span class="stat-value">{{ team.active_member_count || 0 }}/{{ team.max_members || 22 }}</span>
+              <span class="stat-value"
+                >{{ team.active_member_count || 0 }}/{{ team.max_members || 22 }}</span
+              >
             </div>
 
             <div class="stat-item">
@@ -207,13 +235,16 @@ const showNotification = (type, message) => {
                 <div
                   class="progress-fill"
                   :style="{
-                    width: `${Math.min((team.active_member_count || 0) / (team.max_members || 22) * 100, 100)}%`,
-                    backgroundColor: team.active_member_count >= team.max_members ? '#10b981' : '#3b82f6'
+                    width: `${Math.min(((team.active_member_count || 0) / (team.max_members || 22)) * 100, 100)}%`,
+                    backgroundColor:
+                      team.active_member_count >= team.max_members ? '#10b981' : '#3b82f6',
                   }"
                 ></div>
               </div>
               <span class="progress-text">
-                {{ Math.round((team.active_member_count || 0) / (team.max_members || 22) * 100) }}% full
+                {{
+                  Math.round(((team.active_member_count || 0) / (team.max_members || 22)) * 100)
+                }}% full
               </span>
             </div>
           </div>
@@ -223,6 +254,4 @@ const showNotification = (type, message) => {
   </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -14,9 +14,7 @@ const auth = useAuthStore()
 const isAuthenticated = computed(() => auth.isAuthenticated)
 
 const isAuthPage = computed(() => {
-  return route.meta?.layout === 'auth' ||
-    route.name === 'login' ||
-    route.name === 'register'
+  return route.meta?.layout === 'auth' || route.name === 'login' || route.name === 'register'
 })
 
 // Initialize authentication state when app loads
@@ -43,7 +41,13 @@ onMounted(() => {
 /* Global app styles only */
 #app {
   min-height: 100vh;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
 }
 
 * {

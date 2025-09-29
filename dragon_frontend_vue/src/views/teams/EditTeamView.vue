@@ -3,7 +3,7 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useTeamsStore } from '@/stores/teams'
-import '@/assets/styles/edit-team.css';
+import '@/assets/styles/edit-team.css'
 
 // Composables
 const router = useRouter()
@@ -19,7 +19,7 @@ const errors = reactive({})
 const formData = reactive({
   name: '',
   max_members: 22,
-  city: ''
+  city: '',
 })
 
 // Computed
@@ -63,7 +63,7 @@ const populateForm = (teamData) => {
 
 const validateForm = () => {
   // Clear previous errors
-  Object.keys(errors).forEach(key => delete errors[key])
+  Object.keys(errors).forEach((key) => delete errors[key])
 
   // Name validation
   if (!formData.name.trim()) {
@@ -136,7 +136,12 @@ onMounted(() => {
         <div class="header-content">
           <router-link to="/teams" class="back-link">
             <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
             Back to Teams
           </router-link>
@@ -149,22 +154,18 @@ onMounted(() => {
       <form @submit.prevent="handleSubmit" class="edit-form">
         <!-- Team Name -->
         <div class="form-group">
-          <label for="name" class="form-label">
-            Team Name <span class="required">*</span>
-          </label>
+          <label for="name" class="form-label"> Team Name <span class="required">*</span> </label>
           <input
             id="name"
             v-model="formData.name"
             type="text"
             class="form-input"
-            :class="{ 'error': errors.name }"
+            :class="{ error: errors.name }"
             placeholder="Enter team name"
             required
           />
           <span v-if="errors.name" class="error-message">{{ errors.name }}</span>
         </div>
-
-
 
         <!-- Team Settings -->
         <div class="form-row">
@@ -214,5 +215,3 @@ onMounted(() => {
     </div>
   </div>
 </template>
-
-
