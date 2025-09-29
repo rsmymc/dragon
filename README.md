@@ -81,7 +81,6 @@ The application comes with fixture data including:
 - Example lineups and seating arrangement
 
 #
-## Demo Video
 
 ## Demo Video
 <video width="600" controls>
