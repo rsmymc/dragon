@@ -53,7 +53,7 @@ A full-stack web application for managing dragon boat teams, players, training s
     ```
 3. **Start the application**
    ```bash
-     # Development
+   # Development
    docker-compose -f docker-compose.dev.yml up --build
    
    # Production
@@ -83,4 +83,8 @@ The application comes with fixture data including:
 #
 ## Demo Video
 
-https://github.com/rsmymc/dragon/blob/main/demo.mp4
+## Demo Video
+<video width="600" controls>
+  <source src="demo.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
