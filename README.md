@@ -43,14 +43,26 @@ A full-stack web application for managing dragon boat teams, players, training s
    git clone <repository-url>
    cd dragon
    ```
-
-2. **Start the application**
+2. **Setup environment**
    ```bash
-   docker-compose up --build
+   # Make the link script executable
+   chmod +x link-env.sh
+   
+   # Link to development environment
+   ./link-env.sh dev
+    ```
+3. **Start the application**
+   ```bash
+     # Development
+   docker-compose -f docker-compose.dev.yml up --build
+   
+   # Production
+   ./link-env.sh prod
+   docker-compose -f docker-compose.prod.yml up --build
    ```
 
 3. **Access the application**
-    - **Frontend**: http://localhost:5173
+    - **Frontend**: http://localhost:5173 (dev) or http://localhost (prod)
     - **Backend API**: http://localhost:8000
     - **Django Admin**: http://localhost:8000/admin
     - **PgAdmin**: http://localhost:5050
@@ -70,7 +82,5 @@ The application comes with fixture data including:
 
 #
 ## Demo Video
-<video width="600" controls>
-  <source src="demo.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+
+https://github.com/rsmymc/dragon/blob/main/demo.mp4
