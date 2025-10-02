@@ -1,40 +1,40 @@
-.teams-page {
+.teamsPage {
   padding: 1.5rem;
   max-width: 1400px;
   margin: 0 auto;
 }
 
 /* Page Header */
-.page-header {
+.pageHeader {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 2rem;
 }
 
-.header-left {
+.headerLeft {
   flex: 1;
 }
 
-.page-title {
+.pageTitle {
   font-size: 2rem;
   font-weight: 700;
   color: #123157;
   margin: 0 0 0.5rem 0;
 }
 
-.page-subtitle {
+.pageSubtitle {
   color: #6b7280;
   font-size: 1rem;
   margin: 0;
 }
 
-.header-right {
+.headerRight {
   display: flex;
   gap: 1rem;
 }
 
-.btn-primary {
+.btnPrimary {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -48,12 +48,12 @@
   transition: all 0.2s ease;
 }
 
-.btn-primary:hover {
+.btnPrimary:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(18, 49, 87, 0.3);
 }
 
-.btn-secondary {
+.btnSecondary {
   padding: 0.75rem 1.5rem;
   background: white;
   color: #123157;
@@ -64,18 +64,18 @@
   transition: all 0.2s ease;
 }
 
-.btn-secondary:hover {
+.btnSecondary:hover {
   background: #123157;
   color: white;
 }
 
-.btn-icon {
+.btnIcon {
   width: 1.25rem;
   height: 1.25rem;
 }
 
 /* Search Section */
-.search-section {
+.searchSection {
   background: white;
   padding: 1.5rem;
   border-radius: 1rem;
@@ -83,16 +83,16 @@
   margin-bottom: 2rem;
 }
 
-.search-bar {
+.searchBar {
   margin-bottom: 1rem;
 }
 
-.search-input-container {
+.searchInputContainer {
   position: relative;
   max-width: 500px;
 }
 
-.search-icon {
+.searchIcon {
   position: absolute;
   left: 1rem;
   top: 50%;
@@ -102,7 +102,7 @@
   color: #6b7280;
 }
 
-.search-input {
+.searchInput {
   width: 100%;
   padding: 0.875rem 1rem 0.875rem 3rem;
   border: 2px solid #e5e7eb;
@@ -111,7 +111,7 @@
   transition: all 0.2s ease;
 }
 
-.search-input:focus {
+.searchInput:focus {
   outline: none;
   border-color: #123157;
   box-shadow: 0 0 0 3px rgba(18, 49, 87, 0.1);
@@ -123,7 +123,7 @@
   align-items: center;
 }
 
-.filter-select {
+.filterSelect {
   padding: 0.5rem 1rem;
   border: 2px solid #e5e7eb;
   border-radius: 0.5rem;
@@ -132,7 +132,7 @@
   cursor: pointer;
 }
 
-.filter-checkbox {
+.filterCheckbox {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -142,12 +142,12 @@
 }
 
 /* Teams Content */
-.teams-content {
+.teamsContent {
   min-height: 400px;
 }
 
 /* Loading State */
-.loading-state {
+.loadingState {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -156,7 +156,7 @@
   color: #6b7280;
 }
 
-.loading-spinner {
+.loadingSpinner {
   width: 3rem;
   height: 3rem;
   border: 3px solid #e5e7eb;
@@ -176,7 +176,7 @@
 }
 
 /* Error State */
-.error-state {
+.errorState {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -185,26 +185,26 @@
   text-align: center;
 }
 
-.error-icon {
+.errorIcon {
   width: 4rem;
   height: 4rem;
   color: #ef4444;
   margin-bottom: 1rem;
 }
 
-.error-state h3 {
+.errorState h3 {
   font-size: 1.5rem;
   color: #1f2937;
   margin-bottom: 0.5rem;
 }
 
-.error-state p {
+.errorState p {
   color: #6b7280;
   margin-bottom: 1.5rem;
 }
 
 /* Empty State */
-.empty-state {
+.emptyState {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -213,32 +213,32 @@
   text-align: center;
 }
 
-.empty-icon {
+.emptyIcon {
   width: 5rem;
   height: 5rem;
   color: #9ca3af;
   margin-bottom: 1.5rem;
 }
 
-.empty-state h3 {
+.emptyState h3 {
   font-size: 1.5rem;
   color: #1f2937;
   margin-bottom: 0.5rem;
 }
 
-.empty-state p {
+.emptyState p {
   color: #6b7280;
   margin-bottom: 2rem;
 }
 
 /* Teams Grid */
-.teams-grid {
+.teamsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   gap: 1.5rem;
 }
 
-.team-card {
+.teamCard {
   background: white;
   border-radius: 1rem;
   padding: 1.5rem;
@@ -248,20 +248,20 @@
   transition: all 0.2s ease;
 }
 
-.team-card:hover {
+.teamCard:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
   border-color: #123157;
 }
 
-.card-header {
+.cardHeader {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 1rem;
 }
 
-.team-name {
+.teamName {
   font-size: 1.25rem;
   font-weight: 600;
   color: #123157;
@@ -270,18 +270,18 @@
   line-height: 1.3;
 }
 
-.team-actions {
+.teamActions {
   display: flex;
   gap: 0.5rem;
   opacity: 0;
   transition: opacity 0.2s ease;
 }
 
-.team-card:hover .team-actions {
+.teamCard:hover .teamActions {
   opacity: 1;
 }
 
-.action-btn-team-list {
+.actionBtnTeamList {
   padding: 0.5rem;
   background: #f3f4f6;
   border: none;
@@ -290,25 +290,25 @@
   transition: all 0.2s ease;
 }
 
-.action-btn-team-list svg {
+.actionBtnTeamList svg {
   width: 1rem;
   height: 1rem;
   color: #6b7280;
 }
 
-.action-btn-team-list:hover {
+.actionBtnTeamList:hover {
   background: #e5e7eb;
 }
 
-.action-btn-team-list.delete:hover {
+.actionBtnTeamList.delete:hover {
   background: #fef2f2;
 }
 
-.action-btn-team-list.delete:hover svg {
+.actionBtnTeamList.delete:hover svg {
   color: #ef4444;
 }
 
-.team-description {
+.teamDescription {
   color: #6b7280;
   font-size: 0.875rem;
   line-height: 1.4;
@@ -319,20 +319,20 @@
   overflow: hidden;
 }
 
-.team-stats {
+.teamStats {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
 
-.stat-item {
+.statItem {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
 }
 
-.stat-label {
+.statLabel {
   font-size: 0.75rem;
   color: #6b7280;
   font-weight: 500;
@@ -340,27 +340,27 @@
   letter-spacing: 0.05em;
 }
 
-.stat-value {
+.statValue {
   font-size: 0.875rem;
   color: #1f2937;
   font-weight: 600;
 }
 
-.team-footer {
+.teamFooter {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
 }
 
-.member-progress {
+.memberProgress {
   flex: 1;
   display: flex;
   align-items: center;
   gap: 0.75rem;
 }
 
-.progress-bar {
+.progressBar {
   flex: 1;
   height: 0.5rem;
   background: #e5e7eb;
@@ -368,20 +368,20 @@
   overflow: hidden;
 }
 
-.progress-fill {
+.progressFill {
   height: 100%;
   transition: width 0.3s ease;
   border-radius: 0.25rem;
 }
 
-.progress-text {
+.progressText {
   font-size: 0.75rem;
   color: #6b7280;
   font-weight: 500;
   min-width: 4rem;
 }
 
-.team-status {
+.teamStatus {
   padding: 0.375rem 0.75rem;
   border-radius: 1rem;
   font-size: 0.75rem;
@@ -391,16 +391,16 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .teams-page {
+  .teamsPage {
     padding: 1rem;
   }
 
-  .page-header {
+  .pageHeader {
     flex-direction: column;
     gap: 1rem;
   }
 
-  .teams-grid {
+  .teamsGrid {
     grid-template-columns: 1fr;
   }
 
@@ -410,11 +410,11 @@
     gap: 1rem;
   }
 
-  .team-actions {
+  .teamActions {
     opacity: 1;
   }
 
-  .team-stats {
+  .teamStats {
     grid-template-columns: 1fr;
     gap: 0.75rem;
   }

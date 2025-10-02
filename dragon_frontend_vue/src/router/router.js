@@ -7,7 +7,6 @@ import CreateTeamView from '@/views/teams/CreateTeamView.vue'
 import EditTeamView from '@/views/teams/EditTeamView.vue'
 import TeamDetailView from '@/views/teams/TeamDetailView.vue'
 import EditPersonView from '@/views/teams/EditPersonView.vue'
-import CreateTrainingView from '@/views/trainings/CreateTrainingView.vue'
 import TeamTrainingsView from '@/views/trainings/TeamTrainingsView.vue'
 import TrainingDetailsView from '@/views/trainings/TrainingDetailsView.vue'
 import PersonView from '@/views/PersonView.vue'
@@ -63,12 +62,6 @@ const routes = [
     path: '/persons/:id/edit',
     name: 'person-edit',
     component: EditPersonView,
-    meta: { requiresAuth: true, layout: 'app' },
-  },
-  {
-    path: '/trainings/create',
-    name: 'training-create',
-    component: CreateTrainingView,
     meta: { requiresAuth: true, layout: 'app' },
   },
   {

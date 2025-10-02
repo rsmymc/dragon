@@ -18,7 +18,6 @@
 </template>
 
 <style scoped>
-/* Using your exact brand colors from colors.xml */
 .auth-layout {
   min-height: 100vh;
   background: linear-gradient(135deg, #123157 0%, #0b1d33 50%, #194780 100%);

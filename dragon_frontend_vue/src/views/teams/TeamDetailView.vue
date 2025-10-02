@@ -5,7 +5,7 @@ import { useTeamsStore } from '@/stores/teams'
 import { useMembershipStore } from '@/stores/membership'
 import { MEMBERSHIP_ROLE_LABELS, PERSON_SIDE_LABELS } from '@/constants'
 import AddPersonModal from '@/components/modals/AddPersonModal.vue'
-import '@/assets/styles/team-detail.css'
+import styles from '@/assets/styles/team-detail.module.css'
 
 // Composables
 const router = useRouter()
@@ -46,14 +46,12 @@ const loadTeam = async () => {
   const teamId = route.params.id
 
   try {
-    // Check if team is already in store
     const existingTeam = teamsStore.getTeamById(teamId)
     if (existingTeam) {
       team.value = existingTeam
       return
     }
 
-    // Fetch from API
     await teamsStore.fetchTeam(teamId)
     team.value = teamsStore.currentTeam
 
@@ -62,7 +60,6 @@ const loadTeam = async () => {
     }
   } catch (error) {
     console.error('Failed to load team:', error)
-    // Error handled by template through teamsStore.error
   }
 }
 
@@ -97,7 +94,6 @@ const getInitials = (name) => {
 }
 
 const editPerson = (membership) => {
-  // Navigate to person edit page
   router.push(`/persons/${membership.person.id}/edit`)
 }
 
@@ -110,7 +106,6 @@ const removePerson = async (membership) => {
       const result = await membershipStore.removePersonFromTeam(team.value.id, membership.person.id)
       if (result.success) {
         console.log('✅ Person removed from team:', membership.person.name)
-        // Memberships list will automatically update via store reactivity
       } else {
         alert(`Failed to remove person: ${result.error}`)
       }
@@ -128,14 +123,12 @@ const getRoleLabel = (role) => {
 const handlePersonAdded = (membership) => {
   console.log('✅ Person successfully added to team:', membership.person.name)
   showAddPerson.value = false
-  // The store will automatically update the team memberships list
 }
 
 const getSideLabel = (side) => {
   return PERSON_SIDE_LABELS[side] || 'Unknown'
 }
 
-// Search and filter handlers
 const handleSearchChange = (event) => {
   membershipStore.setSearchQuery(event.target.value)
 }
@@ -144,42 +137,40 @@ const handleRoleFilterChange = (event) => {
   membershipStore.updateFilters({ role: event.target.value })
 }
 
-// Lifecycle
 onMounted(() => {
   loadTeam()
   loadMembers()
 })
 
 onUnmounted(() => {
-  // Clear team memberships when leaving the component
   membershipStore.clearTeamMemberships()
   membershipStore.clearFilters()
 })
 </script>
 
 <template>
-  <div class="team-detail-view">
+  <div :class="styles.teamDetailView">
     <!-- Loading State -->
-    <div v-if="teamsStore.isLoading && !team" class="loading-state">
-      <div class="loading-spinner"></div>
+    <div v-if="teamsStore.isLoading && !team" :class="styles.loadingState">
+      <div :class="styles.loadingSpinner"></div>
       <p>Loading team details...</p>
     </div>
 
     <!-- Error State -->
-    <div v-else-if="teamsStore.error && !team" class="error-state">
-      <div class="error-icon">⚠️</div>
+    <div v-else-if="teamsStore.error && !team" :class="styles.errorState">
+      <div :class="styles.errorIcon">⚠️</div>
       <h3>Team Not Found</h3>
       <p>{{ teamsStore.error }}</p>
-      <button @click="loadTeam" class="btn-retry">Try Again</button>
-      <router-link to="/teams" class="btn-secondary">← Back to Teams</router-link>
+      <button @click="loadTeam" :class="styles.btnRetry">Try Again</button>
+      <router-link to="/teams" :class="styles.btnSecondary">← Back to Teams</router-link>
     </div>
 
     <!-- Team Details -->
-    <div v-else-if="team" class="team-detail-container">
+    <div v-else-if="team" :class="styles.teamDetailContainer">
       <!-- Team Header -->
-      <div class="team-header">
-        <div class="header-content">
-          <router-link to="/teams" class="back-link">
+      <div :class="styles.teamHeader">
+        <div :class="styles.headerContent">
+          <router-link to="/teams" :class="styles.backLink">
             <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 stroke-linecap="round"
@@ -191,51 +182,52 @@ onUnmounted(() => {
             Back to Teams
           </router-link>
 
-          <div class="team-info">
-            <div class="team-title">
+          <div :class="styles.teamInfo">
+            <div :class="styles.teamTitle">
               <h1>{{ team.name }}</h1>
-              <div class="team-badges">
-                <span v-if="isTeamFull" class="status-badge full">Team Full</span>
-                <span v-else-if="isAlmostFull" class="status-badge almost-full">Almost Full</span>
+              <div :class="styles.teamBadges">
+                <span v-if="isTeamFull" :class="[styles.statusBadge, styles.full]">Team Full</span>
+                <span v-else-if="isAlmostFull" :class="[styles.statusBadge, styles.almostFull]"
+                >Almost Full</span
+                >
               </div>
             </div>
 
-            <div class="team-stats">
-              <div class="stat-item">
-                <span class="stat-label">Members</span>
-                <span class="stat-value"
-                  >{{ currentMemberCount }}/{{ team.max_members || 22 }}</span
+            <div :class="styles.teamStats">
+              <div :class="styles.statItem">
+                <span :class="styles.statLabel">Members</span>
+                <span :class="styles.statValue"
+                >{{ currentMemberCount }}/{{ team.max_members || 22 }}</span
                 >
               </div>
-              <div v-if="team.city" class="stat-item">
-                <span class="stat-label">Location</span>
-                <span class="stat-value">{{ team.city }}</span>
+              <div v-if="team.city" :class="styles.statItem">
+                <span :class="styles.statLabel">Location</span>
+                <span :class="styles.statValue">{{ team.city }}</span>
               </div>
-              <div class="stat-item">
-                <span class="stat-label">Created</span>
-                <span class="stat-value">{{ formatDate(team.created_at) }}</span>
+              <div :class="styles.statItem">
+                <span :class="styles.statLabel">Created</span>
+                <span :class="styles.statValue">{{ formatDate(team.created_at) }}</span>
               </div>
             </div>
 
             <!-- Progress Bar -->
-            <div class="member-progress">
-              <div class="progress-bar">
+            <div :class="styles.memberProgress">
+              <div :class="styles.progressBar">
                 <div
-                  class="progress-fill"
+                  :class="[
+                    styles.progressFill,
+                    { [styles.full]: isTeamFull, [styles.almostFull]: isAlmostFull },
+                  ]"
                   :style="{ width: `${memberProgress}%` }"
-                  :class="{
-                    full: isTeamFull,
-                    'almost-full': isAlmostFull,
-                  }"
                 ></div>
               </div>
-              <span class="progress-text">{{ memberProgress.toFixed(0) }}% Full</span>
+              <span :class="styles.progressText">{{ memberProgress.toFixed(0) }}% Full</span>
             </div>
           </div>
 
           <!-- Action Buttons -->
-          <div class="team-detail-actions">
-            <router-link :to="`/teams/${team.id}/edit?from=detail`" class="btn-edit">
+          <div :class="styles.teamDetailActions">
+            <router-link :to="`/teams/${team.id}/edit?from=detail`" :class="styles.btnEdit">
               <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -246,7 +238,7 @@ onUnmounted(() => {
               </svg>
               Edit Team
             </router-link>
-            <router-link :to="`/teams/${team.id}/trainings`" class="btn-trainings">
+            <router-link :to="`/teams/${team.id}/trainings`" :class="styles.btnTrainings">
               <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -257,7 +249,7 @@ onUnmounted(() => {
               </svg>
               View Trainings
             </router-link>
-            <button @click="showAddPerson = true" class="btn-primary" :disabled="isTeamFull">
+            <button @click="showAddPerson = true" :class="styles.btnPrimary" :disabled="isTeamFull">
               <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -273,14 +265,14 @@ onUnmounted(() => {
       </div>
 
       <!-- Members Section -->
-      <div class="members-section">
-        <div class="section-content">
+      <div :class="styles.membersSection">
+        <div :class="styles.sectionContent">
           <!-- Members Header -->
-          <div class="members-header">
+          <div :class="styles.membersHeader">
             <h2>Team Members</h2>
-            <div class="members-controls">
+            <div :class="styles.membersControls">
               <!-- Search -->
-              <div class="search-box">
+              <div :class="styles.searchBox">
                 <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     stroke-linecap="round"
@@ -294,7 +286,7 @@ onUnmounted(() => {
                   @input="handleSearchChange"
                   type="text"
                   placeholder="Search members..."
-                  class="search-input"
+                  :class="styles.searchInput"
                 />
               </div>
 
@@ -302,7 +294,7 @@ onUnmounted(() => {
               <select
                 :value="membershipStore.filters.role"
                 @change="handleRoleFilterChange"
-                class="role-filter"
+                :class="styles.roleFilter"
               >
                 <option value="">All Roles</option>
                 <option value="1">Player</option>
@@ -314,22 +306,22 @@ onUnmounted(() => {
           </div>
 
           <!-- Members Loading -->
-          <div v-if="membershipStore.isLoading" class="members-loading">
-            <div class="loading-spinner"></div>
+          <div v-if="membershipStore.isLoading" :class="styles.membersLoading">
+            <div :class="styles.loadingSpinner"></div>
             <p>Loading members...</p>
           </div>
 
           <!-- Members Error -->
-          <div v-else-if="membershipStore.error" class="error-state">
-            <div class="error-icon">⚠️</div>
+          <div v-else-if="membershipStore.error" :class="styles.errorState">
+            <div :class="styles.errorIcon">⚠️</div>
             <h3>Error Loading Members</h3>
             <p>{{ membershipStore.error }}</p>
-            <button @click="loadMembers" class="btn-retry">Try Again</button>
+            <button @click="loadMembers" :class="styles.btnRetry">Try Again</button>
           </div>
 
           <!-- Empty Members -->
-          <div v-else-if="filteredMemberships.length === 0" class="empty-members">
-            <div class="empty-icon">👥</div>
+          <div v-else-if="filteredMemberships.length === 0" :class="styles.emptyMembers">
+            <div :class="styles.emptyIcon">👥</div>
             <h3>
               {{
                 membershipStore.searchQuery || membershipStore.filters.role
@@ -347,54 +339,59 @@ onUnmounted(() => {
             <button
               v-if="!membershipStore.searchQuery && !membershipStore.filters.role"
               @click="showAddPerson = true"
-              class="btn-primary"
+              :class="styles.btnPrimary"
             >
               Add First Member
             </button>
           </div>
 
           <!-- Members Grid -->
-          <div v-else class="members-grid">
-            <div v-for="membership in filteredMemberships" :key="membership.id" class="member-card">
+          <div v-else :class="styles.membersGrid">
+            <div
+              v-for="membership in filteredMemberships"
+              :key="membership.id"
+              :class="styles.memberCard"
+            >
               <!-- Member Avatar/Initial -->
-              <div class="member-avatar">
+              <div :class="styles.memberAvatar">
                 <img
                   v-if="membership.person.profile_picture_url"
                   :src="membership.person.profile_picture_url"
                   :alt="membership.person.name"
-                  class="avatar-image"
+                  :class="styles.avatarImage"
                 />
-                <div v-else class="avatar-initial">
+                <div v-else :class="styles.avatarInitial">
                   {{ getInitials(membership.person.name) }}
                 </div>
               </div>
 
               <!-- Member Info -->
-              <div class="member-info">
-                <h4 class="member-name">{{ membership.person.name }}</h4>
-                <p class="member-role">{{ getRoleLabel(membership.role) }}</p>
-                <div class="member-details">
-                  <span v-if="membership.person.phone" class="detail-item">
+              <div :class="styles.memberInfo">
+                <h4 :class="styles.memberName">{{ membership.person.name }}</h4>
+                <p :class="styles.memberRole">{{ getRoleLabel(membership.role) }}</p>
+                <div :class="styles.memberDetails">
+                  <span v-if="membership.person.phone" :class="styles.detailItem">
                     📱 {{ membership.person.phone }}
                   </span>
-                  <span v-if="membership.person.height" class="detail-item">
+                  <span v-if="membership.person.height" :class="styles.detailItem">
                     📏 {{ membership.person.height }}cm
                   </span>
-                  <span v-if="membership.person.weight" class="detail-item">
+                  <span v-if="membership.person.weight" :class="styles.detailItem">
                     ⚖️ {{ membership.person.weight }}kg
                   </span>
-                  <span class="detail-item"> 🧭 {{ getSideLabel(membership.person.side) }} </span>
-                  <span v-if="membership.joined_at" class="detail-item">
+                  <span :class="styles.detailItem">
+                    🧭 {{ getSideLabel(membership.person.side) }}
+                  </span>
+                  <span v-if="membership.joined_at" :class="styles.detailItem">
                     📅 Joined {{ formatDate(membership.joined_at) }}
                   </span>
                 </div>
               </div>
-
               <!-- Member Actions -->
-              <div class="member-actions">
+              <div :class="styles.memberActions">
                 <button
                   @click="editPerson(membership)"
-                  class="action-btn-member edit"
+                  :class="[styles.actionBtnMember, 'edit']"
                   title="Edit Person"
                 >
                   <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -408,7 +405,7 @@ onUnmounted(() => {
                 </button>
                 <button
                   @click="removePerson(membership)"
-                  class="action-btn-member delete"
+                  :class="[styles.actionBtnMember, 'delete']"
                   title="Remove Person"
                 >
                   <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">

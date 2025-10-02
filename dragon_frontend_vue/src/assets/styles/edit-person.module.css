@@ -1,4 +1,4 @@
-.edit-person-view {
+.editPersonView {
   max-width: 600px;
   margin: 0 auto;
   padding: 2rem;
@@ -12,7 +12,7 @@
   margin-bottom: 2rem;
 }
 
-.back-btn {
+.backBtn {
   padding: 0.5rem 1rem;
   background: transparent;
   border: 1px solid #ddd;
@@ -23,12 +23,12 @@
   transition: all 0.2s ease;
 }
 
-.back-btn:hover:not(:disabled) {
+.backBtn:hover:not(:disabled) {
   background: #f5f5f5;
   border-color: #ccc;
 }
 
-.back-btn:disabled {
+.backBtn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
@@ -58,13 +58,13 @@
   margin-bottom: 1rem;
 }
 
-.error-container {
+.errorContainer {
   display: flex;
   justify-content: center;
   padding: 3rem;
 }
 
-.error-message {
+.errorMessage {
   text-align: center;
   padding: 2rem;
   background: #fee;
@@ -73,16 +73,16 @@
   color: #c33;
 }
 
-.error-message h3 {
+.errorMessage h3 {
   margin: 0 0 0.5rem 0;
   color: #c33;
 }
 
-.error-message p {
+.errorMessage p {
   margin: 0 0 1rem 0;
 }
 
-.retry-btn {
+.retryBtn {
   padding: 0.5rem 1rem;
   background: #c33;
   color: white;
@@ -92,30 +92,30 @@
   transition: background 0.2s ease;
 }
 
-.retry-btn:hover {
+.retryBtn:hover {
   background: #a22;
 }
 
-.form-container {
+.formContainer {
   background: white;
   border-radius: 8px;
   padding: 2rem;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.edit-form {
+.editForm {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
-.form-group {
+.formGroup {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
-.form-label {
+.formLabel {
   font-weight: 500;
   color: #333;
   font-size: 0.9rem;
@@ -125,7 +125,7 @@
   color: #c33;
 }
 
-.form-input {
+.formInput {
   padding: 0.75rem;
   border: 2px solid #ddd;
   border-radius: 6px;
@@ -133,27 +133,27 @@
   transition: border-color 0.2s ease;
 }
 
-.form-input:focus {
+.formInput:focus {
   outline: none;
   border-color: #007bff;
 }
 
-.form-input.error {
+.formInput.error {
   border-color: #c33;
 }
 
-.form-input:disabled {
+.formInput:disabled {
   background: #f5f5f5;
   cursor: not-allowed;
 }
 
-.field-error {
+.fieldError {
   color: #c33;
   font-size: 0.8rem;
   margin-top: 0.25rem;
 }
 
-.form-actions {
+.formActions {
   display: flex;
   gap: 1rem;
   justify-content: flex-end;
@@ -162,8 +162,8 @@
   border-top: 1px solid #eee;
 }
 
-.cancel-btn,
-.save-btn {
+.cancelBtn,
+.saveBtn {
   padding: 0.75rem 1.5rem;
   border-radius: 6px;
   font-size: 1rem;
@@ -176,38 +176,38 @@
   justify-content: center;
 }
 
-.cancel-btn {
+.cancelBtn {
   background: #f8f9fa;
   color: #6c757d;
   border: 1px solid #ddd;
 }
 
-.cancel-btn:hover:not(:disabled) {
+.cancelBtn:hover:not(:disabled) {
   background: #e9ecef;
   border-color: #ccc;
 }
 
-.save-btn {
+.saveBtn {
   background: #007bff;
   color: white;
 }
 
-.save-btn:hover:not(:disabled) {
+.saveBtn:hover:not(:disabled) {
   background: #0056b3;
 }
 
-.save-btn:disabled {
+.saveBtn:disabled {
   background: #ccc;
   cursor: not-allowed;
 }
 
-.btn-loading {
+.btnLoading {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.btn-spinner {
+.btnSpinner {
   width: 16px;
   height: 16px;
   border: 2px solid rgba(255, 255, 255, 0.3);
@@ -227,20 +227,20 @@
 
 /* Responsive design */
 @media (max-width: 768px) {
-  .edit-person-view {
+  .editPersonView {
     padding: 1rem;
   }
 
-  .form-container {
+  .formContainer {
     padding: 1rem;
   }
 
-  .form-actions {
+  .formActions {
     flex-direction: column-reverse;
   }
 
-  .cancel-btn,
-  .save-btn {
+  .cancelBtn,
+  .saveBtn {
     width: 100%;
   }
 }

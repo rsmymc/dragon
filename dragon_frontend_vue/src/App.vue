@@ -4,8 +4,8 @@ import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
 // Layout Components
-import AppLayout from '@/components/AppLayout.vue'
-import AuthLayout from '@/components/AuthLayout.vue'
+import AppLayout from '@/components/layouts/AppLayout.vue'
+import AuthLayout from '@/components/layouts/AuthLayout.vue'
 
 const route = useRoute()
 const auth = useAuthStore()

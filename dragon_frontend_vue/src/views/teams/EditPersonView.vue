@@ -3,7 +3,7 @@ import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePersonsStore } from '@/stores/persons'
 import { PERSON_SIDE_LABELS } from '@/constants'
-import '@/assets/styles/edit-person.css'
+import styles from '@/assets/styles/edit-person.module.css'
 
 const route = useRoute()
 const router = useRouter()
@@ -189,107 +189,104 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="edit-person-view">
+  <div :class="styles.editPersonView">
     <!-- Header -->
-    <div class="header">
-      <button @click="handleBack" class="back-btn" :disabled="isLoading">← Back</button>
-      <h1 class="title">Edit Person</h1>
+    <div :class="styles.header">
+      <button @click="handleBack" :class="styles.backBtn" :disabled="isLoading">← Back</button>
+      <h1 :class="styles.title">Edit Person</h1>
     </div>
 
     <!-- Loading State -->
-    <div v-if="isLoading && !person" class="loading">
-      <div class="spinner"></div>
+    <div v-if="isLoading && !person" :class="styles.loading">
+      <div :class="styles.spinner"></div>
       <p>Loading person details...</p>
     </div>
 
     <!-- Error State -->
-    <div v-else-if="loadError" class="error-container">
-      <div class="error-message">
+    <div v-else-if="loadError" :class="styles.errorContainer">
+      <div :class="styles.errorMessage">
         <h3>Error Loading Person</h3>
         <p>{{ loadError }}</p>
-        <button @click="loadPerson" class="retry-btn">Retry</button>
+        <button @click="loadPerson" :class="styles.retryBtn">Retry</button>
       </div>
     </div>
 
     <!-- Edit Form -->
-    <div v-else-if="person" class="form-container">
-      <form @submit.prevent="handleSubmit" class="edit-form">
+    <div v-else-if="person" :class="styles.formContainer">
+      <form @submit.prevent="handleSubmit" :class="styles.editForm">
         <!-- Name Field -->
-        <div class="form-group">
-          <label for="name" class="form-label"> Name <span class="required">*</span> </label>
+        <div :class="styles.formGroup">
+          <label for="name" :class="styles.formLabel">
+            Name <span :class="styles.required">*</span>
+          </label>
           <input
             id="name"
             v-model.trim="formData.name"
             type="text"
-            class="form-input"
-            :class="{ error: errors.name }"
+            :class="[styles.formInput, { error: errors.name }]"
             placeholder="Enter full name"
             maxlength="100"
             :disabled="isSubmitting"
           />
-          <div v-if="errors.name" class="field-error">{{ errors.name }}</div>
+          <div v-if="errors.name" :class="styles.fieldError">{{ errors.name }}</div>
         </div>
 
         <!-- Phone Field -->
-        <div class="form-group">
-          <label for="phone" class="form-label">Phone</label>
+        <div :class="styles.formGroup">
+          <label for="phone" :class="styles.formLabel">Phone</label>
           <input
             id="phone"
             v-model.trim="formData.phone"
             type="tel"
-            class="form-input"
-            :class="{ error: errors.phone }"
+            :class="[styles.formInput, { error: errors.phone }]"
             placeholder="Enter phone number"
             maxlength="20"
             :disabled="isSubmitting"
           />
-          <div v-if="errors.phone" class="field-error">{{ errors.phone }}</div>
+          <div v-if="errors.phone" :class="styles.fieldError">{{ errors.phone }}</div>
         </div>
 
         <!-- Height Field -->
-        <div class="form-group">
-          <label for="height" class="form-label">Height (cm)</label>
+        <div :class="styles.formGroup">
+          <label for="height" :class="styles.formLabel">Height (cm)</label>
           <input
             id="height"
             v-model.number="formData.height"
             type="number"
-            class="form-input"
-            :class="{ error: errors.height }"
+            :class="[styles.formInput, { error: errors.height }]"
             placeholder="Enter height in cm"
             min="100"
             max="250"
             step="1"
             :disabled="isSubmitting"
           />
-          <div v-if="errors.height" class="field-error">{{ errors.height }}</div>
+          <div v-if="errors.height" :class="styles.fieldError">{{ errors.height }}</div>
         </div>
 
         <!-- Weight Field -->
-        <div class="form-group">
-          <label for="weight" class="form-label">Weight (kg)</label>
+        <div :class="styles.formGroup">
+          <label for="weight" :class="styles.formLabel">Weight (kg)</label>
           <input
             id="weight"
             v-model.number="formData.weight"
             type="number"
-            class="form-input"
-            :class="{ error: errors.weight }"
+            :class="[styles.formInput, { error: errors.weight }]"
             placeholder="Enter weight in kg"
             min="30"
             max="200"
             step="1"
             :disabled="isSubmitting"
           />
-          <div v-if="errors.weight" class="field-error">{{ errors.weight }}</div>
+          <div v-if="errors.weight" :class="styles.fieldError">{{ errors.weight }}</div>
         </div>
 
         <!-- Side Field -->
-        <div class="form-group">
-          <label for="side" class="form-label">Preferred Side</label>
+        <div :class="styles.formGroup">
+          <label for="side" :class="styles.formLabel">Preferred Side</label>
           <select
             id="side"
             v-model="formData.side"
-            class="form-input"
-            :class="{ error: errors.side }"
+            :class="[styles.formInput, { error: errors.side }]"
             :disabled="isSubmitting"
           >
             <option value="">Select preferred side</option>
@@ -297,22 +294,31 @@ onMounted(() => {
               {{ label }}
             </option>
           </select>
-          <div v-if="errors.side" class="field-error">{{ errors.side }}</div>
+          <div v-if="errors.side" :class="styles.fieldError">{{ errors.side }}</div>
         </div>
 
         <!-- Submit Error -->
-        <div v-if="submitError" class="error-message">
+        <div v-if="submitError" :class="styles.errorMessage">
           <p>{{ submitError }}</p>
         </div>
 
         <!-- Form Actions -->
-        <div class="form-actions">
-          <button type="button" @click="handleCancel" class="cancel-btn" :disabled="isSubmitting">
+        <div :class="styles.formActions">
+          <button
+            type="button"
+            @click="handleCancel"
+            :class="styles.cancelBtn"
+            :disabled="isSubmitting"
+          >
             Cancel
           </button>
-          <button type="submit" class="save-btn" :disabled="isSubmitting || !isFormValid">
-            <span v-if="isSubmitting" class="btn-loading">
-              <div class="btn-spinner"></div>
+          <button
+            type="submit"
+            :class="styles.saveBtn"
+            :disabled="isSubmitting || !isFormValid"
+          >
+            <span v-if="isSubmitting" :class="styles.btnLoading">
+              <div :class="styles.btnSpinner"></div>
               Saving...
             </span>
             <span v-else>Save Changes</span>

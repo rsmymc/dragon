@@ -1,21 +1,21 @@
-.create-team-page {
+.createTeamPage {
   padding: 1.5rem;
   max-width: 800px;
   margin: 0 auto;
 }
 
 /* Page Header */
-.page-header {
+.pageHeader {
   margin-bottom: 2rem;
 }
 
-.header-left {
+.headerLeft {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-.back-button {
+.backButton {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -29,30 +29,30 @@
   align-self: flex-start;
 }
 
-.back-button:hover {
+.backButton:hover {
   color: #0b1d33;
 }
 
-.back-button svg {
+.backButton svg {
   width: 1.25rem;
   height: 1.25rem;
 }
 
-.header-content h1 {
+.headerContent h1 {
   font-size: 2rem;
   font-weight: 700;
   color: #123157;
   margin: 0 0 0.5rem 0;
 }
 
-.header-content p {
+.headerContent p {
   color: #6b7280;
   font-size: 1rem;
   margin: 0;
 }
 
 /* Success Banner */
-.success-banner {
+.successBanner {
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -63,48 +63,48 @@
   margin-bottom: 2rem;
 }
 
-.success-icon {
+.successIcon {
   width: 2rem;
   height: 2rem;
   color: #16a34a;
   flex-shrink: 0;
 }
 
-.success-content h3 {
+.successContent h3 {
   font-size: 1.125rem;
   font-weight: 600;
   color: #16a34a;
   margin: 0 0 0.25rem 0;
 }
 
-.success-content p {
+.successContent p {
   color: #15803d;
   margin: 0;
   font-size: 0.875rem;
 }
 
 /* Form Container */
-.form-container {
+.formContainer {
   background: white;
   border-radius: 1rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   border: 2px solid #f3f4f6;
 }
 
-.team-form {
+.teamForm {
   padding: 2rem;
 }
 
 /* Form Sections */
-.form-section {
+.formSection {
   margin-bottom: 2.5rem;
 }
 
-.form-section:last-of-type {
+.formSection:last-of-type {
   margin-bottom: 0;
 }
 
-.section-title {
+.sectionTitle {
   font-size: 1.25rem;
   font-weight: 600;
   color: #123157;
@@ -114,11 +114,11 @@
 }
 
 /* Form Groups */
-.form-group {
+.formGroup {
   margin-bottom: 1.5rem;
 }
 
-.form-label {
+.formLabel {
   display: block;
   font-weight: 600;
   color: #374151;
@@ -132,8 +132,8 @@
 }
 
 /* Form Inputs */
-.form-input,
-.form-textarea {
+.formInput,
+.formTextarea {
   width: 100%;
   padding: 0.875rem 1rem;
   border: 2px solid #e5e7eb;
@@ -143,50 +143,50 @@
   background-color: #f9fafb;
 }
 
-.form-input:focus,
-.form-textarea:focus {
+.formInput:focus,
+.formTextarea:focus {
   outline: none;
   border-color: #123157;
   background-color: white;
   box-shadow: 0 0 0 3px rgba(18, 49, 87, 0.1);
 }
 
-.form-input.error,
-.form-textarea.error {
+.formInput.error,
+.formTextarea.error {
   border-color: #ef4444;
   background-color: #fef2f2;
 }
 
-.number-input {
+.numberInput {
   max-width: 150px;
 }
 
-.form-textarea {
+.formTextarea {
   resize: vertical;
   min-height: 80px;
 }
 
-.textarea-footer {
+.textareaFooter {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-top: 0.5rem;
 }
 
-.char-count {
+.charCount {
   font-size: 0.75rem;
   color: #9ca3af;
 }
 
 /* Help Text */
-.field-help {
+.fieldHelp {
   font-size: 0.75rem;
   color: #6b7280;
   margin-top: 0.25rem;
   margin-bottom: 0;
 }
 
-.error-message {
+.errorMessage {
   color: #ef4444;
   font-size: 0.75rem;
   font-weight: 500;
@@ -194,7 +194,7 @@
 }
 
 /* Form Actions */
-.form-actions {
+.formActions {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -203,15 +203,15 @@
   border-top: 2px solid #f3f4f6;
 }
 
-.action-group {
+.actionGroup {
   display: flex;
   gap: 1rem;
 }
 
 /* Buttons */
-.btn-primary,
-.btn-secondary,
-.btn-outline {
+.btnPrimary,
+.btnSecondary,
+.btnOutline {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -224,45 +224,45 @@
   border: 2px solid transparent;
 }
 
-.btn-primary {
+.btnPrimary {
   background: linear-gradient(135deg, #123157 0%, #0b1d33 100%);
   color: white;
 }
 
-.btn-primary:hover:not(:disabled) {
+.btnPrimary:hover:not(:disabled) {
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(18, 49, 87, 0.3);
 }
 
-.btn-primary:disabled {
+.btnPrimary:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
 }
 
-.btn-secondary {
+.btnSecondary {
   background: white;
   color: #123157;
   border-color: #123157;
 }
 
-.btn-secondary:hover:not(:disabled) {
+.btnSecondary:hover:not(:disabled) {
   background: #123157;
   color: white;
 }
 
-.btn-outline {
+.btnOutline {
   background: white;
   color: #6b7280;
   border-color: #e5e7eb;
 }
 
-.btn-outline:hover:not(:disabled) {
+.btnOutline:hover:not(:disabled) {
   background: #f3f4f6;
   border-color: #d1d5db;
 }
 
-.loading-spinner {
+.loadingSpinner {
   width: 1.25rem;
   height: 1.25rem;
   animation: spin 1s linear infinite;
@@ -279,40 +279,40 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .create-team-page {
+  .createTeamPage {
     padding: 1rem;
   }
 
-  .team-form {
+  .teamForm {
     padding: 1.5rem;
   }
 
-  .form-actions {
+  .formActions {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .action-group {
+  .actionGroup {
     flex-direction: column;
   }
 
-  .btn-primary,
-  .btn-secondary,
-  .btn-outline {
+  .btnPrimary,
+  .btnSecondary,
+  .btnOutline {
     justify-content: center;
   }
 }
 
 @media (max-width: 480px) {
-  .header-content h1 {
+  .headerContent h1 {
     font-size: 1.5rem;
   }
 
-  .team-form {
+  .teamForm {
     padding: 1rem;
   }
 
-  .section-title {
+  .sectionTitle {
     font-size: 1.125rem;
   }
 }

@@ -1,11 +1,11 @@
-.edit-team-view {
+.editTeamView {
   min-height: 100vh;
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   padding: 2rem 0;
 }
 
 /* Loading State */
-.loading-state {
+.loadingState {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -14,7 +14,7 @@
   color: #64748b;
 }
 
-.loading-spinner {
+.loadingSpinner {
   width: 40px;
   height: 40px;
   border: 3px solid #e2e8f0;
@@ -24,7 +24,7 @@
   margin-bottom: 1rem;
 }
 
-.loading-spinner.small {
+.loadingSpinner.small {
   width: 20px;
   height: 20px;
   border-width: 2px;
@@ -41,7 +41,7 @@
 }
 
 /* Error State */
-.error-state {
+.errorState {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -51,25 +51,25 @@
   color: #64748b;
 }
 
-.error-icon {
+.errorIcon {
   font-size: 3rem;
   margin-bottom: 1rem;
 }
 
 /* Page Header */
-.page-header {
+.pageHeader {
   background: white;
   border-bottom: 1px solid #e2e8f0;
   margin-bottom: 2rem;
 }
 
-.header-content {
+.headerContent {
   max-width: 800px;
   margin: 0 auto;
   padding: 2rem;
 }
 
-.back-link {
+.backLink {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -80,11 +80,11 @@
   transition: color 0.2s ease;
 }
 
-.back-link:hover {
+.backLink:hover {
   color: #1e40af;
 }
 
-.page-header h1 {
+.pageHeader h1 {
   font-size: 2rem;
   font-weight: 700;
   color: #123157;
@@ -97,13 +97,13 @@
 }
 
 /* Form Container */
-.edit-form-container {
+.editFormContainer {
   max-width: 800px;
   margin: 0 auto;
   padding: 0 2rem;
 }
 
-.edit-form {
+.editForm {
   background: white;
   border-radius: 12px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
@@ -111,24 +111,24 @@
 }
 
 /* Form Groups */
-.form-group {
+.formGroup {
   margin-bottom: 1.5rem;
 }
 
-.form-row {
+.formRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
 }
 
 @media (max-width: 768px) {
-  .form-row {
+  .formRow {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
 }
 
-.form-label {
+.formLabel {
   display: block;
   font-weight: 600;
   color: #374151;
@@ -139,8 +139,8 @@
   color: #ef4444;
 }
 
-.form-input,
-.form-textarea {
+.formInput,
+.formTextarea {
   width: 100%;
   padding: 0.75rem;
   border: 2px solid #e5e7eb;
@@ -151,24 +151,24 @@
     box-shadow 0.2s ease;
 }
 
-.form-input:focus,
-.form-textarea:focus {
+.formInput:focus,
+.formTextarea:focus {
   outline: none;
   border-color: #123157;
   box-shadow: 0 0 0 3px rgba(18, 49, 87, 0.1);
 }
 
-.form-input.error,
-.form-textarea.error {
+.formInput.error,
+.formTextarea.error {
   border-color: #ef4444;
 }
 
-.form-textarea {
+.formTextarea {
   resize: vertical;
   min-height: 100px;
 }
 
-.form-hint {
+.formHint {
   display: block;
   font-size: 0.875rem;
   color: #6b7280;
@@ -176,13 +176,13 @@
 }
 
 /* Radio Group */
-.radio-group {
+.radioGroup {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
 }
 
-.radio-option {
+.radioOption {
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -190,11 +190,11 @@
   font-weight: 500;
 }
 
-.radio-option input[type='radio'] {
+.radioOption input[type='radio'] {
   display: none;
 }
 
-.radio-custom {
+.radioCustom {
   width: 20px;
   height: 20px;
   border: 2px solid #d1d5db;
@@ -203,11 +203,11 @@
   transition: border-color 0.2s ease;
 }
 
-.radio-option input[type='radio']:checked + .radio-custom {
+.radioOption input[type='radio']:checked + .radioCustom {
   border-color: #123157;
 }
 
-.radio-option input[type='radio']:checked + .radio-custom::after {
+.radioOption input[type='radio']:checked + .radioCustom::after {
   content: '';
   position: absolute;
   top: 50%;
@@ -220,14 +220,14 @@
 }
 
 /* Error Messages */
-.error-message {
+.errorMessage {
   display: block;
   color: #ef4444;
   font-size: 0.875rem;
   margin-top: 0.25rem;
 }
 
-.form-error {
+.formError {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -240,7 +240,7 @@
 }
 
 /* Form Actions */
-.form-actions {
+.formActions {
   display: flex;
   gap: 1rem;
   justify-content: flex-end;
@@ -250,10 +250,10 @@
 }
 
 /* Buttons */
-.btn-primary,
-.btn-cancel,
-.btn-retry,
-.btn-secondary {
+.btnPrimary,
+.btnCancel,
+.btnRetry,
+.btnSecondary {
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
   font-weight: 600;
@@ -267,64 +267,64 @@
   min-width: 120px;
 }
 
-.btn-primary {
+.btnPrimary {
   background: linear-gradient(135deg, #123157 0%, #1e40af 100%);
   color: white;
 }
 
-.btn-primary:hover:not(:disabled) {
+.btnPrimary:hover:not(:disabled) {
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(18, 49, 87, 0.4);
 }
 
-.btn-primary:disabled {
+.btnPrimary:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
 }
 
-.btn-cancel {
+.btnCancel {
   background: #f8fafc;
   color: #64748b;
   border: 2px solid #e2e8f0;
 }
 
-.btn-cancel:hover {
+.btnCancel:hover {
   background: #f1f5f9;
   border-color: #cbd5e1;
 }
 
-.btn-retry,
-.btn-secondary {
+.btnRetry,
+.btnSecondary {
   background: #123157;
   color: white;
 }
 
-.btn-retry:hover,
-.btn-secondary:hover {
+.btnRetry:hover,
+.btnSecondary:hover {
   background: #1e40af;
 }
 
 @media (max-width: 768px) {
-  .edit-team-view {
+  .editTeamView {
     padding: 1rem 0;
   }
 
-  .header-content,
-  .edit-form-container {
+  .headerContent,
+  .editFormContainer {
     padding: 0 1rem;
   }
 
-  .edit-form {
+  .editForm {
     padding: 1.5rem;
   }
 
-  .form-actions {
+  .formActions {
     flex-direction: column;
   }
 
-  .btn-primary,
-  .btn-cancel {
+  .btnPrimary,
+  .btnCancel {
     width: 100%;
   }
 }

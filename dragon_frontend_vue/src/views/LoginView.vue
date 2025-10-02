@@ -3,7 +3,7 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { login } from '@/services/auth'
-import '@/assets/styles/login.css'
+import styles from '@/assets/styles/login.module.css'
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -105,23 +105,23 @@ async function onSubmit() {
 </script>
 
 <template>
-  <div class="login-page">
-    <div class="login-card">
+  <div :class="styles.loginPage">
+    <div :class="styles.loginCard">
       <!-- Dragon Boat Themed Header -->
-      <div class="login-header">
-        <div class="app-logo">
-          <img alt="DragonBoat Logo" src="@/assets/logo.png" width="128" height="128" />
-          <h1 class="app-title">DragonBoat Manager</h1>
+      <div :class="styles.loginHeader">
+        <div :class="styles.appLogo">
+          <img alt="DragonBoat Logo" src="../assets/images/logo.png" width="128" height="128" />
+          <h1 :class="styles.appTitle">DragonBoat Manager</h1>
         </div>
         <h2>Welcome Back</h2>
         <p>Sign in to manage your dragon boat teams</p>
       </div>
 
-      <form @submit.prevent="onSubmit" class="login-form">
+      <form @submit.prevent="onSubmit" :class="styles.loginForm">
         <!-- Username Field -->
-        <div class="form-group">
+        <div :class="styles.formGroup">
           <label for="username">Username</label>
-          <div class="input-container">
+          <div :class="styles.inputContainer">
             <input
               id="username"
               v-model="username"
@@ -133,8 +133,8 @@ async function onSubmit() {
               :class="{ error: errors.username }"
               placeholder="Enter your username"
             />
-            <div v-if="username && !errors.username" class="input-success">
-              <svg class="success-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div v-if="username && !errors.username" :class="styles.inputSuccess">
+              <svg :class="styles.successIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -144,13 +144,13 @@ async function onSubmit() {
               </svg>
             </div>
           </div>
-          <p v-if="errors.username" class="error-message">{{ errors.username }}</p>
+          <p v-if="errors.username" :class="styles.errorMessage">{{ errors.username }}</p>
         </div>
 
         <!-- Password Field -->
-        <div class="form-group">
+        <div :class="styles.formGroup">
           <label for="password">Password</label>
-          <div class="input-container">
+          <div :class="styles.inputContainer">
             <input
               id="password"
               v-model="password"
@@ -162,10 +162,10 @@ async function onSubmit() {
               :class="{ error: errors.password }"
               placeholder="Enter your password"
             />
-            <button type="button" @click="togglePasswordVisibility" class="password-toggle">
+            <button type="button" @click="togglePasswordVisibility" :class="styles.passwordToggle">
               <svg
                 v-if="showPassword"
-                class="toggle-icon"
+                :class="styles.toggleIcon"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -183,7 +183,7 @@ async function onSubmit() {
                   d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
                 ></path>
               </svg>
-              <svg v-else class="toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg v-else :class="styles.toggleIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -193,12 +193,12 @@ async function onSubmit() {
               </svg>
             </button>
           </div>
-          <p v-if="errors.password" class="error-message">{{ errors.password }}</p>
+          <p v-if="errors.password" :class="styles.errorMessage">{{ errors.password }}</p>
         </div>
 
         <!-- Remember Me -->
-        <div class="form-options">
-          <label class="checkbox-container">
+        <div :class="styles.formOptions">
+          <label :class="styles.checkboxContainer">
             <input v-model="rememberMe" type="checkbox" />
             <span class="checkmark"></span>
             Remember me
@@ -206,8 +206,8 @@ async function onSubmit() {
         </div>
 
         <!-- General Error -->
-        <div v-if="errors.general" class="general-error">
-          <svg class="error-icon" viewBox="0 0 20 20" fill="currentColor">
+        <div v-if="errors.general" :class="styles.generalError">
+          <svg :class="styles.errorIcon" viewBox="0 0 20 20" fill="currentColor">
             <path
               fill-rule="evenodd"
               d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
@@ -221,10 +221,9 @@ async function onSubmit() {
         <button
           type="submit"
           :disabled="!isFormValid"
-          class="login-button"
-          :class="{ loading: loading }"
+          :class="[styles.loginButton, { loading: loading }]"
         >
-          <svg v-if="loading" class="loading-spinner" fill="none" viewBox="0 0 24 24">
+          <svg v-if="loading" :class="styles.loadingSpinner" fill="none" viewBox="0 0 24 24">
             <circle
               class="opacity-25"
               cx="12"
@@ -242,8 +241,8 @@ async function onSubmit() {
           <span>{{ loading ? 'Signing in...' : 'Sign In' }}</span>
         </button>
       </form>
-      <div class="demo-help">
-        <p class="demo-text">
+      <div :class="styles.demoHelp">
+        <p :class="styles.demoText">
           <strong>Demo credentials:</strong><br />
           Username: <code>test_user</code><br />
           Password: <code>test_user1234</code>

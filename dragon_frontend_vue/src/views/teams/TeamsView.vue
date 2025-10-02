@@ -3,7 +3,8 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTeamsStore } from '@/stores/teams.js'
 
-import '@/assets/styles/teams-list.css'
+import styles from '@/assets/styles/teams-list.module.css'
+
 const router = useRouter()
 const teamsStore = useTeamsStore()
 
@@ -86,15 +87,15 @@ const showNotification = (type, message) => {
 </script>
 
 <template>
-  <div class="teams-page">
+  <div :class="styles.teamsPage">
     <!-- Page Header -->
-    <div class="page-header">
-      <div class="header-left">
-        <h1 class="page-title">Teams</h1>
+    <div :class="styles.pageHeader">
+      <div :class="styles.headerLeft">
+        <h1 :class="styles.pageTitle">Teams</h1>
       </div>
-      <div class="header-right">
-        <button @click="createTeam" class="btn-primary">
-          <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div :class="styles.headerRight">
+        <button @click="createTeam" :class="styles.btnPrimary">
+          <svg :class="styles.btnIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -108,10 +109,10 @@ const showNotification = (type, message) => {
     </div>
 
     <!-- Search and Filters -->
-    <div class="search-section">
-      <div class="search-bar">
-        <div class="search-input-container">
-          <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div :class="styles.searchSection">
+      <div :class="styles.searchBar">
+        <div :class="styles.searchInputContainer">
+          <svg :class="styles.searchIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -123,16 +124,16 @@ const showNotification = (type, message) => {
             v-model="searchQuery"
             type="text"
             placeholder="Search teams by name or description..."
-            class="search-input"
+            :class="styles.searchInput"
           />
         </div>
       </div>
 
-      <div class="filters">
+      <div :class="styles.filters">
         <select
           v-model="teamsStore.filters.sortBy"
           @change="teamsStore.updateFilters({ sortBy: $event.target.value })"
-          class="filter-select"
+          :class="styles.filterSelect"
         >
           <option value="name">Sort by Name</option>
           <option value="created_at">Sort by Date Created</option>
@@ -142,16 +143,16 @@ const showNotification = (type, message) => {
     </div>
 
     <!-- Teams Grid -->
-    <div class="teams-content">
+    <div :class="styles.teamsContent">
       <!-- Loading State -->
-      <div v-if="isLoading" class="loading-state">
-        <div class="loading-spinner"></div>
+      <div v-if="isLoading" :class="styles.loadingState">
+        <div :class="styles.loadingSpinner"></div>
         <p>Loading teams...</p>
       </div>
 
       <!-- Error State -->
-      <div v-else-if="error" class="error-state">
-        <svg class="error-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div v-else-if="error" :class="styles.errorState">
+        <svg :class="styles.errorIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -161,12 +162,12 @@ const showNotification = (type, message) => {
         </svg>
         <h3>Error Loading Teams</h3>
         <p>{{ error }}</p>
-        <button @click="teamsStore.fetchTeams()" class="btn-secondary">Try Again</button>
+        <button @click="teamsStore.fetchTeams()" :class="styles.btnSecondary">Try Again</button>
       </div>
 
       <!-- Empty State -->
-      <div v-else-if="teams.length === 0" class="empty-state">
-        <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div v-else-if="teams.length === 0" :class="styles.emptyState">
+        <svg :class="styles.emptyIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -177,17 +178,26 @@ const showNotification = (type, message) => {
         <h3>No Teams Found</h3>
         <p v-if="searchQuery">No teams match your search criteria</p>
         <p v-else>Get started by creating your first dragon boat team</p>
-        <button @click="createTeam" class="btn-primary">Create Your First Team</button>
+        <button @click="createTeam" :class="styles.btnPrimary">Create Your First Team</button>
       </div>
 
       <!-- Teams Grid -->
-      <div v-else class="teams-grid">
-        <div v-for="team in teams" :key="team.id" class="team-card" @click="viewTeam(team.id)">
+      <div v-else :class="styles.teamsGrid">
+        <div
+          v-for="team in teams"
+          :key="team.id"
+          :class="styles.teamCard"
+          @click="viewTeam(team.id)"
+        >
           <!-- Team Card Header -->
-          <div class="card-header">
-            <h3 class="team-name">{{ team.name }}</h3>
-            <div class="team-actions" @click.stop>
-              <button @click="editTeam(team.id)" class="action-btn-team-list" title="Edit Team">
+          <div :class="styles.cardHeader">
+            <h3 :class="styles.teamName">{{ team.name }}</h3>
+            <div :class="styles.teamActions" @click.stop>
+              <button
+                @click="editTeam(team.id)"
+                :class="styles.actionBtnTeamList"
+                title="Edit Team"
+              >
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     stroke-linecap="round"
@@ -199,7 +209,7 @@ const showNotification = (type, message) => {
               </button>
               <button
                 @click="deleteTeam(team)"
-                class="action-btn-team-list delete"
+                :class="[styles.actionBtnTeamList, 'delete']"
                 title="Delete Team"
               >
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -214,26 +224,26 @@ const showNotification = (type, message) => {
             </div>
           </div>
           <!-- Team Stats -->
-          <div class="team-stats">
-            <div class="stat-item">
-              <span class="stat-label">Members</span>
-              <span class="stat-value"
-                >{{ team.active_member_count || 0 }}/{{ team.max_members || 22 }}</span
+          <div :class="styles.teamStats">
+            <div :class="styles.statItem">
+              <span :class="styles.statLabel">Members</span>
+              <span :class="styles.statValue"
+              >{{ team.active_member_count || 0 }}/{{ team.max_members || 22 }}</span
               >
             </div>
 
-            <div class="stat-item">
-              <span class="stat-label">City</span>
-              <span class="stat-value">{{ team.city || 'Not assigned' }}</span>
+            <div :class="styles.statItem">
+              <span :class="styles.statLabel">City</span>
+              <span :class="styles.statValue">{{ team.city || 'Not assigned' }}</span>
             </div>
           </div>
 
           <!-- Team Status and Progress -->
-          <div class="team-footer">
-            <div class="member-progress">
-              <div class="progress-bar">
+          <div :class="styles.teamFooter">
+            <div :class="styles.memberProgress">
+              <div :class="styles.progressBar">
                 <div
-                  class="progress-fill"
+                  :class="styles.progressFill"
                   :style="{
                     width: `${Math.min(((team.active_member_count || 0) / (team.max_members || 22)) * 100, 100)}%`,
                     backgroundColor:
@@ -241,7 +251,7 @@ const showNotification = (type, message) => {
                   }"
                 ></div>
               </div>
-              <span class="progress-text">
+              <span :class="styles.progressText">
                 {{
                   Math.round(((team.active_member_count || 0) / (team.max_members || 22)) * 100)
                 }}% full
@@ -253,5 +263,3 @@ const showNotification = (type, message) => {
     </div>
   </div>
 </template>
-
-<style scoped></style>

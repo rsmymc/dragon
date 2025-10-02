@@ -9,7 +9,7 @@ import {
   MEMBERSHIP_ROLES,
   PERSON_SIDES,
 } from '@/constants.js'
-import '@/assets/styles/add-person-to-team.css'
+import styles from '@/assets/styles/add-person-to-team.module.css'
 
 // Props
 const props = defineProps({
@@ -182,19 +182,19 @@ onMounted(() => {
 
   // Focus on first input when modal opens
   setTimeout(() => {
-    const firstInput = document.querySelector('.modal-content input')
+    const firstInput = document.querySelector(`.${styles.modalContent} input`)
     if (firstInput) firstInput.focus()
   }, 100)
 })
 </script>
 
 <template>
-  <div class="modal-overlay" @click="closeModal">
-    <div class="modal-content" @click.stop>
+  <div :class="styles.modalOverlay" @click="closeModal">
+    <div :class="styles.modalContent" @click.stop>
       <!-- Modal Header -->
-      <div class="modal-header">
+      <div :class="styles.modalHeader">
         <h2>Add Person to {{ teamName }}</h2>
-        <button @click="closeModal" class="close-btn">
+        <button @click="closeModal" :class="styles.closeBtn">
           <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
@@ -207,19 +207,17 @@ onMounted(() => {
       </div>
 
       <!-- Mode Selection -->
-      <div class="mode-selection">
-        <div class="mode-tabs">
+      <div :class="styles.modeSelection">
+        <div :class="styles.modeTabs">
           <button
             @click="switchMode('create')"
-            :class="{ active: mode === 'create' }"
-            class="mode-tab"
+            :class="[styles.modeTab, { active: mode === 'create' }]"
           >
             Create New Person
           </button>
           <button
             @click="switchMode('existing')"
-            :class="{ active: mode === 'existing' }"
-            class="mode-tab"
+            :class="[styles.modeTab, { active: mode === 'existing' }]"
           >
             Add Existing Person
           </button>
@@ -227,78 +225,74 @@ onMounted(() => {
       </div>
 
       <!-- Modal Body -->
-      <div class="modal-body">
+      <div :class="styles.modalBody">
         <form @submit.prevent="submitForm">
           <!-- Create New Person Mode -->
-          <div v-if="mode === 'create'" class="form-section">
+          <div v-if="mode === 'create'" :class="styles.formSection">
             <h3>Person Details</h3>
 
             <!-- Name -->
-            <div class="form-group">
+            <div :class="styles.formGroup">
               <label for="name">Name *</label>
               <input
                 id="name"
                 v-model="personForm.name"
                 type="text"
-                class="form-input"
-                :class="{ error: formErrors.name }"
+                :class="[styles.formInput, { error: formErrors.name }]"
                 placeholder="Enter full name"
                 required
               />
-              <span v-if="formErrors.name" class="error-message">{{ formErrors.name }}</span>
+              <span v-if="formErrors.name" :class="styles.errorMessage">{{ formErrors.name }}</span>
             </div>
 
             <!-- Phone -->
-            <div class="form-group">
+            <div :class="styles.formGroup">
               <label for="phone">Phone</label>
               <input
                 id="phone"
                 v-model="personForm.phone"
                 type="tel"
-                class="form-input"
-                :class="{ error: formErrors.phone }"
+                :class="[styles.formInput, { error: formErrors.phone }]"
                 placeholder="Enter phone number"
               />
-              <span v-if="formErrors.phone" class="error-message">{{ formErrors.phone }}</span>
+              <span v-if="formErrors.phone" :class="styles.errorMessage">{{ formErrors.phone }}</span>
             </div>
 
             <!-- Height and Weight -->
-            <div class="form-row">
-              <div class="form-group">
+            <div :class="styles.formRow">
+              <div :class="styles.formGroup">
                 <label for="height">Height (cm)</label>
                 <input
                   id="height"
                   v-model="personForm.height"
                   type="number"
-                  class="form-input"
-                  :class="{ error: formErrors.height }"
+                  :class="[styles.formInput, { error: formErrors.height }]"
                   placeholder="170"
                   min="100"
                   max="250"
                 />
-                <span v-if="formErrors.height" class="error-message">{{ formErrors.height }}</span>
+                <span v-if="formErrors.height" :class="styles.errorMessage">{{ formErrors.height }}</span>
               </div>
 
-              <div class="form-group">
+              <div :class="styles.formGroup">
                 <label for="weight">Weight (kg)</label>
                 <input
                   id="weight"
                   v-model="personForm.weight"
                   type="number"
-                  class="form-input"
-                  :class="{ error: formErrors.weight }"
+                  :class="[styles.formInput, { error: formErrors.weight }]"
                   placeholder="70"
                   min="30"
                   max="200"
                 />
-                <span v-if="formErrors.weight" class="error-message">{{ formErrors.weight }}</span>
+                <span v-if="formErrors.weight" :class="styles.errorMessage">{{ formErrors.weight }}</span>
               </div>
             </div>
 
             <!-- Side Preference -->
-            <div class="form-group">
+            <div :class="styles.formGroup">
               <label for="side">Side Preference</label>
-              <select id="side" v-model="personForm.side" class="form-select">
+              <select id="side" v-model="personForm.side" :class="styles.formSelect">
                 <option :value="PERSON_SIDES.BOTH">
                   {{ PERSON_SIDE_LABELS[PERSON_SIDES.BOTH] }}
                 </option>
@@ -313,29 +307,29 @@ onMounted(() => {
           </div>
 
           <!-- Add Existing Person Mode -->
-          <div v-else class="form-section">
+          <div v-else :class="styles.formSection">
             <h3>Select Person</h3>
 
             <!-- Search -->
-            <div class="form-group">
+            <div :class="styles.formGroup">
               <label for="search">Search People</label>
               <input
                 id="search"
                 v-model="searchQuery"
                 type="text"
-                class="form-input"
+                :class="styles.formInput"
                 placeholder="Search by name or phone..."
               />
             </div>
 
             <!-- Person Selection -->
-            <div class="person-selection">
-              <div v-if="personsStore.isLoading" class="loading-state">
-                <div class="loading-spinner"></div>
+            <div :class="styles.personSelection">
+              <div v-if="personsStore.isLoading" :class="styles.loadingState">
+                <div :class="styles.loadingSpinner"></div>
                 <p>Loading available people...</p>
               </div>
 
-              <div v-else-if="filteredPersons.length === 0" class="empty-state">
+              <div v-else-if="filteredPersons.length === 0" :class="styles.emptyState">
                 <p>
                   {{
                     searchQuery
@@ -345,27 +339,26 @@ onMounted(() => {
                 </p>
               </div>
 
-              <div v-else class="person-list">
+              <div v-else :class="styles.personList">
                 <div
                   v-for="person in filteredPersons"
                   :key="person.id"
-                  class="person-item"
-                  :class="{ selected: selectedPersonId == person.id }"
+                  :class="[styles.personItem, { selected: selectedPersonId == person.id }]"
                   @click="selectedPersonId = person.id"
                 >
-                  <div class="person-avatar">
+                  <div :class="styles.personAvatar">
                     <img
                       v-if="person.profile_picture_url"
                       :src="person.profile_picture_url"
                       :alt="person.name"
-                      class="avatar-image"
+                      :class="styles.avatarImage"
                     />
-                    <div v-else class="avatar-initial">
+                    <div v-else :class="styles.avatarInitial">
                       {{ person.name.charAt(0) }}
                     </div>
                   </div>
 
-                  <div class="person-info">
+                  <div :class="styles.personInfo">
                     <h4>{{ person.name }}</h4>
                     <p v-if="person.phone">📱 {{ person.phone }}</p>
                     <p v-if="person.height || person.weight">
@@ -375,7 +368,7 @@ onMounted(() => {
                     <p>🧭 {{ PERSON_SIDE_LABELS[person.side] }}</p>
                   </div>
 
-                  <div class="selection-indicator">
+                  <div :class="styles.selectionIndicator">
                     <svg
                       v-if="selectedPersonId == person.id"
                       width="20"
@@ -392,13 +385,13 @@ onMounted(() => {
           </div>
 
           <!-- Membership Details -->
-          <div class="form-section">
+          <div :class="styles.formSection">
             <h3>Membership Details</h3>
 
             <!-- Role -->
-            <div class="form-group">
+            <div :class="styles.formGroup">
               <label for="role">Role</label>
-              <select id="role" v-model="membershipForm.role" class="form-select">
+              <select id="role" v-model="membershipForm.role" :class="styles.formSelect">
                 <option :value="MEMBERSHIP_ROLES.PLAYER">
                   {{ MEMBERSHIP_ROLE_LABELS[MEMBERSHIP_ROLES.PLAYER] }}
                 </option>
@@ -418,9 +411,9 @@ onMounted(() => {
       </div>
 
       <!-- Modal Footer -->
-      <div class="modal-footer">
-        <button @click="closeModal" class="btn-secondary">Cancel</button>
-        <button @click="submitForm" :disabled="!isFormValid || isSubmitting" class="btn-primary">
+      <div :class="styles.modalFooter">
+        <button @click="closeModal" :class="styles.btnSecondary">Cancel</button>
+        <button @click="submitForm" :disabled="!isFormValid || isSubmitting" :class="styles.btnPrimary">
           <span v-if="isSubmitting">Adding...</span>
           <span v-else>Add to Team</span>
         </button>

@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTeamsStore } from '@/stores/teams.js'
-import '@/assets/styles/create-team.css'
+import styles from '@/assets/styles/create-team.module.css'
 
 const router = useRouter()
 const teamsStore = useTeamsStore()
@@ -102,11 +102,11 @@ const isFormValid = computed(() => {
 </script>
 
 <template>
-  <div class="create-team-page">
+  <div :class="styles.createTeamPage">
     <!-- Page Header -->
-    <div class="page-header">
-      <div class="header-left">
-        <button @click="handleCancel" class="back-button">
+    <div :class="styles.pageHeader">
+      <div :class="styles.headerLeft">
+        <button @click="handleCancel" :class="styles.backButton">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
@@ -117,16 +117,16 @@ const isFormValid = computed(() => {
           </svg>
           Back to Teams
         </button>
-        <div class="header-content">
-          <h1 class="page-title">Create New Team</h1>
-          <p class="page-subtitle">Add a new dragon boat team to your organization</p>
+        <div :class="styles.headerContent">
+          <h1 :class="styles.pageTitle">Create New Team</h1>
+          <p :class="styles.pageSubtitle">Add a new dragon boat team to your organization</p>
         </div>
       </div>
     </div>
 
     <!-- Success Message -->
-    <div v-if="showSuccess" class="success-banner">
-      <svg class="success-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div v-if="showSuccess" :class="styles.successBanner">
+      <svg :class="styles.successIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
           stroke-linecap="round"
           stroke-linejoin="round"
@@ -134,24 +134,24 @@ const isFormValid = computed(() => {
           d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
         />
       </svg>
-      <div class="success-content">
+      <div :class="styles.successContent">
         <h3>Team Created Successfully!</h3>
         <p>Redirecting to teams list...</p>
       </div>
     </div>
 
     <!-- Create Team Form -->
-    <div class="form-container">
-      <form @submit.prevent="handleSubmit" class="team-form">
+    <div :class="styles.formContainer">
+      <form @submit.prevent="handleSubmit" :class="styles.teamForm">
         <!-- Team Information Section -->
-        <div class="form-section">
-          <h2 class="section-title">Team Information</h2>
+        <div :class="styles.formSection">
+          <h2 :class="styles.sectionTitle">Team Information</h2>
 
           <!-- Team Name -->
-          <div class="form-group">
-            <label for="team-name" class="form-label">
+          <div :class="styles.formGroup">
+            <label for="team-name" :class="styles.formLabel">
               Team Name
-              <span class="required">*</span>
+              <span :class="styles.required">*</span>
             </label>
             <input
               id="team-name"
@@ -159,37 +159,35 @@ const isFormValid = computed(() => {
               @input="clearError('name')"
               @blur="validateForm"
               type="text"
-              class="form-input"
-              :class="{ error: errors.name }"
+              :class="[styles.formInput, { error: errors.name }]"
               placeholder="e.g., Dragon Warriors"
               maxlength="80"
               required
             />
-            <p v-if="errors.name" class="error-message">{{ errors.name }}</p>
+            <p v-if="errors.name" :class="styles.errorMessage">{{ errors.name }}</p>
           </div>
 
           <!-- City -->
-          <div class="form-group">
-            <label for="city" class="form-label">City (Optional)</label>
+          <div :class="styles.formGroup">
+            <label for="city" :class="styles.formLabel">City (Optional)</label>
             <input
               id="city"
               v-model="formData.city"
               @input="clearError('city')"
               type="text"
-              class="form-input"
-              :class="{ error: errors.city }"
+              :class="[styles.formInput, { error: errors.city }]"
               placeholder="e.g., San Francisco"
               maxlength="80"
             />
-            <p class="field-help">The city where this team is based</p>
-            <p v-if="errors.city" class="error-message">{{ errors.city }}</p>
+            <p :class="styles.fieldHelp">The city where this team is based</p>
+            <p v-if="errors.city" :class="styles.errorMessage">{{ errors.city }}</p>
           </div>
 
           <!-- Max Members -->
-          <div class="form-group">
-            <label for="max-members" class="form-label">
+          <div :class="styles.formGroup">
+            <label for="max-members" :class="styles.formLabel">
               Maximum Members
-              <span class="required">*</span>
+              <span :class="styles.required">*</span>
             </label>
             <input
               id="max-members"
@@ -197,30 +195,43 @@ const isFormValid = computed(() => {
               @input="clearError('max_members')"
               @blur="validateForm"
               type="number"
-              class="form-input number-input"
-              :class="{ error: errors.max_members }"
+              :class="[styles.formInput, styles.numberInput, { error: errors.max_members }]"
               min="1"
               max="50"
               required
             />
-            <p class="field-help">Typical dragon boat teams have 20-22 members</p>
-            <p v-if="errors.max_members" class="error-message">{{ errors.max_members }}</p>
+            <p :class="styles.fieldHelp">Typical dragon boat teams have 20-22 members</p>
+            <p v-if="errors.max_members" :class="styles.errorMessage">{{ errors.max_members }}</p>
           </div>
         </div>
 
         <!-- Form Actions -->
-        <div class="form-actions">
-          <button type="button" @click="handleCancel" class="btn-secondary" :disabled="isLoading">
+        <div :class="styles.formActions">
+          <button
+            type="button"
+            @click="handleCancel"
+            :class="styles.btnSecondary"
+            :disabled="isLoading"
+          >
             Cancel
           </button>
 
-          <div class="action-group">
-            <button type="button" @click="resetForm" class="btn-outline" :disabled="isLoading">
+          <div :class="styles.actionGroup">
+            <button
+              type="button"
+              @click="resetForm"
+              :class="styles.btnOutline"
+              :disabled="isLoading"
+            >
               Reset Form
             </button>
 
-            <button type="submit" class="btn-primary" :disabled="!isFormValid || isLoading">
-              <svg v-if="isLoading" class="loading-spinner" fill="none" viewBox="0 0 24 24">
+            <button
+              type="submit"
+              :class="styles.btnPrimary"
+              :disabled="!isFormValid || isLoading"
+            >
+              <svg v-if="isLoading" :class="styles.loadingSpinner" fill="none" viewBox="0 0 24 24">
                 <circle
                   class="opacity-25"
                   cx="12"

@@ -3,6 +3,7 @@ import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useTeamsStore } from '@/stores/teams.js'
 import { useLocationsStore } from '@/stores/locations.js'
 import { useTrainingsStore } from '@/stores/trainings.js'
+import styles from '@/assets/styles/create-training.module.css'
 
 // Props
 const props = defineProps({
@@ -358,27 +359,26 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="modal-overlay" @click="handleOverlayClick">
-    <div class="modal-content" @click.stop>
+  <div :class="styles.modalOverlay" @click="handleOverlayClick">
+    <div :class="styles.modalContent" @click.stop>
       <!-- Modal Header -->
-      <div class="modal-header">
+      <div :class="styles.modalHeader">
         <h3>Create Training Session</h3>
-        <button @click="handleClose" class="modal-close" :disabled="isSubmitting">×</button>
+        <button @click="handleClose" :class="styles.modalClose" :disabled="isSubmitting">×</button>
       </div>
 
       <!-- Modal Body -->
-      <div class="modal-body">
-        <form @submit.prevent="handleSubmit" class="training-form">
+      <div :class="styles.modalBody">
+        <form @submit.prevent="handleSubmit" :class="styles.trainingForm">
           <!-- Team Selection (if not pre-selected) -->
-          <div v-if="!teamId" class="form-group">
-            <label for="team-select" class="form-label">
-              Team <span class="required">*</span>
+          <div v-if="!teamId" :class="styles.formGroup">
+            <label for="team-select" :class="styles.formLabel">
+              Team <span :class="styles.required">*</span>
             </label>
             <select
               id="team-select"
               v-model="formData.teamId"
-              class="form-input"
-              :class="{ error: errors.teamId }"
+              :class="[styles.formInput, { error: errors.teamId }]"
               :disabled="isSubmitting || teamsLoading"
               @change="onTeamChange"
             >
@@ -387,19 +387,18 @@ onMounted(() => {
                 {{ team.name }}
               </option>
             </select>
-            <div v-if="errors.teamId" class="field-error">{{ errors.teamId }}</div>
+            <div v-if="errors.teamId" :class="styles.fieldError">{{ errors.teamId }}</div>
           </div>
 
           <!-- Location Selection -->
-          <div class="form-group">
-            <label for="location-select" class="form-label">
-              Location <span class="required">*</span>
+          <div :class="styles.formGroup">
+            <label for="location-select" :class="styles.formLabel">
+              Location <span :class="styles.required">*</span>
             </label>
             <select
               id="location-select"
               v-model="formData.locationId"
-              class="form-input"
-              :class="{ error: errors.locationId }"
+              :class="[styles.formInput, { error: errors.locationId }]"
               :disabled="isSubmitting || !selectedTeamId || locationsLoading"
             >
               <option value="">
@@ -415,18 +414,18 @@ onMounted(() => {
                 {{ location.name }}
               </option>
             </select>
-            <div v-if="errors.locationId" class="field-error">{{ errors.locationId }}</div>
+            <div v-if="errors.locationId" :class="styles.fieldError">{{ errors.locationId }}</div>
 
             <!-- No Locations / Create Location Section -->
             <div
               v-if="!filteredLocations.length && selectedTeamId && !locationsLoading"
-              class="no-locations-section"
+              :class="styles.noLocationsSection"
             >
-              <div class="field-help">No locations found for this team.</div>
+              <div :class="styles.fieldHelp">No locations found for this team.</div>
               <button
                 type="button"
                 @click="showCreateLocation = true"
-                class="btn-create-location"
+                :class="styles.btnCreateLocation"
                 :disabled="isSubmitting"
               >
                 + Create New Location
@@ -434,59 +433,62 @@ onMounted(() => {
             </div>
 
             <!-- Quick Location Creation Form -->
-            <div v-if="showCreateLocation" class="create-location-form">
-              <div class="form-group">
-                <label class="form-label"> Location Name <span class="required">*</span> </label>
+            <div v-if="showCreateLocation" :class="styles.createLocationForm">
+              <div :class="styles.formGroup">
+                <label :class="styles.formLabel">
+                  Location Name <span :class="styles.required">*</span>
+                </label>
                 <input
                   v-model="newLocationName"
                   type="text"
-                  class="form-input"
-                  :class="{ error: newLocationError }"
+                  :class="[styles.formInput, { error: newLocationError }]"
                   placeholder="Enter location name..."
                   :disabled="isCreatingLocation"
                 />
-                <div v-if="newLocationError" class="field-error">{{ newLocationError }}</div>
+                <div v-if="newLocationError" :class="styles.fieldError">{{ newLocationError }}</div>
               </div>
 
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label"> Latitude <span class="required">*</span> </label>
+              <div :class="styles.formRow">
+                <div :class="styles.formGroup">
+                  <label :class="styles.formLabel">
+                    Latitude <span :class="styles.required">*</span>
+                  </label>
                   <input
                     v-model="newLocationLat"
                     type="number"
                     step="any"
-                    class="form-input"
-                    :class="{ error: newLocationLatError }"
+                    :class="[styles.formInput, { error: newLocationLatError }]"
                     placeholder="e.g. 40.7128"
                     :disabled="isCreatingLocation"
                   />
-                  <div v-if="newLocationLatError" class="field-error">
+                  <div v-if="newLocationLatError" :class="styles.fieldError">
                     {{ newLocationLatError }}
                   </div>
                 </div>
 
-                <div class="form-group">
-                  <label class="form-label"> Longitude <span class="required">*</span> </label>
+                <div :class="styles.formGroup">
+                  <label :class="styles.formLabel">
+                    Longitude <span :class="styles.required">*</span>
+                  </label>
                   <input
                     v-model="newLocationLon"
                     type="number"
                     step="any"
-                    class="form-input"
-                    :class="{ error: newLocationLonError }"
+                    :class="[styles.formInput, { error: newLocationLonError }]"
                     placeholder="e.g. -74.0060"
                     :disabled="isCreatingLocation"
                   />
-                  <div v-if="newLocationLonError" class="field-error">
+                  <div v-if="newLocationLonError" :class="styles.fieldError">
                     {{ newLocationLonError }}
                   </div>
                 </div>
               </div>
 
-              <div class="location-actions">
+              <div :class="styles.locationActions">
                 <button
                   type="button"
                   @click="cancelCreateLocation"
-                  class="btn-cancel-small"
+                  :class="styles.btnCancelSmall"
                   :disabled="isCreatingLocation"
                 >
                   Cancel
@@ -494,7 +496,7 @@ onMounted(() => {
                 <button
                   type="button"
                   @click="createLocation"
-                  class="btn-create-small"
+                  :class="styles.btnCreateSmall"
                   :disabled="isCreatingLocation || !isLocationFormValid"
                 >
                   <span v-if="isCreatingLocation">Creating...</span>
@@ -505,57 +507,57 @@ onMounted(() => {
           </div>
 
           <!-- Date and Time -->
-          <div class="form-row">
-            <div class="form-group">
-              <label for="date" class="form-label"> Date <span class="required">*</span> </label>
+          <div :class="styles.formRow">
+            <div :class="styles.formGroup">
+              <label for="date" :class="styles.formLabel">
+                Date <span :class="styles.required">*</span>
+              </label>
               <input
                 id="date"
                 v-model="formData.date"
                 type="date"
-                class="form-input"
-                :class="{ error: errors.date }"
+                :class="[styles.formInput, { error: errors.date }]"
                 :min="todayDate"
                 :disabled="isSubmitting"
               />
-              <div v-if="errors.date" class="field-error">{{ errors.date }}</div>
+              <div v-if="errors.date" :class="styles.fieldError">{{ errors.date }}</div>
             </div>
 
-            <div class="form-group">
-              <label for="time" class="form-label">
-                Start Time <span class="required">*</span>
+            <div :class="styles.formGroup">
+              <label for="time" :class="styles.formLabel">
+                Start Time <span :class="styles.required">*</span>
               </label>
               <input
                 id="time"
                 v-model="formData.time"
                 type="time"
-                class="form-input"
-                :class="{ error: errors.time }"
+                :class="[styles.formInput, { error: errors.time }]"
                 :disabled="isSubmitting"
               />
-              <div v-if="errors.time" class="field-error">{{ errors.time }}</div>
+              <div v-if="errors.time" :class="styles.fieldError">{{ errors.time }}</div>
             </div>
           </div>
 
           <!-- Submit Error -->
-          <div v-if="submitError" class="error-message">
+          <div v-if="submitError" :class="styles.errorMessage">
             <p>{{ submitError }}</p>
           </div>
         </form>
       </div>
 
       <!-- Modal Footer -->
-      <div class="modal-footer">
-        <button type="button" @click="handleClose" class="btn-cancel" :disabled="isSubmitting">
+      <div :class="styles.modalFooter">
+        <button type="button" @click="handleClose" :class="styles.btnCancel" :disabled="isSubmitting">
           Cancel
         </button>
         <button
           type="button"
           @click="handleSubmit"
-          class="btn-primary"
+          :class="styles.btnPrimary"
           :disabled="isSubmitting || !isFormValid"
         >
-          <span v-if="isSubmitting" class="btn-loading">
-            <div class="btn-spinner"></div>
+          <span v-if="isSubmitting" :class="styles.btnLoading">
+            <div :class="styles.btnSpinner"></div>
             Creating...
           </span>
           <span v-else>Create Training</span>
@@ -564,322 +566,3 @@ onMounted(() => {
     </div>
   </div>
 </template>
-
-<style scoped>
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 1rem;
-}
-
-.modal-content {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  max-width: 500px;
-  width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem 1.5rem 0 1.5rem;
-  border-bottom: 1px solid #eee;
-}
-
-.modal-header h3 {
-  margin: 0;
-  color: #333;
-  font-size: 1.25rem;
-}
-
-.modal-close {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: #666;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-}
-
-.modal-close:hover:not(:disabled) {
-  background: #f5f5f5;
-  color: #333;
-}
-
-.modal-close:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.modal-body {
-  padding: 1.5rem;
-  flex: 1;
-}
-
-.training-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-}
-
-.form-label {
-  font-weight: 500;
-  color: #333;
-  font-size: 0.9rem;
-}
-
-.required {
-  color: #c33;
-}
-
-.form-input {
-  padding: 0.75rem;
-  border: 2px solid #ddd;
-  border-radius: 6px;
-  font-size: 1rem;
-  transition: border-color 0.2s ease;
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: #007bff;
-}
-
-.form-input.error {
-  border-color: #c33;
-}
-
-.form-input:disabled {
-  background: #f5f5f5;
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
-.field-error {
-  color: #c33;
-  font-size: 0.8rem;
-}
-
-.field-help {
-  color: #666;
-  font-size: 0.8rem;
-}
-
-.no-locations-section {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin-top: 0.5rem;
-}
-
-.btn-create-location {
-  padding: 0.5rem 1rem;
-  background: #28a745;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: background 0.2s ease;
-  align-self: flex-start;
-}
-
-.btn-create-location:hover:not(:disabled) {
-  background: #218838;
-}
-
-.btn-create-location:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-}
-
-.create-location-form {
-  background: #f8f9fa;
-  border: 1px solid #dee2e6;
-  border-radius: 6px;
-  padding: 1rem;
-  margin-top: 0.5rem;
-}
-
-.location-actions {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
-  margin-top: 0.75rem;
-}
-
-.btn-cancel-small,
-.btn-create-small {
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-cancel-small {
-  background: #f8f9fa;
-  color: #6c757d;
-  border: 1px solid #ddd;
-}
-
-.btn-cancel-small:hover:not(:disabled) {
-  background: #e9ecef;
-}
-
-.btn-create-small {
-  background: #007bff;
-  color: white;
-}
-
-.btn-create-small:hover:not(:disabled) {
-  background: #0056b3;
-}
-
-.btn-create-small:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-}
-
-.error-message {
-  background: #fee;
-  border: 1px solid #fcc;
-  border-radius: 6px;
-  padding: 0.75rem;
-  color: #c33;
-  font-size: 0.9rem;
-}
-
-.error-message p {
-  margin: 0;
-}
-
-.modal-footer {
-  padding: 1rem 1.5rem;
-  border-top: 1px solid #eee;
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-}
-
-.btn-cancel,
-.btn-primary {
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: none;
-  min-width: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.btn-cancel {
-  background: #f8f9fa;
-  color: #6c757d;
-  border: 1px solid #ddd;
-}
-
-.btn-cancel:hover:not(:disabled) {
-  background: #e9ecef;
-  border-color: #ccc;
-}
-
-.btn-primary {
-  background: #007bff;
-  color: white;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: #0056b3;
-}
-
-.btn-primary:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-}
-
-.btn-loading {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.btn-spinner {
-  width: 16px;
-  height: 16px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top: 2px solid white;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .modal-overlay {
-    padding: 0.5rem;
-  }
-
-  .modal-content {
-    max-width: none;
-  }
-
-  .form-row {
-    grid-template-columns: 1fr;
-  }
-
-  .modal-footer {
-    flex-direction: column-reverse;
-  }
-
-  .btn-cancel,
-  .btn-primary {
-    width: 100%;
-  }
-}
-</style>

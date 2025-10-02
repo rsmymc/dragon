@@ -5,7 +5,7 @@ import { useTrainingsStore } from '@/stores/trainings'
 import { useLocationsStore } from '@/stores/locations'
 import { useTeamsStore } from '@/stores/teams'
 import CreateTrainingModal from '@/components/modals/CreateTrainingModal.vue'
-import '@/assets/styles/team-trainings.css'
+import styles from '@/assets/styles/team-trainings.module.css'
 
 const route = useRoute()
 const trainingsStore = useTrainingsStore()
@@ -19,6 +19,7 @@ const dateRange = ref({
   end: '',
 })
 const showCreateModal = ref(false)
+
 // Computed
 const teamId = computed(() => route.params.teamId)
 
@@ -200,7 +201,6 @@ const deleteTraining = async (training) => {
 const handleTrainingCreated = (newTraining) => {
   console.log('✅ Training created successfully:', newTraining)
   showCreateModal.value = false
-  // The store will automatically update the trainings list
 }
 
 // Lifecycle
@@ -208,12 +208,13 @@ onMounted(() => {
   loadTrainings()
 })
 </script>
+
 <template>
-  <div class="team-trainings-view">
+  <div :class="styles.teamTrainingsView">
     <!-- Header -->
-    <div class="header">
-      <div class="header-content">
-        <router-link :to="`/teams/${teamId}`" class="back-link">
+    <div :class="styles.header">
+      <div :class="styles.headerContent">
+        <router-link :to="`/teams/${teamId}`" :class="styles.backLink">
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
@@ -225,13 +226,13 @@ onMounted(() => {
           Back to {{ teamName }}
         </router-link>
 
-        <div class="page-info">
+        <div :class="styles.pageInfo">
           <h1>Training Sessions</h1>
-          <p class="team-subtitle">{{ teamName }}</p>
+          <p :class="styles.teamSubtitle">{{ teamName }}</p>
         </div>
 
-        <div class="header-actions">
-          <button @click="showCreateModal = true" class="btn-primary">
+        <div :class="styles.headerActions">
+          <button @click="showCreateModal = true" :class="styles.btnPrimary">
             <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 stroke-linecap="round"
@@ -247,44 +248,49 @@ onMounted(() => {
     </div>
 
     <!-- Filters -->
-    <div class="filters-section">
-      <div class="filters-content">
+    <div :class="styles.filtersSection">
+      <div :class="styles.filtersContent">
         <!-- Time Filter Tabs -->
-        <div class="filter-tabs">
+        <div :class="styles.filterTabs">
           <button
             @click="timeFilter = 'upcoming'"
-            :class="['tab-btn', { active: timeFilter === 'upcoming' }]"
+            :class="[styles.tabBtn, { active: timeFilter === 'upcoming' }]"
           >
             Upcoming ({{ upcomingCount }})
           </button>
           <button
             @click="timeFilter = 'past'"
-            :class="['tab-btn', { active: timeFilter === 'past' }]"
+            :class="[styles.tabBtn, { active: timeFilter === 'past' }]"
           >
             Past ({{ pastCount }})
           </button>
           <button
             @click="timeFilter = 'all'"
-            :class="['tab-btn', { active: timeFilter === 'all' }]"
+            :class="[styles.tabBtn, { active: timeFilter === 'all' }]"
           >
             All ({{ totalCount }})
           </button>
         </div>
 
         <!-- Date Range Picker -->
-        <div class="date-filters">
+        <div :class="styles.dateFilters">
           <input
             v-model="dateRange.start"
             type="date"
-            class="date-input"
+            :class="styles.dateInput"
             placeholder="Start date"
           />
-          <span class="date-separator">to</span>
-          <input v-model="dateRange.end" type="date" class="date-input" placeholder="End date" />
+          <span :class="styles.dateSeparator">to</span>
+          <input
+            v-model="dateRange.end"
+            type="date"
+            :class="styles.dateInput"
+            placeholder="End date"
+          />
           <button
             v-if="dateRange.start || dateRange.end"
             @click="clearDateRange"
-            class="clear-dates-btn"
+            :class="styles.clearDatesBtn"
             title="Clear date filter"
           >
             ✕
@@ -294,25 +300,25 @@ onMounted(() => {
     </div>
 
     <!-- Loading State -->
-    <div v-if="trainingsStore.isLoading" class="loading-state">
-      <div class="loading-spinner"></div>
+    <div v-if="trainingsStore.isLoading" :class="styles.loadingState">
+      <div :class="styles.loadingSpinner"></div>
       <p>Loading trainings...</p>
     </div>
 
     <!-- Error State -->
-    <div v-else-if="trainingsStore.error" class="error-state">
-      <div class="error-icon">⚠️</div>
+    <div v-else-if="trainingsStore.error" :class="styles.errorState">
+      <div :class="styles.errorIcon">⚠️</div>
       <h3>Error Loading Trainings</h3>
       <p>{{ trainingsStore.error }}</p>
-      <button @click="loadTrainings" class="btn-retry">Try Again</button>
+      <button @click="loadTrainings" :class="styles.btnRetry">Try Again</button>
     </div>
 
     <!-- Empty State -->
-    <div v-else-if="filteredTrainings.length === 0" class="empty-state">
-      <div class="empty-icon">🏃‍♂️</div>
+    <div v-else-if="filteredTrainings.length === 0" :class="styles.emptyState">
+      <div :class="styles.emptyIcon">🏃‍♂️</div>
       <h3>{{ getEmptyTitle() }}</h3>
       <p>{{ getEmptyMessage() }}</p>
-      <button @click="showCreateModal = true" class="btn-primary">
+      <button @click="showCreateModal = true" :class="styles.btnPrimary">
         <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             stroke-linecap="round"
@@ -326,60 +332,63 @@ onMounted(() => {
     </div>
 
     <!-- Trainings Grid -->
-    <div v-else class="trainings-container">
-      <div class="trainings-stats">
-        <div class="stat-card">
-          <div class="stat-number">{{ filteredTrainings.length }}</div>
-          <div class="stat-label">
+    <div v-else :class="styles.trainingsContainer">
+      <div :class="styles.trainingsStats">
+        <div :class="styles.statCard">
+          <div :class="styles.statNumber">{{ filteredTrainings.length }}</div>
+          <div :class="styles.statLabel">
             {{
               timeFilter === 'upcoming' ? 'Upcoming' : timeFilter === 'past' ? 'Completed' : 'Total'
             }}
             Trainings
           </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-number">{{ uniqueLocationsCount }}</div>
-          <div class="stat-label">Training Locations</div>
+        <div :class="styles.statCard">
+          <div :class="styles.statNumber">{{ uniqueLocationsCount }}</div>
+          <div :class="styles.statLabel">Training Locations</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-number">{{ nextTrainingDays }}</div>
-          <div class="stat-label">Days to Next Training</div>
+        <div :class="styles.statCard">
+          <div :class="styles.statNumber">{{ nextTrainingDays }}</div>
+          <div :class="styles.statLabel">Days to Next Training</div>
         </div>
       </div>
 
-      <div class="trainings-grid">
+      <div :class="styles.trainingsGrid">
         <div
           v-for="training in filteredTrainings"
           :key="training.id"
-          class="training-card"
-          :class="{ past: isPastTraining(training) }"
+          :class="[styles.trainingCard, { past: isPastTraining(training) }]"
         >
           <!-- Training Header -->
-          <div class="training-header">
-            <div class="training-date-time">
-              <div class="training-date">
+          <div :class="styles.trainingHeader">
+            <div :class="styles.trainingDateTime">
+              <div :class="styles.trainingDate">
                 {{ formatTrainingDate(training.start_at) }}
               </div>
-              <div class="training-time">
+              <div :class="styles.trainingTime">
                 {{ formatTrainingTime(training.start_at) }}
               </div>
             </div>
 
-            <div class="training-status-badges">
-              <span v-if="isPastTraining(training)" class="status-badge past"> Completed </span>
-              <span v-else-if="isToday(training.start_at)" class="status-badge today"> Today </span>
-              <span v-else-if="isTomorrow(training.start_at)" class="status-badge soon">
+            <div :class="styles.trainingStatusBadges">
+              <span v-if="isPastTraining(training)" :class="[styles.statusBadge, styles.past]">
+                Completed
+              </span>
+              <span v-else-if="isToday(training.start_at)" :class="[styles.statusBadge, styles.today]">
+                Today
+              </span>
+              <span v-else-if="isTomorrow(training.start_at)" :class="[styles.statusBadge, styles.soon]">
                 Tomorrow
               </span>
-              <span v-else-if="isThisWeek(training.start_at)" class="status-badge this-week">
+              <span v-else-if="isThisWeek(training.start_at)" :class="[styles.statusBadge, styles.thisWeek]">
                 This Week
               </span>
             </div>
           </div>
 
           <!-- Training Content -->
-          <div class="training-content">
-            <div class="training-location">
+          <div :class="styles.trainingContent">
+            <div :class="styles.trainingLocation">
               <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -397,32 +406,32 @@ onMounted(() => {
               <span>{{ training.location.name }}</span>
             </div>
 
-            <div class="training-details">
-              <div class="detail-row">
-                <span class="detail-label">📅 Date:</span>
-                <span class="detail-value">{{ getRelativeDate(training.start_at) }}</span>
+            <div :class="styles.trainingDetails">
+              <div :class="styles.detailRow">
+                <span :class="styles.detailLabel">📅 Date:</span>
+                <span :class="styles.detailValue">{{ getRelativeDate(training.start_at) }}</span>
               </div>
-              <div class="detail-row">
-                <span class="detail-label">📍 Coordinates:</span>
+              <div :class="styles.detailRow">
+                <span :class="styles.detailLabel">📍 Coordinates:</span>
                 <a
-                  v-if="getLocationCoordinates(training.location.id) !== 'N/A'"
-                  :href="getLocationCoordinates(training.location.id).url"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="detail-link"
+                v-if="getLocationCoordinates(training.location.id) !== 'N/A'"
+                :href="getLocationCoordinates(training.location.id).url"
+                target="_blank"
+                rel="noopener noreferrer"
+                :class="styles.detailLink"
                 >
-                  {{ getLocationCoordinates(training.location.id).text }}
+                {{ getLocationCoordinates(training.location.id).text }}
                 </a>
-                <span v-else class="detail-value">N/A</span>
+                <span v-else :class="styles.detailValue">N/A</span>
               </div>
             </div>
           </div>
 
           <!-- Training Actions -->
-          <div class="training-actions">
+          <div :class="styles.trainingActions">
             <router-link
               :to="`/teams/${teamId}/trainings/${training.id}`"
-              class="action-btn primary"
+              :class="[styles.actionBtn, styles.primary]"
             >
               <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -441,18 +450,7 @@ onMounted(() => {
               Details
             </router-link>
 
-            <!--            <router-link
-              v-if="!isPastTraining(training)"
-              :to="`/teams/${teamId}/trainings/${training.id}/edit`"
-              class="action-btn secondary"
-            >
-              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-              </svg>
-              Edit
-            </router-link>-->
-
-            <button @click="deleteTraining(training)" class="action-btn danger">
+            <button @click="deleteTraining(training)" :class="[styles.actionBtn, styles.danger]">
               <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -467,6 +465,7 @@ onMounted(() => {
         </div>
       </div>
     </div>
+
     <!-- Create Training Modal -->
     <CreateTrainingModal
       v-if="showCreateModal"
