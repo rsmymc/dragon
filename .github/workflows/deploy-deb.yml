@@ -1,0 +1,193 @@
+name: Deploy to Dev
+
+# Trigger on push to main branch or manually
+on:
+  push:
+    branches: [ main, dev ]
+  workflow_dispatch:  # Allows manual trigger from GitHub UI
+
+env:
+  AWS_REGION: us-east-2
+  ECR_REGISTRY: public.ecr.aws/x6i8o2b8
+  ENVIRONMENT: dev
+
+jobs:
+  deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    
+    steps:
+    # Step 1: Checkout code
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Step 2: Configure AWS credentials
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1  # ECR Public uses us-east-1
+
+    # Step 3: Login to Amazon ECR Public
+    - name: Login to Amazon ECR Public
+      run: |
+        aws ecr-public get-login-password --region us-east-1 | \
+          docker login --username AWS --password-stdin $ECR_REGISTRY
+
+    # Step 4: Build and push backend image
+    - name: Build and push backend
+      working-directory: ./dragon_backend_django
+      run: |
+        echo "🏗️ Building backend..."
+        docker build -t $ECR_REGISTRY/dragon-backend:$ENVIRONMENT .
+        echo "📤 Pushing backend..."
+        docker push $ECR_REGISTRY/dragon-backend:$ENVIRONMENT
+        echo "✅ Backend image pushed"
+
+    # Step 5: Update backend service FIRST (so it gets new IP)
+    - name: Update backend service
+      run: |
+        echo "🔄 Updating backend service with new image..."
+        aws ecs update-service \
+          --cluster dragon-app-cluster-$ENVIRONMENT \
+          --service dragon-backend-service-$ENVIRONMENT \
+          --force-new-deployment \
+          --region $AWS_REGION \
+          --output text > /dev/null
+        echo "✅ Backend service update initiated"
+
+    # Step 6: Wait for new backend task to be running
+    - name: Wait for new backend task
+      run: |
+        echo "⏳ Waiting for new backend task to start (60 seconds)..."
+        sleep 60
+        
+        echo "🔍 Checking backend task status..."
+        aws ecs describe-services \
+          --cluster dragon-app-cluster-$ENVIRONMENT \
+          --services dragon-backend-service-$ENVIRONMENT \
+          --region $AWS_REGION \
+          --query 'services[0].deployments[0].[status,runningCount]' \
+          --output text
+
+    # Step 7: Get NEW backend IP (from restarted backend)
+    - name: Get NEW backend IP
+      id: backend-ip
+      run: |
+        echo "🔍 Getting NEW backend IP from running task..."
+        
+        TASK_ARN=$(aws ecs list-tasks \
+          --cluster dragon-app-cluster-$ENVIRONMENT \
+          --service-name dragon-backend-service-$ENVIRONMENT \
+          --region $AWS_REGION \
+          --query 'taskArns[0]' \
+          --output text)
+        
+        if [ "$TASK_ARN" == "None" ] || [ -z "$TASK_ARN" ]; then
+          echo "❌ Backend task not found"
+          exit 1
+        fi
+        
+        ENI_ID=$(aws ecs describe-tasks \
+          --cluster dragon-app-cluster-$ENVIRONMENT \
+          --tasks $TASK_ARN \
+          --region $AWS_REGION \
+          --query 'tasks[0].attachments[0].details[?name==`networkInterfaceId`].value' \
+          --output text)
+        
+        BACKEND_IP=$(aws ec2 describe-network-interfaces \
+          --network-interface-ids $ENI_ID \
+          --region $AWS_REGION \
+          --query 'NetworkInterfaces[0].Association.PublicIp' \
+          --output text)
+        
+        echo "✅ NEW Backend IP: $BACKEND_IP"
+        echo "ip=$BACKEND_IP" >> $GITHUB_OUTPUT
+
+    # Step 8: Build and push frontend with NEW backend IP
+    - name: Build and push frontend
+      working-directory: ./dragon_frontend_vue
+      env:
+        BACKEND_IP: ${{ steps.backend-ip.outputs.ip }}
+      run: |
+        echo "📝 Creating .env.development with NEW backend IP..."
+        cat > .env.development << EOF
+        VITE_API_BASE=http://$BACKEND_IP:8000/api/v1
+        NODE_ENV=development
+        EOF
+        
+        echo "✅ .env.development created:"
+        cat .env.development
+        
+        echo "🏗️ Building frontend with backend IP: $BACKEND_IP"
+        docker build -f Dockerfile.aws -t $ECR_REGISTRY/dragon-frontend:$ENVIRONMENT .
+        
+        echo "📤 Pushing frontend..."
+        docker push $ECR_REGISTRY/dragon-frontend:$ENVIRONMENT
+        echo "✅ Frontend image pushed"
+
+    # Step 9: Update frontend service
+    - name: Update frontend service
+      run: |
+        echo "🔄 Updating frontend service..."
+        aws ecs update-service \
+          --cluster dragon-app-cluster-$ENVIRONMENT \
+          --service dragon-frontend-service-$ENVIRONMENT \
+          --force-new-deployment \
+          --region $AWS_REGION \
+          --output text > /dev/null
+        echo "✅ Frontend service updated"
+
+    # Step 10: Get deployment URLs
+    - name: Get service URLs
+      id: get-urls
+      run: |
+        echo "⏳ Waiting 45s for frontend task to start..."
+        sleep 45
+        
+        # Backend IP (we already have it)
+        BACKEND_IP="${{ steps.backend-ip.outputs.ip }}"
+        echo "backend_url=http://$BACKEND_IP:8000" >> $GITHUB_OUTPUT
+        
+        # Get frontend IP
+        FRONTEND_TASK_ARN=$(aws ecs list-tasks \
+          --cluster dragon-app-cluster-$ENVIRONMENT \
+          --service-name dragon-frontend-service-$ENVIRONMENT \
+          --region $AWS_REGION \
+          --query 'taskArns[0]' \
+          --output text)
+        
+        if [ "$FRONTEND_TASK_ARN" != "None" ] && [ -n "$FRONTEND_TASK_ARN" ]; then
+          FRONTEND_ENI=$(aws ecs describe-tasks \
+            --cluster dragon-app-cluster-$ENVIRONMENT \
+            --tasks $FRONTEND_TASK_ARN \
+            --region $AWS_REGION \
+            --query 'tasks[0].attachments[0].details[?name==`networkInterfaceId`].value' \
+            --output text)
+          
+          FRONTEND_IP=$(aws ec2 describe-network-interfaces \
+            --network-interface-ids $FRONTEND_ENI \
+            --region $AWS_REGION \
+            --query 'NetworkInterfaces[0].Association.PublicIp' \
+            --output text)
+          
+          echo "frontend_url=http://$FRONTEND_IP:5173" >> $GITHUB_OUTPUT
+        fi
+
+    # Step 11: Display summary
+    - name: Deployment Summary
+      run: |
+        echo "======================================"
+        echo "🎉 Deployment Complete!"
+        echo "======================================"
+        echo ""
+        echo "Backend:  ${{ steps.get-urls.outputs.backend_url }}"
+        echo "Frontend: ${{ steps.get-urls.outputs.frontend_url }}"
+        echo ""
+        echo "✅ Backend restarted with new code and NEW IP"
+        echo "✅ Frontend built with correct backend IP"
+        echo "✅ Frontend deployed with new code"
+        echo ""
+        echo "Check services in AWS Console:"
+        echo "https://console.aws.amazon.com/ecs/home?region=$AWS_REGION#/clusters/dragon-app-cluster-$ENVIRONMENT/services"
