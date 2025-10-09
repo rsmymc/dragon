@@ -7,7 +7,8 @@ on:
   workflow_dispatch:  # Allows manual trigger from GitHub UI
 
 env:
-  AWS_REGION: us-east-2
+  ECS_REGION: us-east-2        # Region for ECS cluster (changed from AWS_REGION)
+  ECR_REGION: us-east-1        # Region for ECR Public (always us-east-1)
   ECR_REGISTRY: public.ecr.aws/x6i8o2b8
   ENVIRONMENT: dev
 
@@ -15,7 +16,7 @@ jobs:
   deploy:
     name: Build and Deploy
     runs-on: ubuntu-latest
-    
+
     steps:
     # Step 1: Checkout code
     - name: Checkout code
@@ -27,12 +28,12 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1  # ECR Public uses us-east-1
+        aws-region: ${{ env.ECR_REGION }}  # Use ECR_REGION for authentication
 
     # Step 3: Login to Amazon ECR Public
     - name: Login to Amazon ECR Public
       run: |
-        aws ecr-public get-login-password --region us-east-1 | \
+        aws ecr-public get-login-password --region $ECR_REGION | \
           docker login --username AWS --password-stdin $ECR_REGISTRY
 
     # Step 4: Build and push backend image
@@ -53,7 +54,7 @@ jobs:
           --cluster dragon-app-cluster-$ENVIRONMENT \
           --service dragon-backend-service-$ENVIRONMENT \
           --force-new-deployment \
-          --region $AWS_REGION \
+          --region $ECS_REGION \
           --output text > /dev/null
         echo "✅ Backend service update initiated"
 
@@ -67,7 +68,7 @@ jobs:
         aws ecs describe-services \
           --cluster dragon-app-cluster-$ENVIRONMENT \
           --services dragon-backend-service-$ENVIRONMENT \
-          --region $AWS_REGION \
+          --region $ECS_REGION \
           --query 'services[0].deployments[0].[status,runningCount]' \
           --output text
 
@@ -80,7 +81,7 @@ jobs:
         TASK_ARN=$(aws ecs list-tasks \
           --cluster dragon-app-cluster-$ENVIRONMENT \
           --service-name dragon-backend-service-$ENVIRONMENT \
-          --region $AWS_REGION \
+          --region $ECS_REGION \
           --query 'taskArns[0]' \
           --output text)
         
@@ -92,13 +93,13 @@ jobs:
         ENI_ID=$(aws ecs describe-tasks \
           --cluster dragon-app-cluster-$ENVIRONMENT \
           --tasks $TASK_ARN \
-          --region $AWS_REGION \
+          --region $ECS_REGION \
           --query 'tasks[0].attachments[0].details[?name==`networkInterfaceId`].value' \
           --output text)
         
         BACKEND_IP=$(aws ec2 describe-network-interfaces \
           --network-interface-ids $ENI_ID \
-          --region $AWS_REGION \
+          --region $ECS_REGION \
           --query 'NetworkInterfaces[0].Association.PublicIp' \
           --output text)
         
@@ -111,14 +112,14 @@ jobs:
       env:
         BACKEND_IP: ${{ steps.backend-ip.outputs.ip }}
       run: |
-        echo "📝 Creating .env.development with NEW backend IP..."
-        cat > .env.development << EOF
+        echo "📝 Creating .env.aws with NEW backend IP..."
+        cat > .env.aws << EOF
         VITE_API_BASE=http://$BACKEND_IP:8000/api/v1
         NODE_ENV=development
         EOF
         
-        echo "✅ .env.development created:"
-        cat .env.development
+        echo "✅ .env.aws created:"
+        cat .env.aws
         
         echo "🏗️ Building frontend with backend IP: $BACKEND_IP"
         docker build -f Dockerfile.aws -t $ECR_REGISTRY/dragon-frontend:$ENVIRONMENT .
@@ -135,7 +136,7 @@ jobs:
           --cluster dragon-app-cluster-$ENVIRONMENT \
           --service dragon-frontend-service-$ENVIRONMENT \
           --force-new-deployment \
-          --region $AWS_REGION \
+          --region $ECS_REGION \
           --output text > /dev/null
         echo "✅ Frontend service updated"
 
@@ -154,7 +155,7 @@ jobs:
         FRONTEND_TASK_ARN=$(aws ecs list-tasks \
           --cluster dragon-app-cluster-$ENVIRONMENT \
           --service-name dragon-frontend-service-$ENVIRONMENT \
-          --region $AWS_REGION \
+          --region $ECS_REGION \
           --query 'taskArns[0]' \
           --output text)
         
@@ -162,13 +163,13 @@ jobs:
           FRONTEND_ENI=$(aws ecs describe-tasks \
             --cluster dragon-app-cluster-$ENVIRONMENT \
             --tasks $FRONTEND_TASK_ARN \
-            --region $AWS_REGION \
+            --region $ECS_REGION \
             --query 'tasks[0].attachments[0].details[?name==`networkInterfaceId`].value' \
             --output text)
           
           FRONTEND_IP=$(aws ec2 describe-network-interfaces \
             --network-interface-ids $FRONTEND_ENI \
-            --region $AWS_REGION \
+            --region $ECS_REGION \
             --query 'NetworkInterfaces[0].Association.PublicIp' \
             --output text)
           
@@ -190,4 +191,4 @@ jobs:
         echo "✅ Frontend deployed with new code"
         echo ""
         echo "Check services in AWS Console:"
-        echo "https://console.aws.amazon.com/ecs/home?region=$AWS_REGION#/clusters/dragon-app-cluster-$ENVIRONMENT/services"
+        echo "https://console.aws.amazon.com/ecs/home?region=${{ env.ECS_REGION }}#/clusters/dragon-app-cluster-${{ env.ENVIRONMENT }}/services"
