@@ -11,6 +11,8 @@ echo "🚀 Dragon App - Dev Deployment Script"
 echo "======================================"
 echo ""
 
+cd ..
+
 # Step 1: Build and push backend
 echo "📦 Step 1/8: Building and pushing backend..."
 cd dragon_backend_django
