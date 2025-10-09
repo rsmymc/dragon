@@ -1,0 +1,14 @@
+# Copy this file to terraform.tfvars and fill in your values
+
+aws_region = "us-east-2"
+environment = "dev"
+vpc_id = "vpc-0e23a80099b2d4ec2"
+ecr_registry = "public.ecr.aws/x6i8o2b8"
+
+db_name = "dragondb_dev"
+db_username = "dragonuser_dev"
+db_password = "CHANGE_ME_TO_SECURE_PASSWORD"
+
+secret_key = "django-aws-prod-secret-change-this"
+
+availability_zones = ["us-east-2a", "us-east-2b"]
