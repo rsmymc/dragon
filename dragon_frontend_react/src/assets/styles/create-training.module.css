@@ -1,0 +1,316 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modalContent {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 1.5rem 0 1.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+.modalHeader h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.25rem;
+}
+
+.modalClose {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.modalClose:hover:not(:disabled) {
+  background: #f5f5f5;
+  color: #333;
+}
+
+.modalClose:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.modalBody {
+  padding: 1.5rem;
+  flex: 1;
+}
+
+.trainingForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.formLabel {
+  font-weight: 500;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.required {
+  color: #c33;
+}
+
+.formInput {
+  padding: 0.75rem;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.formInput:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.formInput.error {
+  border-color: #c33;
+}
+
+.formInput:disabled {
+  background: #f5f5f5;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.fieldError {
+  color: #c33;
+  font-size: 0.8rem;
+}
+
+.fieldHelp {
+  color: #666;
+  font-size: 0.8rem;
+}
+
+.noLocationsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.btnCreateLocation {
+  padding: 0.5rem 1rem;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  align-self: flex-start;
+}
+
+.btnCreateLocation:hover:not(:disabled) {
+  background: #218838;
+}
+
+.btnCreateLocation:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.createLocationForm {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-top: 0.5rem;
+}
+
+.locationActions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  margin-top: 0.75rem;
+}
+
+.btnCancelSmall,
+.btnCreateSmall {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnCancelSmall {
+  background: #f8f9fa;
+  color: #6c757d;
+  border: 1px solid #ddd;
+}
+
+.btnCancelSmall:hover:not(:disabled) {
+  background: #e9ecef;
+}
+
+.btnCreateSmall {
+  background: #007bff;
+  color: white;
+}
+
+.btnCreateSmall:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.btnCreateSmall:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.errorMessage {
+  background: #fee;
+  border: 1px solid #fcc;
+  border-radius: 6px;
+  padding: 0.75rem;
+  color: #c33;
+  font-size: 0.9rem;
+}
+
+.errorMessage p {
+  margin: 0;
+}
+
+.modalFooter {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #eee;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.btnCancel,
+.btnPrimary {
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  min-width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btnCancel {
+  background: #f8f9fa;
+  color: #6c757d;
+  border: 1px solid #ddd;
+}
+
+.btnCancel:hover:not(:disabled) {
+  background: #e9ecef;
+  border-color: #ccc;
+}
+
+.btnPrimary {
+  background: #007bff;
+  color: white;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.btnPrimary:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.btnLoading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btnSpinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .modalOverlay {
+    padding: 0.5rem;
+  }
+
+  .modalContent {
+    max-width: none;
+  }
+
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+
+  .modalFooter {
+    flex-direction: column-reverse;
+  }
+
+  .btnCancel,
+  .btnPrimary {
+    width: 100%;
+  }
+}
