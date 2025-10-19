@@ -452,21 +452,31 @@ onMounted(() => {
             <div :class="styles.trainingTitle">
               <h1>Training Session</h1>
               <div :class="styles.trainingBadges">
-                <span v-if="isPastTraining" :class="[styles.statusBadge, styles.past]">Completed</span>
-                <span v-else-if="isToday" :class="[styles.statusBadge, styles.today]">Today</span>
-                <span v-else-if="isTomorrow" :class="[styles.statusBadge, styles.soon]">Tomorrow</span>
-                <span v-if="lineup?.state === 2" :class="[styles.statusBadge, styles.published]"
-                >Lineup Published</span
+                <span v-if="isPastTraining" :class="[styles.statusBadge, styles.past]"
+                  >Completed</span
                 >
-                <span v-else-if="lineup?.state === 1" :class="[styles.statusBadge, styles.draft]">Draft Lineup</span>
-                <span v-if="hasUnsavedChanges" :class="[styles.statusBadge, styles.unsaved]">Unsaved Changes</span>
+                <span v-else-if="isToday" :class="[styles.statusBadge, styles.today]">Today</span>
+                <span v-else-if="isTomorrow" :class="[styles.statusBadge, styles.soon]"
+                  >Tomorrow</span
+                >
+                <span v-if="lineup?.state === 2" :class="[styles.statusBadge, styles.published]"
+                  >Lineup Published</span
+                >
+                <span v-else-if="lineup?.state === 1" :class="[styles.statusBadge, styles.draft]"
+                  >Draft Lineup</span
+                >
+                <span v-if="hasUnsavedChanges" :class="[styles.statusBadge, styles.unsaved]"
+                  >Unsaved Changes</span
+                >
               </div>
             </div>
 
             <div :class="styles.trainingStats">
               <div :class="styles.statItem">
                 <span :class="styles.statLabel">When</span>
-                <span :class="styles.statValue">{{ formatTrainingDateTime(training.start_at) }}</span>
+                <span :class="styles.statValue">{{
+                  formatTrainingDateTime(training.start_at)
+                }}</span>
               </div>
               <div :class="styles.statItem">
                 <span :class="styles.statLabel">Location</span>
@@ -587,7 +597,11 @@ onMounted(() => {
                   <div
                     v-for="member in availableMembers"
                     :key="member.id"
-                    :class="[styles.memberCard, 'draggable', { dragging: dragActive && draggedMember?.id === member.id }]"
+                    :class="[
+                      styles.memberCard,
+                      'draggable',
+                      { dragging: dragActive && draggedMember?.id === member.id },
+                    ]"
                     draggable="true"
                     @dragstart="handleDragStart($event, member)"
                     @dragend="handleDragEnd"
@@ -607,10 +621,18 @@ onMounted(() => {
                       <h4 :class="styles.memberName">{{ member.name }}</h4>
                       <p :class="styles.memberRole">{{ getRoleLabel(member.role) }}</p>
                       <div :class="styles.memberStats">
-                        <span v-if="member.height" :class="styles.statItem">{{ member.height }}cm</span>
-                        <span v-if="member.weight" :class="styles.statItem">{{ member.weight }}kg</span>
+                        <span v-if="member.height" :class="styles.statItem"
+                          >{{ member.height }}cm</span
+                        >
+                        <span v-if="member.weight" :class="styles.statItem"
+                          >{{ member.weight }}kg</span
+                        >
                         <span
-                          :class="[styles.statItem, styles.preferredSide, `side-${member.side?.toLowerCase()}`]"
+                          :class="[
+                            styles.statItem,
+                            styles.preferredSide,
+                            `side-${member.side?.toLowerCase()}`,
+                          ]"
                         >
                           {{ getSideLabel(member.side) }}
                         </span>
@@ -692,7 +714,10 @@ onMounted(() => {
                         >
                           <div
                             v-if="getSeatPerson('L', seatNum)"
-                            :class="[styles.seatPerson, { dragging: dragActive && draggedFromSeat === `L${seatNum}` }]"
+                            :class="[
+                              styles.seatPerson,
+                              { dragging: dragActive && draggedFromSeat === `L${seatNum}` },
+                            ]"
                             draggable="true"
                             @dragstart="
                               handleSeatDragStart($event, getSeatPerson('L', seatNum), 'L', seatNum)
@@ -703,7 +728,9 @@ onMounted(() => {
                               {{ getInitials(getSeatPerson('L', seatNum).name) }}
                             </div>
                             <div :class="styles.personDetails">
-                              <div :class="styles.personName">{{ getSeatPerson('L', seatNum).name }}</div>
+                              <div :class="styles.personName">
+                                {{ getSeatPerson('L', seatNum).name }}
+                              </div>
                               <div :class="styles.seatLabel">L{{ seatNum }}</div>
                             </div>
                             <button
@@ -743,7 +770,10 @@ onMounted(() => {
                         >
                           <div
                             v-if="getSeatPerson('R', seatNum)"
-                            :class="[styles.seatPerson, { dragging: dragActive && draggedFromSeat === `R${seatNum}` }]"
+                            :class="[
+                              styles.seatPerson,
+                              { dragging: dragActive && draggedFromSeat === `R${seatNum}` },
+                            ]"
                             draggable="true"
                             @dragstart="
                               handleSeatDragStart($event, getSeatPerson('R', seatNum), 'R', seatNum)
@@ -754,7 +784,9 @@ onMounted(() => {
                               {{ getInitials(getSeatPerson('R', seatNum).name) }}
                             </div>
                             <div :class="styles.personDetails">
-                              <div :class="styles.personName">{{ getSeatPerson('R', seatNum).name }}</div>
+                              <div :class="styles.personName">
+                                {{ getSeatPerson('R', seatNum).name }}
+                              </div>
                               <div :class="styles.seatLabel">R{{ seatNum }}</div>
                             </div>
                             <button
@@ -789,4 +821,3 @@ onMounted(() => {
     </div>
   </div>
 </template>
-

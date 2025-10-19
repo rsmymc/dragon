@@ -1,4 +1,3 @@
-// stores/teams.js - Dragon Boat Teams Management Store
 import { defineStore } from 'pinia'
 import { fetchTeams, fetchTeam, createTeam, updateTeam, deleteTeam } from '@/services/teams'
 

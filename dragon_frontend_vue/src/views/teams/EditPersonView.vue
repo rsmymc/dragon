@@ -312,11 +312,7 @@ onMounted(() => {
           >
             Cancel
           </button>
-          <button
-            type="submit"
-            :class="styles.saveBtn"
-            :disabled="isSubmitting || !isFormValid"
-          >
+          <button type="submit" :class="styles.saveBtn" :disabled="isSubmitting || !isFormValid">
             <span v-if="isSubmitting" :class="styles.btnLoading">
               <div :class="styles.btnSpinner"></div>
               Saving...

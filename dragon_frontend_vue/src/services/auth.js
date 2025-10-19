@@ -1,4 +1,3 @@
-// src/services/auth.js
 import axios from 'axios'
 
 export async function login(username, password) {

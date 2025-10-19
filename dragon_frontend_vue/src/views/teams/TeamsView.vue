@@ -228,7 +228,7 @@ const showNotification = (type, message) => {
             <div :class="styles.statItem">
               <span :class="styles.statLabel">Members</span>
               <span :class="styles.statValue"
-              >{{ team.active_member_count || 0 }}/{{ team.max_members || 22 }}</span
+                >{{ team.active_member_count || 0 }}/{{ team.max_members || 22 }}</span
               >
             </div>
 

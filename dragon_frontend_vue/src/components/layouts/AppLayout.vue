@@ -50,7 +50,13 @@ const handleLogout = async () => {
       <!-- Logo -->
       <div :class="styles.sidebarHeader">
         <div :class="styles.logoContainer">
-          <img alt="Vue logo" :class="styles.logo" src="../../assets/images/logo.png" width="96" height="96" />
+          <img
+            alt="Vue logo"
+            :class="styles.logo"
+            src="../../assets/images/logo.png"
+            width="96"
+            height="96"
+          />
         </div>
       </div>
 

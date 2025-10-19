@@ -188,7 +188,7 @@ onUnmounted(() => {
               <div :class="styles.teamBadges">
                 <span v-if="isTeamFull" :class="[styles.statusBadge, styles.full]">Team Full</span>
                 <span v-else-if="isAlmostFull" :class="[styles.statusBadge, styles.almostFull]"
-                >Almost Full</span
+                  >Almost Full</span
                 >
               </div>
             </div>
@@ -197,7 +197,7 @@ onUnmounted(() => {
               <div :class="styles.statItem">
                 <span :class="styles.statLabel">Members</span>
                 <span :class="styles.statValue"
-                >{{ currentMemberCount }}/{{ team.max_members || 22 }}</span
+                  >{{ currentMemberCount }}/{{ team.max_members || 22 }}</span
                 >
               </div>
               <div v-if="team.city" :class="styles.statItem">

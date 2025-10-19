@@ -547,7 +547,12 @@ onMounted(() => {
 
       <!-- Modal Footer -->
       <div :class="styles.modalFooter">
-        <button type="button" @click="handleClose" :class="styles.btnCancel" :disabled="isSubmitting">
+        <button
+          type="button"
+          @click="handleClose"
+          :class="styles.btnCancel"
+          :disabled="isSubmitting"
+        >
           Cancel
         </button>
         <button

@@ -1,4 +1,3 @@
-// src/services/api.js
 import axios from 'axios'
 import { useAuthStore } from '@/stores/auth'
 
@@ -14,8 +13,9 @@ api.interceptors.request.use((config) => {
     if (auth.access) {
       config.headers.Authorization = `Bearer ${auth.access}`
     }
-  } catch (_) {
+  }  catch (e) {
     /* store not ready in some edge cases */
+    console.error("Request interceptor error:", e);
   }
   return config
 })
@@ -50,7 +50,7 @@ api.interceptors.response.use(
       }
       try {
         isRefreshing = true
-        const { data } = await axios.post(`${import.meta.env.VITE_API_BASE}/token/refresh/`, {
+        const { data } = await axios.post(`${import.meta.env.VITE_API_BASE}/auth/token/refresh/`, {
           refresh: auth.refresh,
         })
         const newAccess = data.access

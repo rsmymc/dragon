@@ -255,7 +255,9 @@ onMounted(() => {
                 :class="[styles.formInput, { error: formErrors.phone }]"
                 placeholder="Enter phone number"
               />
-              <span v-if="formErrors.phone" :class="styles.errorMessage">{{ formErrors.phone }}</span>
+              <span v-if="formErrors.phone" :class="styles.errorMessage">{{
+                formErrors.phone
+              }}</span>
             </div>
 
             <!-- Height and Weight -->
@@ -271,7 +273,9 @@ onMounted(() => {
                   min="100"
                   max="250"
                 />
-                <span v-if="formErrors.height" :class="styles.errorMessage">{{ formErrors.height }}</span>
+                <span v-if="formErrors.height" :class="styles.errorMessage">{{
+                  formErrors.height
+                }}</span>
               </div>
 
               <div :class="styles.formGroup">
@@ -285,7 +289,9 @@ onMounted(() => {
                   min="30"
                   max="200"
                 />
-                <span v-if="formErrors.weight" :class="styles.errorMessage">{{ formErrors.weight }}</span>
+                <span v-if="formErrors.weight" :class="styles.errorMessage">{{
+                  formErrors.weight
+                }}</span>
               </div>
             </div>
 
@@ -413,7 +419,11 @@ onMounted(() => {
       <!-- Modal Footer -->
       <div :class="styles.modalFooter">
         <button @click="closeModal" :class="styles.btnSecondary">Cancel</button>
-        <button @click="submitForm" :disabled="!isFormValid || isSubmitting" :class="styles.btnPrimary">
+        <button
+          @click="submitForm"
+          :disabled="!isFormValid || isSubmitting"
+          :class="styles.btnPrimary"
+        >
           <span v-if="isSubmitting">Adding...</span>
           <span v-else>Add to Team</span>
         </button>

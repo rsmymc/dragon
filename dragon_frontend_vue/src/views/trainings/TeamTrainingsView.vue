@@ -374,13 +374,22 @@ onMounted(() => {
               <span v-if="isPastTraining(training)" :class="[styles.statusBadge, styles.past]">
                 Completed
               </span>
-              <span v-else-if="isToday(training.start_at)" :class="[styles.statusBadge, styles.today]">
+              <span
+                v-else-if="isToday(training.start_at)"
+                :class="[styles.statusBadge, styles.today]"
+              >
                 Today
               </span>
-              <span v-else-if="isTomorrow(training.start_at)" :class="[styles.statusBadge, styles.soon]">
+              <span
+                v-else-if="isTomorrow(training.start_at)"
+                :class="[styles.statusBadge, styles.soon]"
+              >
                 Tomorrow
               </span>
-              <span v-else-if="isThisWeek(training.start_at)" :class="[styles.statusBadge, styles.thisWeek]">
+              <span
+                v-else-if="isThisWeek(training.start_at)"
+                :class="[styles.statusBadge, styles.thisWeek]"
+              >
                 This Week
               </span>
             </div>
@@ -414,13 +423,13 @@ onMounted(() => {
               <div :class="styles.detailRow">
                 <span :class="styles.detailLabel">📍 Coordinates:</span>
                 <a
-                v-if="getLocationCoordinates(training.location.id) !== 'N/A'"
-                :href="getLocationCoordinates(training.location.id).url"
-                target="_blank"
-                rel="noopener noreferrer"
-                :class="styles.detailLink"
+                  v-if="getLocationCoordinates(training.location.id) !== 'N/A'"
+                  :href="getLocationCoordinates(training.location.id).url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  :class="styles.detailLink"
                 >
-                {{ getLocationCoordinates(training.location.id).text }}
+                  {{ getLocationCoordinates(training.location.id).text }}
                 </a>
                 <span v-else :class="styles.detailValue">N/A</span>
               </div>

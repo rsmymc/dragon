@@ -4,11 +4,14 @@ const ACCESS_KEY = 'access'
 const REFRESH_KEY = 'refresh'
 const USERNAME_KEY = 'username'
 
+const getFromStorages = (key) =>
+  localStorage.getItem(key) ?? sessionStorage.getItem(key) ?? null;
+
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    access: localStorage.getItem(ACCESS_KEY) || sessionStorage.getItem(ACCESS_KEY) || null,
-    refresh: localStorage.getItem(REFRESH_KEY) || sessionStorage.getItem(REFRESH_KEY) || null,
-    username: localStorage.getItem(USERNAME_KEY) || sessionStorage.getItem(USERNAME_KEY) || null,
+    access: getFromStorages(ACCESS_KEY),
+    refresh: getFromStorages(REFRESH_KEY),
+    username: getFromStorages(USERNAME_KEY),
   }),
 
   getters: {
@@ -26,16 +29,25 @@ export const useAuthStore = defineStore('auth', {
       const storage = rememberMe ? localStorage : sessionStorage
 
       // Clear from both storages first
-      localStorage.removeItem(ACCESS_KEY)
-      localStorage.removeItem(REFRESH_KEY)
-      sessionStorage.removeItem(ACCESS_KEY)
-      sessionStorage.removeItem(REFRESH_KEY)
+      try {
+        localStorage.removeItem(ACCESS_KEY);
+        localStorage.removeItem(REFRESH_KEY);
+        localStorage.removeItem(USERNAME_KEY);
+        sessionStorage.removeItem(ACCESS_KEY);
+        sessionStorage.removeItem(REFRESH_KEY);
+        sessionStorage.removeItem(USERNAME_KEY);
+      } catch (e) {
+        console.error("Failed to clear storage:", e);
+      }
 
       // Set in chosen storage
-      if (access) storage.setItem(ACCESS_KEY, access)
-      if (refresh) storage.setItem(REFRESH_KEY, refresh)
-
-      storage.setItem(USERNAME_KEY, username)
+      try {
+        if (access) storage.setItem(ACCESS_KEY, access);
+        if (refresh) storage.setItem(REFRESH_KEY, refresh);
+        if (username) storage.setItem(USERNAME_KEY, username);
+      } catch (e) {
+        console.error("Failed to set storage:", e);
+      }
     },
 
     logout() {

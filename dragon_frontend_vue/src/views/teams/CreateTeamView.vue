@@ -226,11 +226,7 @@ const isFormValid = computed(() => {
               Reset Form
             </button>
 
-            <button
-              type="submit"
-              :class="styles.btnPrimary"
-              :disabled="!isFormValid || isLoading"
-            >
+            <button type="submit" :class="styles.btnPrimary" :disabled="!isFormValid || isLoading">
               <svg v-if="isLoading" :class="styles.loadingSpinner" fill="none" viewBox="0 0 24 24">
                 <circle
                   class="opacity-25"
