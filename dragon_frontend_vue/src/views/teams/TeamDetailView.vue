@@ -16,6 +16,7 @@ const membershipStore = useMembershipStore()
 // Reactive data
 const team = ref(null)
 const showAddPerson = ref(false)
+const codeCopied = ref(false)
 
 // Computed
 const currentMemberCount = computed(() => {
@@ -71,6 +72,17 @@ const loadMembers = async () => {
     console.log('✅ Team memberships loaded:', membershipStore.teamMemberships.length)
   } catch (error) {
     console.error('Failed to load team memberships:', error)
+  }
+}
+
+const copyTeamCode = async () => {
+  if (!team.value?.code) return
+  try {
+    await navigator.clipboard.writeText(team.value.code)
+    codeCopied.value = true
+    setTimeout(() => (codeCopied.value = false), 1500)
+  } catch (error) {
+    console.error('Could not copy code:', error)
   }
 }
 
@@ -146,6 +158,45 @@ onUnmounted(() => {
   membershipStore.clearTeamMemberships()
   membershipStore.clearFilters()
 })
+
+// Inline styles for the invite-code block
+const shareBoxStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: '12px',
+  marginTop: '16px',
+  padding: '12px 16px',
+  background: '#f9fafb',
+  border: '1px solid #e5e7eb',
+  borderRadius: '10px',
+}
+const shareLabelStyle = {
+  fontSize: '12px',
+  color: '#6b7280',
+  textTransform: 'uppercase',
+  letterSpacing: '0.5px',
+}
+const shareCodeStyle = {
+  fontSize: '22px',
+  fontFamily: 'monospace',
+  fontWeight: '700',
+  letterSpacing: '3px',
+  color: '#111827',
+}
+const shareBtnStyle = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '6px',
+  padding: '8px 14px',
+  fontSize: '14px',
+  color: '#fff',
+  background: '#3b82f6',
+  border: 'none',
+  borderRadius: '8px',
+  cursor: 'pointer',
+  whiteSpace: 'nowrap',
+}
 </script>
 
 <template>
@@ -222,6 +273,25 @@ onUnmounted(() => {
                 ></div>
               </div>
               <span :class="styles.progressText">{{ memberProgress.toFixed(0) }}% Full</span>
+            </div>
+
+            <!-- Invite Code -->
+            <div v-if="team.code" :style="shareBoxStyle">
+              <div>
+                <div :style="shareLabelStyle">Invite code</div>
+                <div :style="shareCodeStyle">{{ team.code }}</div>
+              </div>
+              <button @click="copyTeamCode" :style="shareBtnStyle">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                  />
+                </svg>
+                {{ codeCopied ? 'Copied!' : 'Copy' }}
+              </button>
             </div>
           </div>
 

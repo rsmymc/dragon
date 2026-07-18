@@ -70,6 +70,15 @@ const submitJoin = async () => {
   }
 }
 
+const copyCode = async (code) => {
+  try {
+    await navigator.clipboard.writeText(code)
+    showNotification('success', `Code ${code} copied`)
+  } catch {
+    showNotification('error', 'Could not copy code')
+  }
+}
+
 const viewTeam = (teamId) => {
   router.push(`/teams/${teamId}`)
 }
@@ -158,6 +167,21 @@ const actionsStyle = {
   justifyContent: 'flex-end',
   gap: '8px',
   marginTop: '20px',
+}
+const codeBadgeStyle = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '4px',
+  marginTop: '4px',
+  padding: '2px 8px',
+  fontSize: '12px',
+  fontFamily: 'monospace',
+  letterSpacing: '1px',
+  color: '#374151',
+  background: '#f3f4f6',
+  border: '1px solid #e5e7eb',
+  borderRadius: '6px',
+  cursor: 'pointer',
 }
 </script>
 
@@ -267,7 +291,25 @@ const actionsStyle = {
         >
           <!-- Team Card Header -->
           <div :class="styles.cardHeader">
-            <h3 :class="styles.teamName">{{ team.name }}</h3>
+            <div>
+              <h3 :class="styles.teamName">{{ team.name }}</h3>
+              <button
+                v-if="team.code"
+                @click.stop="copyCode(team.code)"
+                title="Copy team code"
+                :style="codeBadgeStyle"
+              >
+                {{ team.code }}
+                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                  />
+                </svg>
+              </button>
+            </div>
             <div :class="styles.teamActions" @click.stop>
               <button
                 @click="editTeam(team.id)"
