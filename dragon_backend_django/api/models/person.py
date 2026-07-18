@@ -10,19 +10,19 @@ class Person(TimeStampedModel):
         LEFT = 1, "Left"
         RIGHT = 2, "Right"
 
-
-    # Link the auth identity to your profile (nullable so you can backfill)
-    # user = models.OneToOneField(
-    #     settings.AUTH_USER_MODEL,
-    #     on_delete=models.CASCADE,
-    #     related_name="person_profile",
-    #     null=True,
-    #     blank=True,
-    # )
-
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    # Optional auth link. SET_NULL keeps the roster entry if the account is deleted.
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        related_name="person",
+        null=True,
+        blank=True,
+    )
+
     name = models.CharField(max_length=50, blank=False, null=False)
-    phone = models.CharField(max_length=15, db_index=True, blank=False, null=False)
+    phone = models.CharField(max_length=15, blank=True, null=False)
     height = models.SmallIntegerField(null=True, blank=True)  # cm
     weight = models.SmallIntegerField(null=True, blank=True)  # kg
     side = models.SmallIntegerField(choices=Side.choices, default=Side.BOTH)
