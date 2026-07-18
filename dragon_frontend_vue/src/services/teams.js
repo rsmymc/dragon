@@ -22,6 +22,12 @@ export async function updateTeam(id, teamData) {
   return data
 }
 
+export async function joinTeam(code) {
+  const { data } = await api.post('/team/join/', { code })
+  return data
+}
+
+
 export async function deleteTeam(id) {
   await api.delete(`/team/${id}/`)
 }

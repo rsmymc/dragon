@@ -1,5 +1,12 @@
 import { defineStore } from 'pinia'
-import { fetchMyTeams, fetchTeam, createTeam, updateTeam, deleteTeam } from '@/services/teams'
+import {
+  fetchMyTeams,
+  fetchTeam,
+  createTeam,
+  updateTeam,
+  deleteTeam,
+  joinTeam,
+} from '@/services/teams'
 
 export const useTeamsStore = defineStore('teams', {
   state: () => ({
@@ -138,7 +145,27 @@ export const useTeamsStore = defineStore('teams', {
         this.isLoading = false
       }
     },
+    async joinTeam(code) {
+      this.error = null
 
+      try {
+        console.log('🔄 Joining team with code:', code)
+
+        const team = await joinTeam(code)
+
+        // Refresh my teams so the newly joined team shows up
+        await this.fetchTeams()
+
+        console.log('✅ Joined team:', team.name)
+        return { success: true, team }
+      } catch (error) {
+        console.error('❌ Failed to join team:', error)
+        // Backend sends a friendly reason in response.data.detail
+        // (e.g. "Invalid team code" / "You are already a member of this team.")
+        const message = error.response?.data?.detail || error.message || 'Failed to join team'
+        return { success: false, error: message }
+      }
+    },
     async updateTeam(id, teamData) {
       this.isLoading = true
       this.error = null
