@@ -12,11 +12,12 @@ class TeamSerializer(serializers.ModelSerializer):
             "name",
             "city",
             "max_members",
+            "code",
             "active_member_count",
             "created_at",
             "updated_at",
         ]
-        read_only_fields = ["id", "created_at", "updated_at", "active_member_count"]
+        read_only_fields = ["id", "code", "created_at", "updated_at", "active_member_count"]
 
     def get_active_member_count(self, obj: Team) -> int:
         return Membership.objects.filter(team=obj).count()
@@ -25,4 +26,4 @@ class TeamSerializer(serializers.ModelSerializer):
 class TeamCompactSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
-        fields = ["id", "name", "city", "max_members"]
+        fields = ["id", "name", "city", "max_members", "code"]
