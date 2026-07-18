@@ -11,6 +11,7 @@ import TeamTrainingsView from '@/views/trainings/TeamTrainingsView.vue'
 import TrainingDetailsView from '@/views/trainings/TrainingDetailsView.vue'
 import PersonView from '@/views/PersonView.vue'
 import SettingsView from '@/views/SettingsView.vue'
+import RegisterView from "@/views/RegisterView.vue";
 
 const routes = [
   // Auth Routes (Auth Layout)
@@ -22,6 +23,16 @@ const routes = [
     path: '/login',
     name: 'login',
     component: LoginView,
+    meta: {
+      requiresAuth: false,
+      layout: 'auth',
+      redirectIfAuthenticated: true,
+    },
+  },
+  {
+    path: '/register',
+    name: 'register',
+    component: RegisterView,
     meta: {
       requiresAuth: false,
       layout: 'auth',

@@ -252,11 +252,18 @@ async function onSubmit() {
           <span>{{ loading ? 'Signing in...' : 'Sign In' }}</span>
         </button>
       </form>
-      <div :class="styles.demoHelp">
-        <p :class="styles.demoText">
-          <strong>Demo credentials:</strong><br />
-          Username: <code>test_user</code><br />
-          Password: <code>test_user1234</code>
+      <!--  <div :class="styles.demoHelp">
+         <p :class="styles.demoText">
+           <strong>Demo credentials:</strong><br />
+           Username: <code>test_user</code><br />
+           Password: <code>test_user1234</code>
+         </p>
+       </div>-->
+      <!-- Sign up link -->
+      <div :class="styles.loginFooter">
+        <p>
+          Don't have an account?
+          <RouterLink to="/register">Sign up</RouterLink>
         </p>
       </div>
     </div>

@@ -211,6 +211,23 @@
   animation: spin 1s linear infinite;
 }
 
+.loginFooter {
+  margin-top: 1.25rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #64748b; /* muted text for the "Already have an account?" part */
+}
+
+.loginFooter a {
+  color: #2563eb; /* or your dragon-boat accent color */
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.loginFooter a:hover {
+  text-decoration: underline;
+}
+
 @keyframes spin {
   from {
     transform: rotate(0deg);

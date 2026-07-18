@@ -10,3 +10,14 @@ export async function login(username, password) {
   // data = { access, refresh }
   return data
 }
+
+export async function register(payload) {
+  // payload: { username, password, name, email?, phone? }
+  const { data } = await axios.post(
+    `${import.meta.env.VITE_API_BASE}/auth/register/`,
+    payload,
+    { timeout: 15000 },
+  )
+  // data = { access, refresh, user, person }
+  return data
+}
