@@ -5,6 +5,13 @@ export async function fetchTeams(params = {}) {
   const { data } = await api.get('/team/', { params })
   return data
 }
+
+export async function fetchMyTeams(params = {}) {
+  // params is optional if you later add pagination/filtering
+  const { data } = await api.get('/team/my_teams/', { params })
+  return data
+}
+
 export async function createTeam(teamData) {
   const { data } = await api.post('/team/', teamData)
   return data

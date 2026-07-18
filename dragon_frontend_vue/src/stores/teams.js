@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { fetchTeams, fetchTeam, createTeam, updateTeam, deleteTeam } from '@/services/teams'
+import { fetchMyTeams, fetchTeam, createTeam, updateTeam, deleteTeam } from '@/services/teams'
 
 export const useTeamsStore = defineStore('teams', {
   state: () => ({
@@ -71,7 +71,7 @@ export const useTeamsStore = defineStore('teams', {
       try {
         console.log('🔄 Fetching teams from API...')
 
-        const teams = await fetchTeams()
+        const teams = await fetchMyTeams()
         this.teams = teams
 
         console.log('✅ Teams loaded:', this.teams.length)
