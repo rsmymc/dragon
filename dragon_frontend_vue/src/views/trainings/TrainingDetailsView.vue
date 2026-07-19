@@ -4,6 +4,8 @@ import { useRoute } from 'vue-router'
 import { useTrainingsStore } from '@/stores/trainings'
 import { useMembershipStore } from '@/stores/membership'
 import { useLineupsStore } from '@/stores/lineups'
+import { useAttendanceStore } from '@/stores/attendance'
+import { useAuthStore } from '@/stores/auth'
 import { MEMBERSHIP_ROLE_LABELS, PERSON_SIDE_LABELS } from '@/constants'
 import styles from '@/assets/styles/training-details.module.css'
 
@@ -12,6 +14,8 @@ const route = useRoute()
 const trainingsStore = useTrainingsStore()
 const membershipStore = useMembershipStore()
 const lineupsStore = useLineupsStore()
+const attendanceStore = useAttendanceStore()
+const authStore = useAuthStore()
 
 // Reactive state
 const training = ref(null)
@@ -101,6 +105,7 @@ const loadTraining = async () => {
         ...m.person,
         role: m.role,
       }))
+      await attendanceStore.fetchRoster(trainingId.value) // ← add this line
     }
 
     await loadLineup()
@@ -409,6 +414,74 @@ const getRoleLabel = (role) => {
 const getSideLabel = (side) => {
   return PERSON_SIDE_LABELS[side] || 'Unknown'
 }
+
+// which membership row belongs to a given person (from the team roster already loaded)
+const membershipByPersonId = computed(() => {
+  const map = {}
+  membershipStore.teamMemberships.forEach((m) => {
+    map[m.person.id] = m
+  })
+  return map
+})
+
+// current user's membership + role on this team
+const myMembership = computed(() => {
+  const myPersonId = authStore.myPersonId
+  if (!myPersonId) return null
+  return membershipByPersonId.value[myPersonId] || null
+})
+const canMarkTeam = computed(() => [2, 3, 4].includes(myMembership.value?.role ?? null))
+
+// attendance state for a person: true / false / null (not recorded)
+const attendanceForPerson = (personId) => {
+  const membership = membershipByPersonId.value[personId]
+  if (!membership) return null
+  const row = attendanceStore.roster.find((r) => r.membership === membership.id)
+  return row ? row.attended : null
+}
+
+// can the current user edit THIS person's attendance?
+const canEditAttendance = (personId) => {
+  if (canMarkTeam.value) return true // coach/captain/manager: everyone
+  return authStore.myPersonId === personId // player: only themselves
+}
+
+// saving guard, keyed by person id so only one toggle disables
+const savingPersonId = ref(null)
+
+// flip a person's attendance (null/absent -> present, present -> absent)
+const toggleAttendance = async (personId) => {
+  if (!canEditAttendance(personId) || savingPersonId.value) return
+
+  const membership = membershipByPersonId.value[personId]
+  if (!membership) return
+
+  const current = attendanceForPerson(personId)
+  const next = current === true ? false : true
+
+  savingPersonId.value = personId
+  try {
+    if (canMarkTeam.value) {
+      await attendanceStore.saveMarks(trainingId.value, [
+        { membership: membership.id, attended: next },
+      ])
+    } else {
+      // player marking self — uses the self endpoint (derives membership from token)
+      await attendanceStore.markMine(trainingId.value, next)
+    }
+  } finally {
+    savingPersonId.value = null
+  }
+}
+
+// label/class helpers for the toggle
+const attendanceClass = (personId) => {
+  const v = attendanceForPerson(personId)
+  if (v === true) return 'present'
+  if (v === false) return 'absent'
+  return 'unrecorded'
+}
+
 // Lifecycle
 onMounted(() => {
   loadTraining()
@@ -639,6 +712,20 @@ onMounted(() => {
                       </div>
                     </div>
                     <div :class="styles.dragHandle">⋮⋮</div>
+                    <!-- Attendance toggle -->
+                    <button
+                      type="button"
+                      class="att-toggle"
+                      :class="attendanceClass(member.id)"
+                      :disabled="!canEditAttendance(member.id) || savingPersonId === member.id"
+                      :title="canEditAttendance(member.id) ? 'Toggle attendance' : 'View only'"
+                      role="switch"
+                      :aria-checked="attendanceForPerson(member.id) === true"
+                      @click.stop="toggleAttendance(member.id)"
+                      @dragstart.prevent.stop
+                    >
+                      <span class="att-knob"></span>
+                    </button>
                   </div>
                 </div>
 
@@ -821,3 +908,43 @@ onMounted(() => {
     </div>
   </div>
 </template>
+<style scoped>
+.att-toggle {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  width: 44px;
+  min-width: 44px;
+  height: 24px;
+  min-height: 24px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  background: #cbd5e1;
+  transition: background 0.15s ease;
+}
+.att-toggle.present {
+  background: #16a34a;
+}
+.att-toggle.absent {
+  background: #ef4444;
+}
+.att-toggle:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+.att-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.15s ease;
+}
+.att-toggle.present .att-knob {
+  transform: translateX(20px);
+}
+</style>
