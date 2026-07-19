@@ -8,10 +8,6 @@ import styles from '@/assets/styles/teams-list.module.css'
 const router = useRouter()
 const teamsStore = useTeamsStore()
 
-// Local UI state
-const showCreateModal = ref(false)
-const selectedTeamId = ref(null)
-
 // Join-modal state
 const showJoinModal = ref(false)
 const joinCode = ref('')
