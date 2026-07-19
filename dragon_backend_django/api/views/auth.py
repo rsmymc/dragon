@@ -11,12 +11,17 @@ from api.serializers.register import RegisterSerializer
 @permission_classes([IsAuthenticated])
 def me(request):
     user = request.user
+    person = getattr(user, "person", None)
     return Response({
         "id": user.id,
         "username": user.get_username(),
         "email": getattr(user, "email", ""),
         "is_staff": getattr(user, "is_staff", False),
         "is_superuser": getattr(user, "is_superuser", False),
+        "person": {
+            "id": str(person.id),
+            "name": person.name,
+        } if person else None,
     })
 
 @api_view(["POST"])
