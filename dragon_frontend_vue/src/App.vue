@@ -19,7 +19,9 @@ const isAuthPage = computed(() => {
 
 // Initialize authentication state when app loads
 onMounted(() => {
-  //auth.initializeAuth()
+  if (auth.isAuthenticated) {
+    auth.fetchMe()
+  }
 })
 </script>
 

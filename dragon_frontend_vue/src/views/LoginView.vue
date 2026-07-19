@@ -82,6 +82,9 @@ async function onSubmit() {
     const tokens = await login(username.value.trim(), password.value)
     auth.setTokens(tokens, rememberMe.value, username.value)
 
+    // Load the current user's person (id + name) so role/membership can be resolved
+    await auth.fetchMe()
+
     // Redirect to teams or intended route
     const redirectTo = router.currentRoute.value.query.redirect || '/teams'
     await router.push(redirectTo)
