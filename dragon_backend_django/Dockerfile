@@ -33,6 +33,6 @@ RUN chown -R appuser:appuser /app
 USER appuser
 
 # Expose port
-EXPOSE 8000
+EXPOSE 9000
 
 ENTRYPOINT ["/entrypoint.sh"]

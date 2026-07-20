@@ -36,8 +36,8 @@ EOF
 
 if [ "$DEBUG" = "True" ]; then
     echo "Starting Django development server with hot reload..."
-    python manage.py runserver 0.0.0.0:8000
+    python manage.py runserver 0.0.0.0:9000
 else
     echo "Starting Gunicorn..."
-    gunicorn server.wsgi:application --bind 0.0.0.0:8000
+    gunicorn server.wsgi:application --bind 0.0.0.0:9000
 fi

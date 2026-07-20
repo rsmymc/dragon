@@ -33,7 +33,7 @@ services:
     env_file:
       - ./dragon_backend_django/.env.prod
     ports:
-      - "8000:8000"
+      - "9000:9000"
     volumes:
       - ./dragon_backend_django:/app
     networks:
@@ -47,7 +47,7 @@ services:
       target: prod
     container_name: dragon_frontend_vue
     ports:
-      - "80:80"
+      - "9090:80"
     depends_on:
       - backend
     networks:
