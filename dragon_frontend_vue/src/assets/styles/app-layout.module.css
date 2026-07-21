@@ -1,17 +1,59 @@
 .appLayout {
   display: flex;
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
+/* ---------- Mobile top bar (hidden on desktop) ---------- */
+.mobileTopBar {
+  display: none;
+}
+
+.hamburger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hamburgerIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.mobileAppName {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: white;
+}
+
+/* ---------- Backdrop behind the mobile drawer ---------- */
+.backdrop {
+  display: none;
+}
+
+/* ---------- Sidebar ---------- */
 .sidebar {
   width: 260px;
   background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
   color: white;
   display: flex;
   flex-direction: column;
-  transition: width 0.3s ease;
+  transition:
+    width 0.3s ease,
+    transform 0.3s ease;
   position: fixed;
+  top: 0;
+  left: 0;
   height: 100vh;
+  height: 100dvh;
   z-index: 50;
 }
 
@@ -43,6 +85,7 @@
 .sidebarNav {
   flex: 1;
   padding: 1rem 0;
+  overflow-y: auto;
 }
 
 .navItem {
@@ -55,11 +98,7 @@
   transition: all 0.2s ease;
   margin: 0 0.5rem;
   border-radius: 0.5rem;
-}
-
-.navItem:hover {
-  background-color: #334155;
-  color: white;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .navItem.router-link-active {
@@ -142,12 +181,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 0.875rem;
-}
-
-.logoutButton:hover {
-  background-color: #dc2626;
-  border-color: #dc2626;
-  color: white;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .logoutIcon {
@@ -238,14 +272,78 @@
   background-color: #f8fafc;
 }
 
-/* Mobile styles */
-@media (max-width: 768px) {
-  .sidebar {
-    transform: translateX(-100%);
+/* Hover effects only on real pointer devices, so taps don't leave sticky states */
+@media (hover: hover) {
+  .navItem:hover {
+    background-color: #334155;
+    color: white;
   }
 
+  .logoutButton:hover {
+    background-color: #dc2626;
+    border-color: #dc2626;
+    color: white;
+  }
+
+  .sidebarToggle:hover {
+    background-color: #f1f5f9;
+    color: #1e293b;
+  }
+}
+
+/* ---------- Mobile styles ---------- */
+@media (max-width: 768px) {
+  /* Show the fixed mobile top bar */
+  .mobileTopBar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: calc(56px + env(safe-area-inset-top));
+    padding-top: env(safe-area-inset-top);
+    padding-left: max(0.5rem, env(safe-area-inset-left));
+    padding-right: 1rem;
+    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+    z-index: 30;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Sidebar becomes a slide-in drawer */
+  .sidebar {
+    width: min(84vw, 300px);
+    transform: translateX(-100%);
+    padding-top: env(safe-area-inset-top);
+    box-shadow: none;
+  }
+
+  .sidebar.mobileOpen {
+    transform: translateX(0);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.35);
+  }
+
+  .sidebarFooter {
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+  }
+
+  /* Dark scrim behind the open drawer */
+  .backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 45;
+  }
+
+  /* Content takes the full width and clears the fixed top bar */
   .mainArea {
     margin-left: 0;
+  }
+
+  .mainContent {
+    padding-top: calc(56px + env(safe-area-inset-top) + 1rem);
   }
 
   .searchContainer {

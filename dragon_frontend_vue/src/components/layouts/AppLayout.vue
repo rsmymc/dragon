@@ -1,14 +1,16 @@
 <script setup>
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, watch, onUnmounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.js'
 import styles from '@/assets/styles/app-layout.module.css'
 
 const router = useRouter()
+const route = useRoute()
 const auth = useAuthStore()
 
 // UI State
-const sidebarCollapsed = ref(false)
+const sidebarCollapsed = ref(false) // desktop collapse (unchanged)
+const mobileOpen = ref(false) // mobile drawer open/closed
 
 // Computed properties
 const currentUser = computed(() => auth.username)
@@ -37,6 +39,31 @@ const toggleSidebar = () => {
   sidebarCollapsed.value = !sidebarCollapsed.value
 }
 
+const toggleMobile = () => {
+  mobileOpen.value = !mobileOpen.value
+}
+
+const closeMobile = () => {
+  mobileOpen.value = false
+}
+
+// Close the drawer whenever the route changes (e.g. after tapping a nav item)
+watch(
+  () => route.path,
+  () => {
+    mobileOpen.value = false
+  },
+)
+
+// Lock body scroll while the mobile drawer is open
+watch(mobileOpen, (open) => {
+  document.body.style.overflow = open ? 'hidden' : ''
+})
+
+onUnmounted(() => {
+  document.body.style.overflow = ''
+})
+
 const handleLogout = async () => {
   await auth.logout()
   router.push('/login')
@@ -45,8 +72,34 @@ const handleLogout = async () => {
 
 <template>
   <div :class="styles.appLayout">
+    <!-- Mobile top bar (visible on mobile only) -->
+    <header :class="styles.mobileTopBar">
+      <button
+        type="button"
+        :class="styles.hamburger"
+        @click="toggleMobile"
+        aria-label="Toggle navigation menu"
+        :aria-expanded="mobileOpen"
+      >
+        <svg :class="styles.hamburgerIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 6h16M4 12h16M4 18h16"
+          />
+        </svg>
+      </button>
+      <span :class="styles.mobileAppName">DragonBoat Manager</span>
+    </header>
+
+    <!-- Backdrop behind the mobile drawer -->
+    <div v-if="mobileOpen" :class="styles.backdrop" @click="closeMobile"></div>
+
     <!-- Sidebar -->
-    <aside :class="[styles.sidebar, { collapsed: sidebarCollapsed }]">
+    <aside
+      :class="[styles.sidebar, { collapsed: sidebarCollapsed, [styles.mobileOpen]: mobileOpen }]"
+    >
       <!-- Logo -->
       <div :class="styles.sidebarHeader">
         <div :class="styles.logoContainer">
@@ -68,6 +121,7 @@ const handleLogout = async () => {
           :to="item.path"
           :class="styles.navItem"
           :title="sidebarCollapsed ? item.name : ''"
+          @click="closeMobile"
         >
           <svg :class="styles.navIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="item.icon" />
