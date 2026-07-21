@@ -210,8 +210,8 @@ async function onSubmit() {
           <img alt="DragonBoat Logo" src="../assets/images/logo.png" width="128" height="128" />
           <h1 :class="styles.appTitle">DragonBoat Manager</h1>
         </div>
-        <h2>Create Account</h2>
-        <p>Sign up to manage your dragon boat teams</p>
+<!--        <h2>Create Account</h2>
+        <p>Sign up to manage your dragon boat teams</p>-->
       </div>
 
       <form @submit.prevent="onSubmit" :class="styles.loginForm">
