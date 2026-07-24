@@ -8,6 +8,14 @@ import styles from '@/assets/styles/teams-list.module.css'
 const router = useRouter()
 const teamsStore = useTeamsStore()
 
+// Roles allowed to edit/delete a team. "Player" (the default member role)
+// is intentionally excluded. Kept here so the rule lives in the frontend.
+const EDIT_ROLES = [2, 3, 4]
+
+// Can the current user manage (edit/delete) this team?
+// Relies on `my_role` returned per team by TeamSerializer.
+const canManage = (team) => EDIT_ROLES.includes(Number(team?.my_role))
+
 // Join-modal state
 const showJoinModal = ref(false)
 const joinCode = ref('')
@@ -79,11 +87,14 @@ const viewTeam = (teamId) => {
   router.push(`/teams/${teamId}`)
 }
 
-const editTeam = (teamId) => {
-  router.push(`/teams/${teamId}/edit?from=list`)
+const editTeam = (team) => {
+  if (!canManage(team)) return // guard: players can't reach edit
+  router.push(`/teams/${team.id}/edit?from=list`)
 }
 
 const deleteTeam = async (team) => {
+  if (!canManage(team)) return // guard: players can't delete
+
   // Create custom confirmation dialog
   const confirmed = await showDeleteConfirmation(team)
   if (!confirmed) return
@@ -318,12 +329,9 @@ const actionsStyle = {
                 </svg>
               </button>
             </div>
-            <div :class="styles.teamActions" @click.stop>
-              <button
-                @click="editTeam(team.id)"
-                :class="styles.actionBtnTeamList"
-                title="Edit Team"
-              >
+            <!-- Edit/Delete only enabled for manager/coach/captain -->
+            <div v-if="canManage(team)" :class="styles.teamActions" @click.stop>
+              <button @click="editTeam(team)" :class="styles.actionBtnTeamList" title="Edit Team">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     stroke-linecap="round"

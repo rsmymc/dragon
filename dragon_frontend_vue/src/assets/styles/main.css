@@ -1,16 +1,10 @@
 @import 'base.css';
-@import "tokens.css";
+@import 'tokens.css';
 
-a,
-.green {
+/* Links are styled by their component classes throughout the app.
+   This is just a neutral default - the old create-vue green link/hover
+   styles were removed so no stray green highlight appears on any <a>. */
+a {
+  color: inherit;
   text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
-}
-
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
 }

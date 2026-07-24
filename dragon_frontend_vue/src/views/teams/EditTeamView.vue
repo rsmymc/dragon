@@ -145,7 +145,7 @@ onMounted(() => {
             Back to Teams
           </router-link>
           <h1>Edit Team: {{ team.name }}</h1>
-          <p :class="styles.subtitle">Update your dragon boat team information</p>
+          <!--          <p :class="styles.subtitle">Update your dragon boat team information</p>-->
         </div>
       </div>
 
@@ -160,7 +160,7 @@ onMounted(() => {
             id="name"
             v-model="formData.name"
             type="text"
-            :class="[styles.formInput, { error: errors.name }]"
+            :class="[styles.formInput, { [styles.error]: errors.name }]"
             placeholder="Enter team name"
             required
           />
@@ -208,7 +208,7 @@ onMounted(() => {
             :class="styles.btnPrimary"
             :disabled="teamsStore.isLoading || !isFormValid"
           >
-            <span v-if="teamsStore.isLoading" :class="[styles.loadingSpinner, 'small']"></span>
+            <span v-if="teamsStore.isLoading" :class="[styles.loadingSpinner, styles.small]"></span>
             {{ teamsStore.isLoading ? 'Updating...' : 'Update Team' }}
           </button>
         </div>
