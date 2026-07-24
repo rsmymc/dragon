@@ -129,55 +129,67 @@ const showNotification = (type, message) => {
   }
 }
 
-// Inline styles for the join modal (self-contained, no CSS-module dependency)
+// Progress bar fill: brand blue while filling, teal once the roster is full
+const progressPercent = (team) => {
+  const current = team.active_member_count || 0
+  const max = team.max_members || 22
+  return Math.min((current / max) * 100, 100)
+}
+
+const progressColor = (team) =>
+  (team.active_member_count || 0) >= (team.max_members || 22)
+    ? 'var(--color-success)'
+    : 'var(--color-primary)'
+
+// Inline styles for the join modal (self-contained, no CSS-module dependency).
+// Colours reference the brand tokens - custom properties resolve in inline styles.
 const overlayStyle = {
   position: 'fixed',
   inset: 0,
-  background: 'rgba(0, 0, 0, 0.5)',
+  background: 'rgba(0, 34, 95, 0.55)', // brand-blue tinted scrim
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
+  padding: '1rem',
   zIndex: 1000,
 }
 const modalStyle = {
-  background: '#fff',
+  background: 'var(--color-surface)',
   borderRadius: '12px',
   padding: '24px',
-  width: '90%',
+  width: '100%',
   maxWidth: '400px',
+  maxHeight: '90dvh', // scrolls instead of clipping on short/landscape screens
+  overflowY: 'auto',
   boxShadow: '0 10px 40px rgba(0, 0, 0, 0.2)',
+}
+const modalTitleStyle = {
+  margin: '0 0 6px',
+  fontSize: '20px',
+  color: 'var(--color-text-strong)',
+}
+const modalHintStyle = {
+  margin: '0 0 16px',
+  color: 'var(--color-text-muted)',
+  fontSize: '14px',
 }
 const inputStyle = {
   width: '100%',
-  padding: '10px 12px',
-  fontSize: '16px',
+  padding: '12px',
+  fontSize: '16px', // keeps iOS from zooming on focus
   letterSpacing: '2px',
   textTransform: 'uppercase',
-  border: '1px solid #d1d5db',
+  color: 'var(--color-text-strong)',
+  border: '1px solid var(--color-border-strong)',
   borderRadius: '8px',
   boxSizing: 'border-box',
 }
-const errorTextStyle = { color: '#dc2626', fontSize: '14px', marginTop: '8px' }
+const errorTextStyle = { color: 'var(--color-danger)', fontSize: '14px', marginTop: '8px' }
 const actionsStyle = {
   display: 'flex',
   justifyContent: 'flex-end',
   gap: '8px',
   marginTop: '20px',
-}
-const codeBadgeStyle = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: '4px',
-  marginTop: '4px',
-  padding: '2px 8px',
-  fontSize: '12px',
-  fontFamily: 'monospace',
-  letterSpacing: '1px',
-  color: '#374151',
-  background: '#f3f4f6',
-  border: '1px solid #e5e7eb',
-  borderRadius: '6px',
-  cursor: 'pointer',
 }
 </script>
 
@@ -205,38 +217,38 @@ const codeBadgeStyle = {
     </div>
 
     <!-- Search and Filters -->
-    <div :class="styles.searchSection">
-      <div :class="styles.searchBar">
-        <div :class="styles.searchInputContainer">
-          <svg :class="styles.searchIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
-          <input
-            v-model="searchQuery"
-            type="text"
-            placeholder="Search teams by name or description..."
-            :class="styles.searchInput"
-          />
-        </div>
-      </div>
+    <!--    <div :class="styles.searchSection">
+          <div :class="styles.searchBar">
+            <div :class="styles.searchInputContainer">
+              <svg :class="styles.searchIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+              <input
+                v-model="searchQuery"
+                type="text"
+                placeholder="Search teams by name or description..."
+                :class="styles.searchInput"
+              />
+            </div>
+          </div>
 
-      <div :class="styles.filters">
-        <select
-          v-model="teamsStore.filters.sortBy"
-          @change="teamsStore.updateFilters({ sortBy: $event.target.value })"
-          :class="styles.filterSelect"
-        >
-          <option value="name">Sort by Name</option>
-          <option value="created_at">Sort by Date Created</option>
-          <option value="active_member_count">Sort by Member Count</option>
-        </select>
-      </div>
-    </div>
+          <div :class="styles.filters">
+            <select
+              v-model="teamsStore.filters.sortBy"
+              @change="teamsStore.updateFilters({ sortBy: $event.target.value })"
+              :class="styles.filterSelect"
+            >
+              <option value="name">Sort by Name</option>
+              <option value="created_at">Sort by Date Created</option>
+              <option value="active_member_count">Sort by Member Count</option>
+            </select>
+          </div>
+        </div>-->
 
     <!-- Teams Grid -->
     <div :class="styles.teamsContent">
@@ -293,7 +305,7 @@ const codeBadgeStyle = {
                 v-if="team.code"
                 @click.stop="copyCode(team.code)"
                 title="Copy team code"
-                :style="codeBadgeStyle"
+                :class="styles.codeBadge"
               >
                 {{ team.code }}
                 <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -323,7 +335,7 @@ const codeBadgeStyle = {
               </button>
               <button
                 @click="deleteTeam(team)"
-                :class="[styles.actionBtnTeamList, 'delete']"
+                :class="[styles.actionBtnTeamList, styles.delete]"
                 title="Delete Team"
               >
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -359,16 +371,13 @@ const codeBadgeStyle = {
                 <div
                   :class="styles.progressFill"
                   :style="{
-                    width: `${Math.min(((team.active_member_count || 0) / (team.max_members || 22)) * 100, 100)}%`,
-                    backgroundColor:
-                      team.active_member_count >= team.max_members ? '#10b981' : '#3b82f6',
+                    width: `${progressPercent(team)}%`,
+                    backgroundColor: progressColor(team),
                   }"
                 ></div>
               </div>
               <span :class="styles.progressText">
-                {{
-                  Math.round(((team.active_member_count || 0) / (team.max_members || 22)) * 100)
-                }}% full
+                {{ Math.round(progressPercent(team)) }}% full
               </span>
             </div>
           </div>
@@ -379,10 +388,8 @@ const codeBadgeStyle = {
     <!-- Join Team Modal -->
     <div v-if="showJoinModal" :style="overlayStyle" @click.self="closeJoinModal">
       <div :style="modalStyle">
-        <h2 style="margin: 0 0 6px; font-size: 20px">Join a Team</h2>
-        <p style="margin: 0 0 16px; color: #6b7280; font-size: 14px">
-          Enter the team code shared with you.
-        </p>
+        <h2 :style="modalTitleStyle">Join a Team</h2>
+        <p :style="modalHintStyle">Enter the team code shared with you.</p>
 
         <input
           v-model="joinCode"

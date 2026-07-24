@@ -10,12 +10,17 @@
   padding-bottom: max(1rem, env(safe-area-inset-bottom));
   padding-left: max(1rem, env(safe-area-inset-left));
   padding-right: max(1rem, env(safe-area-inset-right));
-  background: linear-gradient(135deg, #123157 0%, #0b1d33 50%, #194780 100%);
+  background: linear-gradient(
+    135deg,
+    var(--brand-blue) 0%,
+    var(--brand-blue-dark) 50%,
+    var(--brand-blue-80) 100%
+  );
   overflow-y: auto; /* let the card scroll on short/landscape screens instead of clipping */
 }
 
 .loginCard {
-  background: white;
+  background: var(--color-surface);
   border-radius: 1rem;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   padding: 2.5rem;
@@ -41,7 +46,9 @@
 .appTitle {
   font-size: 1.5rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #123157 0%, #8b1721 100%);
+  /* ana renk -> yardimci renk: the orange appears only at the tail of the
+     gradient, keeping it well under the 1/4 proportion rule */
+  background: linear-gradient(135deg, var(--brand-blue) 0%, var(--brand-orange) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -51,12 +58,12 @@
 .loginHeader h2 {
   font-size: 1.875rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--color-text-strong);
   margin-bottom: 0.5rem;
 }
 
 .loginHeader p {
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-size: 0.875rem;
 }
 
@@ -73,7 +80,7 @@
 
 .formGroup label {
   font-weight: 600;
-  color: #374151;
+  color: var(--color-text-body);
   margin-bottom: 0.5rem;
   font-size: 0.875rem;
 }
@@ -86,23 +93,24 @@
   width: 100%;
   /* extra right padding clears the success check / password toggle */
   padding: 0.875rem 2.75rem 0.875rem 1rem;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--color-border);
   border-radius: 0.75rem;
   font-size: 16px; /* 16px stops iOS Safari from auto-zooming on focus */
   transition: all 0.2s ease;
-  background-color: #f9fafb;
+  background-color: var(--color-surface-subtle);
+  color: var(--color-text-strong);
 }
 
 .formGroup input:focus {
   outline: none;
-  border-color: #123157;
-  background-color: white;
-  box-shadow: 0 0 0 3px rgba(18, 49, 87, 0.1);
+  border-color: var(--color-primary);
+  background-color: var(--color-surface);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
 }
 
 .formGroup input.error {
-  border-color: #ef4444;
-  background-color: #fef2f2;
+  border-color: var(--color-danger);
+  background-color: var(--color-danger-soft);
 }
 
 .inputSuccess {
@@ -116,7 +124,7 @@
 .successIcon {
   width: 1.25rem;
   height: 1.25rem;
-  color: #10b981;
+  color: var(--color-success);
 }
 
 .passwordToggle {
@@ -127,7 +135,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--color-text-muted);
   border-radius: 0.5rem;
   transition: color 0.2s ease;
   /* 44x44 minimum touch target, icon stays visually the same size */
@@ -144,7 +152,7 @@
 }
 
 .errorMessage {
-  color: #ef4444;
+  color: var(--color-danger);
   font-size: 0.75rem;
   margin-top: 0.25rem;
   font-weight: 500;
@@ -161,7 +169,7 @@
   align-items: center;
   cursor: pointer;
   font-size: 0.875rem;
-  color: #374151;
+  color: var(--color-text-body);
   font-weight: 500;
   min-height: 44px; /* comfortable tap target for the whole row */
   padding: 0.25rem 0;
@@ -172,17 +180,18 @@
   width: 1.15rem;
   height: 1.15rem;
   flex-shrink: 0;
+  accent-color: var(--color-primary); /* checked state uses the ana renk */
 }
 
 .generalError {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
+  background-color: var(--color-danger-soft);
+  border: 1px solid var(--color-danger-border);
   border-radius: 0.75rem;
   padding: 0.875rem;
-  color: #dc2626;
+  color: var(--color-danger);
   font-size: 0.875rem;
 }
 
@@ -199,8 +208,8 @@
   gap: 0.5rem;
   width: 100%;
   padding: 1rem;
-  background: linear-gradient(135deg, #123157 0%, #0b1d33 100%);
-  color: white;
+  background: var(--gradient-brand);
+  color: var(--color-text-inverse);
   border: none;
   border-radius: 0.75rem;
   font-size: 1rem;
@@ -226,11 +235,11 @@
   margin-top: 1.25rem;
   text-align: center;
   font-size: 0.9rem;
-  color: #64748b; /* muted text for the "Already have an account?" part */
+  color: var(--color-text-muted);
 }
 
 .loginFooter a {
-  color: #2563eb; /* or your dragon-boat accent color */
+  color: var(--color-primary);
   font-weight: 600;
   text-decoration: none;
 }
@@ -247,22 +256,22 @@
 .demoHelp {
   margin-top: 1.5rem;
   padding-top: 1.5rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--color-border);
   text-align: center;
 }
 
 .demoText {
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-size: 0.75rem;
   line-height: 1.5;
 }
 
 .demoText code {
-  background: #f3f4f6;
+  background: var(--color-surface-muted);
   padding: 0.125rem 0.25rem;
   border-radius: 0.25rem;
   font-family: monospace;
-  color: #1f2937;
+  color: var(--color-text-strong);
   font-weight: 500;
 }
 
@@ -270,12 +279,12 @@
 @media (hover: hover) {
   .loginButton:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 10px 25px -5px rgba(18, 49, 87, 0.4);
-    background: linear-gradient(135deg, #194780 0%, #123157 100%);
+    box-shadow: 0 10px 25px -5px rgba(0, 48, 135, 0.4);
+    background: linear-gradient(135deg, var(--brand-blue-80) 0%, var(--brand-blue) 100%);
   }
 
   .passwordToggle:hover {
-    color: #374151;
+    color: var(--color-text-body);
   }
 
   .loginFooter a:hover {

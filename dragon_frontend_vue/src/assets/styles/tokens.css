@@ -1,0 +1,73 @@
+:root {
+  /* ---------- Main color: + tints (over white) ---------- */
+  --brand-blue: #003087;
+  --brand-blue-80: #33599f;
+  --brand-blue-60: #6683b7;
+  --brand-blue-40: #99accf;
+  --brand-blue-20: #ccd6e7;
+
+  /* darker shade for gradients / pressed states (not in the guideline,
+     derived from the main color) */
+  --brand-blue-dark: #00225f;
+
+  /* ---------- second color: + tints ---------- */
+  --brand-orange: #ff5620;
+  --brand-orange-80: #ff784d;
+  --brand-orange-60: #ff9a79;
+  --brand-orange-40: #ffbba6;
+  --brand-orange-20: #ffddd2;
+
+  /* ---------- : grey ramp ----------
+     #EBEBEE is the guideline value; the rest are derived from its hue so
+     text and borders stay in the same neutral family. */
+  --grey-50: #f7f7f9;
+  --grey-100: #ebebee;
+  --grey-200: #d8d8de;
+  --grey-300: #bcbcc6;
+  --grey-400: #9494a1;
+  --grey-500: #6e6e7d;
+  --grey-600: #52525e;
+  --grey-700: #3a3a44;
+  --grey-800: #26262d;
+
+  /* ---------- Semantic tokens (use these in components) ---------- */
+  --color-primary: var(--brand-blue);
+  --color-primary-dark: var(--brand-blue-dark);
+  --color-primary-soft: var(--brand-blue-20);
+
+  /* accent: borders, indicators, icons, large text. NOT small white-on-orange
+     text - that combination is ~3.2:1 and fails WCAG AA. */
+  --color-accent: var(--brand-orange);
+  --color-accent-soft: var(--brand-orange-20);
+
+  --color-surface: #ffffff;
+  --color-surface-subtle: var(--grey-50);
+  --color-surface-muted: var(--grey-100);
+
+  --color-border: var(--grey-200);
+  --color-border-strong: var(--grey-300);
+
+  --color-text-strong: var(--grey-800);
+  --color-text-body: var(--grey-700);
+  --color-text-muted: var(--grey-500);
+  --color-text-inverse: #ffffff;
+
+  /* focus ring - blue at low opacity */
+  --color-focus-ring: rgba(0, 48, 135, 0.18);
+
+  /* ---------- Functional colours ----------
+     Deliberately outside the brand palette: error/success must read as
+     status, not as branding. Using the brand orange for errors would make
+     accents look like warnings. */
+  --color-danger: #dc2626;
+  --color-danger-soft: #fef2f2;
+  --color-danger-border: #fecaca;
+  --color-success: #077780; /* destek #1 teal from the guideline */
+  --color-success-soft: #e6f2f3;
+
+  /* ---------- Brand gradients ---------- */
+  --gradient-brand: linear-gradient(135deg, #003087 0%, #00225f 100%);
+  --gradient-sidebar: linear-gradient(180deg, #003087 0%, #00225f 100%);
+  /* the blue-to-orange gradient from the guideline - decorative use only */
+  --gradient-accent: linear-gradient(90deg, #003087 0%, #077780 45%, #ff5620 100%);
+}

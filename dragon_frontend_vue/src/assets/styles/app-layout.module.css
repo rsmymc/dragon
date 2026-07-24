@@ -17,7 +17,7 @@
   min-height: 44px;
   background: none;
   border: none;
-  color: white;
+  color: var(--color-text-inverse);
   cursor: pointer;
   border-radius: 0.5rem;
   -webkit-tap-highlight-color: transparent;
@@ -31,7 +31,7 @@
 .mobileAppName {
   font-size: 1.125rem;
   font-weight: 700;
-  color: white;
+  color: var(--color-text-inverse);
 }
 
 /* ---------- Backdrop behind the mobile drawer ---------- */
@@ -42,8 +42,8 @@
 /* ---------- Sidebar ---------- */
 .sidebar {
   width: 260px;
-  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-  color: white;
+  background: var(--gradient-sidebar);
+  color: var(--color-text-inverse);
   display: flex;
   flex-direction: column;
   transition:
@@ -63,7 +63,8 @@
 
 .sidebarHeader {
   padding: 1.5rem 1rem;
-  border-bottom: 1px solid #334155;
+  /* translucent white divider reads correctly over the blue gradient */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .logoContainer {
@@ -79,7 +80,7 @@
 .appName {
   font-size: 1.25rem;
   font-weight: 700;
-  color: white;
+  color: var(--color-text-inverse);
 }
 
 .sidebarNav {
@@ -93,17 +94,23 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem 1rem;
-  color: #cbd5e1;
+  color: var(--brand-blue-20);
   text-decoration: none;
   transition: all 0.2s ease;
   margin: 0 0.5rem;
   border-radius: 0.5rem;
   -webkit-tap-highlight-color: transparent;
+  /* reserve the accent bar space so active/inactive items don't shift */
+  border-left: 3px solid transparent;
 }
 
+/* Active item: lighter blue panel + yardimci renk accent bar.
+   White on --brand-blue-80 is ~6.8:1, so the label stays AA compliant. */
 .navItem.router-link-active {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  color: white;
+  background: var(--brand-blue-80);
+  border-left-color: var(--brand-orange);
+  color: var(--color-text-inverse);
+  font-weight: 600;
 }
 
 .navIcon {
@@ -118,7 +125,7 @@
 
 .sidebarFooter {
   padding: 1rem;
-  border-top: 1px solid #334155;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .userSection {
@@ -126,7 +133,7 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem;
-  background-color: #334155;
+  background-color: rgba(255, 255, 255, 0.1);
   border-radius: 0.5rem;
   margin-bottom: 0.75rem;
 }
@@ -139,11 +146,15 @@
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  /* light disc with blue initials - readable at small size, unlike
+     white-on-orange which would fail contrast */
+  background: var(--brand-blue-20);
+  color: var(--brand-blue);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 0.8125rem;
   flex-shrink: 0;
 }
 
@@ -154,7 +165,7 @@
 .userName {
   font-weight: 600;
   font-size: 0.875rem;
-  color: white;
+  color: var(--color-text-inverse);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -162,7 +173,7 @@
 
 .userEmail {
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: var(--brand-blue-40);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -175,9 +186,9 @@
   width: 100%;
   padding: 0.75rem;
   background: none;
-  border: 1px solid #475569;
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 0.5rem;
-  color: #cbd5e1;
+  color: var(--brand-blue-20);
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 0.875rem;
@@ -201,8 +212,8 @@
 }
 
 .topHeader {
-  background: white;
-  border-bottom: 1px solid #e2e8f0;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
   padding: 1rem 1.5rem;
   display: flex;
   justify-content: space-between;
@@ -225,14 +236,14 @@
   padding: 0.5rem;
   border-radius: 0.5rem;
   cursor: pointer;
-  color: #64748b;
+  color: var(--color-text-muted);
   transition: all 0.2s ease;
 }
 
 .breadcrumbItem {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--color-text-strong);
   text-transform: capitalize;
 }
 
@@ -249,11 +260,19 @@
 .searchInput {
   width: 300px;
   padding: 0.5rem 2.5rem 0.5rem 1rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--color-border);
   border-radius: 0.5rem;
-  font-size: 0.875rem;
-  background-color: #f8fafc;
+  font-size: 16px; /* keeps iOS from zooming if this is ever shown on mobile */
+  background-color: var(--color-surface-subtle);
+  color: var(--color-text-strong);
   transition: all 0.2s ease;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background-color: var(--color-surface);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
 }
 
 .searchIcon {
@@ -263,31 +282,31 @@
   transform: translateY(-50%);
   width: 1rem;
   height: 1rem;
-  color: #64748b;
+  color: var(--color-text-muted);
 }
 
 .mainContent {
   padding: 1.5rem;
   min-height: calc(100vh - 70px);
-  background-color: #f8fafc;
+  background-color: var(--color-surface-subtle);
 }
 
 /* Hover effects only on real pointer devices, so taps don't leave sticky states */
 @media (hover: hover) {
   .navItem:hover {
-    background-color: #334155;
-    color: white;
+    background-color: rgba(255, 255, 255, 0.12);
+    color: var(--color-text-inverse);
   }
 
   .logoutButton:hover {
-    background-color: #dc2626;
-    border-color: #dc2626;
-    color: white;
+    background-color: var(--color-danger);
+    border-color: var(--color-danger);
+    color: var(--color-text-inverse);
   }
 
   .sidebarToggle:hover {
-    background-color: #f1f5f9;
-    color: #1e293b;
+    background-color: var(--color-surface-muted);
+    color: var(--color-text-strong);
   }
 }
 
@@ -306,7 +325,7 @@
     padding-top: env(safe-area-inset-top);
     padding-left: max(0.5rem, env(safe-area-inset-left));
     padding-right: 1rem;
-    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+    background: var(--gradient-sidebar);
     z-index: 30;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   }
@@ -333,7 +352,7 @@
     display: block;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 34, 95, 0.55); /* brand-blue-dark tinted scrim */
     z-index: 45;
   }
 

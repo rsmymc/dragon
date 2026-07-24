@@ -14,7 +14,7 @@ def generate_team_code(length=6):
 
 class Team(TimeStampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255)
     city = models.CharField(max_length=255, blank=True, null=True)
     max_members = models.PositiveIntegerField(default=22, blank=True)
     code = models.CharField(max_length=8, unique=True, blank=True, db_index=True)

@@ -117,10 +117,10 @@ const isFormValid = computed(() => {
           </svg>
           Back to Teams
         </button>
-        <div :class="styles.headerContent">
+<!--        <div :class="styles.headerContent">
           <h1 :class="styles.pageTitle">Create New Team</h1>
           <p :class="styles.pageSubtitle">Add a new dragon boat team to your organization</p>
-        </div>
+        </div>-->
       </div>
     </div>
 

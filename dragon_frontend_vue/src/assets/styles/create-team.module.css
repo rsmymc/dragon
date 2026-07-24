@@ -1,5 +1,6 @@
 .createTeamPage {
-  padding: 1.5rem;
+  /* no padding here: the page sits inside .mainContent (1.5rem) already */
+  padding: 0;
   max-width: 800px;
   margin: 0 auto;
 }
@@ -20,17 +21,16 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 0;
+  min-height: 44px; /* touch target */
   background: none;
   border: none;
-  color: #123157;
+  color: var(--color-primary);
   cursor: pointer;
   font-weight: 500;
+  font-size: 0.9375rem;
   transition: color 0.2s ease;
   align-self: flex-start;
-}
-
-.backButton:hover {
-  color: #0b1d33;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .backButton svg {
@@ -38,15 +38,36 @@
   height: 1.25rem;
 }
 
+/* Real classes for the title/subtitle the template already references
+   (previously these bindings resolved to undefined and the h1 was only
+   styled by tag structure). */
+.pageTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin: 0 0 0.5rem 0;
+  /* yardimci renk: short orange underline, matching the Teams page */
+  padding-bottom: 0.5rem;
+  border-bottom: 3px solid var(--color-accent);
+  display: inline-block;
+}
+
+.pageSubtitle {
+  color: var(--color-text-muted);
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Kept for backwards compatibility in case other markup relies on them */
 .headerContent h1 {
   font-size: 2rem;
   font-weight: 700;
-  color: #123157;
+  color: var(--color-primary);
   margin: 0 0 0.5rem 0;
 }
 
 .headerContent p {
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-size: 1rem;
   margin: 0;
 }
@@ -56,8 +77,8 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  background: #ecfdf5;
-  border: 1px solid #86efac;
+  background: var(--color-success-soft);
+  border: 1px solid var(--color-success);
   border-radius: 0.75rem;
   padding: 1rem;
   margin-bottom: 2rem;
@@ -66,29 +87,42 @@
 .successIcon {
   width: 2rem;
   height: 2rem;
-  color: #16a34a;
+  color: var(--color-success);
   flex-shrink: 0;
 }
 
 .successContent h3 {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #16a34a;
+  color: var(--color-success);
   margin: 0 0 0.25rem 0;
 }
 
 .successContent p {
-  color: #15803d;
+  color: var(--color-success);
   margin: 0;
   font-size: 0.875rem;
 }
 
 /* Form Container */
 .formContainer {
-  background: white;
+  background: var(--color-surface);
   border-radius: 1rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  border: 2px solid #f3f4f6;
+  border: 2px solid var(--color-surface-muted);
+  overflow: hidden; /* clip the accent bar to the rounded corners */
+  position: relative;
+}
+
+/* yardimci renk: orange accent strip along the top of the form card */
+.formContainer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--color-accent);
 }
 
 .teamForm {
@@ -107,10 +141,10 @@
 .sectionTitle {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #123157;
+  color: var(--color-primary);
   margin: 0 0 1.5rem 0;
   padding-bottom: 0.75rem;
-  border-bottom: 2px solid #f3f4f6;
+  border-bottom: 2px solid var(--color-surface-muted);
 }
 
 /* Form Groups */
@@ -121,13 +155,13 @@
 .formLabel {
   display: block;
   font-weight: 600;
-  color: #374151;
+  color: var(--color-text-body);
   margin-bottom: 0.5rem;
   font-size: 0.875rem;
 }
 
 .required {
-  color: #ef4444;
+  color: var(--color-danger);
   margin-left: 0.25rem;
 }
 
@@ -136,25 +170,26 @@
 .formTextarea {
   width: 100%;
   padding: 0.875rem 1rem;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--color-border);
   border-radius: 0.5rem;
-  font-size: 1rem;
+  font-size: 16px; /* 16px stops iOS Safari from auto-zooming on focus */
+  color: var(--color-text-strong);
   transition: all 0.2s ease;
-  background-color: #f9fafb;
+  background-color: var(--color-surface-subtle);
 }
 
 .formInput:focus,
 .formTextarea:focus {
   outline: none;
-  border-color: #123157;
-  background-color: white;
-  box-shadow: 0 0 0 3px rgba(18, 49, 87, 0.1);
+  border-color: var(--color-primary);
+  background-color: var(--color-surface);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
 }
 
 .formInput.error,
 .formTextarea.error {
-  border-color: #ef4444;
-  background-color: #fef2f2;
+  border-color: var(--color-danger);
+  background-color: var(--color-danger-soft);
 }
 
 .numberInput {
@@ -175,19 +210,19 @@
 
 .charCount {
   font-size: 0.75rem;
-  color: #9ca3af;
+  color: var(--color-text-muted);
 }
 
 /* Help Text */
 .fieldHelp {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   margin-top: 0.25rem;
   margin-bottom: 0;
 }
 
 .errorMessage {
-  color: #ef4444;
+  color: var(--color-danger);
   font-size: 0.75rem;
   font-weight: 500;
   margin-top: 0.25rem;
@@ -200,7 +235,7 @@
   align-items: center;
   gap: 1rem;
   padding-top: 2rem;
-  border-top: 2px solid #f3f4f6;
+  border-top: 2px solid var(--color-surface-muted);
 }
 
 .actionGroup {
@@ -214,24 +249,22 @@
 .btnOutline {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
   padding: 0.875rem 1.5rem;
+  min-height: 44px; /* touch target */
   border-radius: 0.5rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 0.875rem;
   border: 2px solid transparent;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .btnPrimary {
-  background: linear-gradient(135deg, #123157 0%, #0b1d33 100%);
-  color: white;
-}
-
-.btnPrimary:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(18, 49, 87, 0.3);
+  background: var(--gradient-brand);
+  color: var(--color-text-inverse);
 }
 
 .btnPrimary:disabled {
@@ -241,25 +274,15 @@
 }
 
 .btnSecondary {
-  background: white;
-  color: #123157;
-  border-color: #123157;
-}
-
-.btnSecondary:hover:not(:disabled) {
-  background: #123157;
-  color: white;
+  background: var(--color-surface);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
 }
 
 .btnOutline {
-  background: white;
-  color: #6b7280;
-  border-color: #e5e7eb;
-}
-
-.btnOutline:hover:not(:disabled) {
-  background: #f3f4f6;
-  border-color: #d1d5db;
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  border-color: var(--color-border);
 }
 
 .loadingSpinner {
@@ -277,12 +300,39 @@
   }
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .createTeamPage {
-    padding: 1rem;
+/* Hover effects only on real pointer devices, so taps don't leave sticky states */
+@media (hover: hover) {
+  .backButton:hover {
+    color: var(--color-primary-dark);
   }
 
+  .btnPrimary:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 48, 135, 0.3);
+  }
+
+  .btnSecondary:hover:not(:disabled) {
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+  }
+
+  .btnOutline:hover:not(:disabled) {
+    background: var(--color-surface-muted);
+    border-color: var(--color-border-strong);
+  }
+}
+
+/* Keyboard focus stays visible even where hover doesn't apply */
+.backButton:focus-visible,
+.btnPrimary:focus-visible,
+.btnSecondary:focus-visible,
+.btnOutline:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
   .teamForm {
     padding: 1.5rem;
   }
@@ -304,6 +354,7 @@
 }
 
 @media (max-width: 480px) {
+  .pageTitle,
   .headerContent h1 {
     font-size: 1.5rem;
   }

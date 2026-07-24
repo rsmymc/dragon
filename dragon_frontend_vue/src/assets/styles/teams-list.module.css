@@ -1,5 +1,7 @@
 .teamsPage {
-  padding: 1.5rem;
+  /* no padding here: the page already sits inside .mainContent (1.5rem),
+     so padding at both levels doubled the gutters, especially on phones */
+  padding: 0;
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -10,6 +12,7 @@
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 2rem;
+  gap: 1rem;
 }
 
 .headerLeft {
@@ -19,12 +22,16 @@
 .pageTitle {
   font-size: 2rem;
   font-weight: 700;
-  color: #123157;
+  color: var(--color-primary);
   margin: 0 0 0.5rem 0;
+  /* yardimci renk: short orange underline under the title */
+  padding-bottom: 0.5rem;
+  border-bottom: 3px solid var(--color-accent);
+  display: inline-block;
 }
 
 .pageSubtitle {
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-size: 1rem;
   margin: 0;
 }
@@ -32,51 +39,64 @@
 .headerRight {
   display: flex;
   gap: 1rem;
+  flex-shrink: 0;
 }
 
 .btnPrimary {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #123157 0%, #0b1d33 100%);
-  color: white;
+  min-height: 44px; /* touch target */
+  background: var(--gradient-brand);
+  color: var(--color-text-inverse);
   border: none;
   border-radius: 0.5rem;
   font-weight: 600;
+  font-size: 0.9375rem;
   cursor: pointer;
   transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.btnPrimary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(18, 49, 87, 0.3);
+.btnPrimary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .btnSecondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 0.75rem 1.5rem;
-  background: white;
-  color: #123157;
-  border: 2px solid #123157;
+  min-height: 44px; /* touch target */
+  background: var(--color-surface);
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
   border-radius: 0.5rem;
   font-weight: 600;
+  font-size: 0.9375rem;
   cursor: pointer;
   transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.btnSecondary:hover {
-  background: #123157;
-  color: white;
+.btnSecondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .btnIcon {
   width: 1.25rem;
   height: 1.25rem;
+  flex-shrink: 0;
 }
 
 /* Search Section */
 .searchSection {
-  background: white;
+  background: var(--color-surface);
   padding: 1.5rem;
   border-radius: 1rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -99,22 +119,25 @@
   transform: translateY(-50%);
   width: 1.25rem;
   height: 1.25rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
+  pointer-events: none;
 }
 
 .searchInput {
   width: 100%;
   padding: 0.875rem 1rem 0.875rem 3rem;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--color-border);
   border-radius: 0.5rem;
-  font-size: 1rem;
+  font-size: 16px; /* 16px stops iOS Safari from auto-zooming on focus */
+  color: var(--color-text-strong);
+  background: var(--color-surface);
   transition: all 0.2s ease;
 }
 
 .searchInput:focus {
   outline: none;
-  border-color: #123157;
-  box-shadow: 0 0 0 3px rgba(18, 49, 87, 0.1);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
 }
 
 .filters {
@@ -125,10 +148,12 @@
 
 .filterSelect {
   padding: 0.5rem 1rem;
-  border: 2px solid #e5e7eb;
+  min-height: 44px;
+  border: 2px solid var(--color-border);
   border-radius: 0.5rem;
-  font-size: 0.875rem;
-  background: white;
+  font-size: 16px; /* prevents iOS zoom on focus */
+  color: var(--color-text-strong);
+  background: var(--color-surface);
   cursor: pointer;
 }
 
@@ -136,9 +161,14 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  min-height: 44px;
   font-size: 0.875rem;
-  color: #374151;
+  color: var(--color-text-body);
   cursor: pointer;
+}
+
+.filterCheckbox input {
+  accent-color: var(--color-primary);
 }
 
 /* Teams Content */
@@ -152,15 +182,15 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 4rem;
-  color: #6b7280;
+  padding: 4rem 1rem;
+  color: var(--color-text-muted);
 }
 
 .loadingSpinner {
   width: 3rem;
   height: 3rem;
-  border: 3px solid #e5e7eb;
-  border-top: 3px solid #123157;
+  border: 3px solid var(--color-border);
+  border-top: 3px solid var(--color-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 1rem;
@@ -181,25 +211,25 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 4rem;
+  padding: 4rem 1rem;
   text-align: center;
 }
 
 .errorIcon {
   width: 4rem;
   height: 4rem;
-  color: #ef4444;
+  color: var(--color-danger);
   margin-bottom: 1rem;
 }
 
 .errorState h3 {
   font-size: 1.5rem;
-  color: #1f2937;
+  color: var(--color-text-strong);
   margin-bottom: 0.5rem;
 }
 
 .errorState p {
-  color: #6b7280;
+  color: var(--color-text-muted);
   margin-bottom: 1.5rem;
 }
 
@@ -209,65 +239,76 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 4rem;
+  padding: 4rem 1rem;
   text-align: center;
 }
 
 .emptyIcon {
   width: 5rem;
   height: 5rem;
-  color: #9ca3af;
+  color: var(--grey-400);
   margin-bottom: 1.5rem;
 }
 
 .emptyState h3 {
   font-size: 1.5rem;
-  color: #1f2937;
+  color: var(--color-text-strong);
   margin-bottom: 0.5rem;
 }
 
 .emptyState p {
-  color: #6b7280;
+  color: var(--color-text-muted);
   margin-bottom: 2rem;
 }
 
 /* Teams Grid */
 .teamsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  /* min() keeps a card from forcing horizontal overflow on narrow screens */
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 350px), 1fr));
   gap: 1.5rem;
 }
 
 .teamCard {
-  background: white;
+  position: relative;
+  background: var(--color-surface);
   border-radius: 1rem;
   padding: 1.5rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  border: 2px solid #f3f4f6;
+  border: 2px solid var(--color-surface-muted);
   cursor: pointer;
   transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  overflow: hidden; /* clip the accent bar to the rounded corners */
 }
 
-.teamCard:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-  border-color: #123157;
+/* yardimci renk: orange accent strip along the top of every card */
+.teamCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--color-accent);
 }
 
 .cardHeader {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  gap: 0.75rem;
   margin-bottom: 1rem;
 }
 
 .teamName {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #123157;
+  color: var(--color-primary);
   margin: 0;
   flex: 1;
   line-height: 1.3;
+  overflow-wrap: anywhere; /* long team names can't blow out the card */
 }
 
 .teamActions {
@@ -275,46 +316,36 @@
   gap: 0.5rem;
   opacity: 0;
   transition: opacity 0.2s ease;
-}
-
-.teamCard:hover .teamActions {
-  opacity: 1;
+  flex-shrink: 0;
 }
 
 .actionBtnTeamList {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 0.5rem;
-  background: #f3f4f6;
+  background: var(--color-surface-muted);
   border: none;
   border-radius: 0.375rem;
   cursor: pointer;
   transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .actionBtnTeamList svg {
   width: 1rem;
   height: 1rem;
-  color: #6b7280;
-}
-
-.actionBtnTeamList:hover {
-  background: #e5e7eb;
-}
-
-.actionBtnTeamList.delete:hover {
-  background: #fef2f2;
-}
-
-.actionBtnTeamList.delete:hover svg {
-  color: #ef4444;
+  color: var(--color-text-muted);
 }
 
 .teamDescription {
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-size: 0.875rem;
   line-height: 1.4;
   margin-bottom: 1.5rem;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -330,11 +361,12 @@
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  min-width: 0;
 }
 
 .statLabel {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -342,8 +374,9 @@
 
 .statValue {
   font-size: 0.875rem;
-  color: #1f2937;
+  color: var(--color-text-strong);
   font-weight: 600;
+  overflow-wrap: anywhere;
 }
 
 .teamFooter {
@@ -358,12 +391,13 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  min-width: 0;
 }
 
 .progressBar {
   flex: 1;
   height: 0.5rem;
-  background: #e5e7eb;
+  background: var(--color-border);
   border-radius: 0.25rem;
   overflow: hidden;
 }
@@ -376,9 +410,28 @@
 
 .progressText {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-weight: 500;
   min-width: 4rem;
+}
+
+/* Team code badge (also used inline in the template) */
+.codeBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  min-height: 32px;
+  font-size: 0.75rem;
+  font-family: monospace;
+  letter-spacing: 1px;
+  color: var(--color-text-body);
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 0.375rem;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .teamStatus {
@@ -387,31 +440,113 @@
   font-size: 0.75rem;
   font-weight: 600;
   white-space: nowrap;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+/* "Nearly full" emphasis (80-99%): yardimci renk pill.
+   Orange on a light orange tint is ~4.6:1 -> passes AA for this small text. */
+.teamStatusNearFull {
+  color: #b83000; /* darkened brand orange so the small label clears AA */
+  background: var(--color-accent-soft);
+}
+
+/* Hover effects only on real pointer devices, so taps don't leave sticky states */
+@media (hover: hover) {
+  .btnPrimary:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 48, 135, 0.3);
+  }
+
+  .btnSecondary:hover:not(:disabled) {
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+  }
+
+  /* card hover: lift + orange border to echo the top accent */
+  .teamCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border-color: var(--color-accent);
+  }
+
+  .teamCard:hover .teamActions {
+    opacity: 1;
+  }
+
+  .actionBtnTeamList:hover {
+    background: var(--color-border);
+  }
+
+  .actionBtnTeamList.delete:hover {
+    background: var(--color-danger-soft);
+  }
+
+  .actionBtnTeamList.delete:hover svg {
+    color: var(--color-danger);
+  }
+
+  .codeBadge:hover {
+    background: var(--color-border);
+  }
+}
+
+/* Keyboard focus stays visible even where hover doesn't apply */
+.btnPrimary:focus-visible,
+.btnSecondary:focus-visible,
+.actionBtnTeamList:focus-visible,
+.codeBadge:focus-visible,
+.teamCard:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .teamsPage {
-    padding: 1rem;
-  }
-
   .pageHeader {
     flex-direction: column;
+    align-items: stretch;
     gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .pageTitle {
+    font-size: 1.5rem;
+  }
+
+  /* action buttons share the full width instead of hugging the right edge */
+  .headerRight {
+    width: 100%;
+  }
+
+  .headerRight > * {
+    flex: 1;
   }
 
   .teamsGrid {
     grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .teamCard {
+    padding: 1.25rem;
   }
 
   .filters {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
     gap: 1rem;
   }
 
+  /* card actions are always visible on touch (there is no hover to reveal them) */
   .teamActions {
     opacity: 1;
+  }
+
+  /* full-size touch targets for the edit/delete icons */
+  .actionBtnTeamList {
+    min-width: 44px;
+    min-height: 44px;
   }
 
   .teamStats {
