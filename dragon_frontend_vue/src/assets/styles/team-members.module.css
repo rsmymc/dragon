@@ -1,0 +1,511 @@
+.membersTab {
+  /* renders inside the layout's container; no own max-width needed */
+}
+
+/* Meta row: stats + compact invite chip */
+.teamMeta {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.teamStats {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.statLabel {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.statValue {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+/* Compact invite chip */
+.inviteBox {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--color-surface-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.inviteLabel {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.inviteCode {
+  font-size: 16px;
+  font-family: monospace;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--color-text-strong);
+}
+
+.inviteBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.5rem 0.75rem;
+  min-height: 40px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-inverse);
+  background: var(--color-primary);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.inviteBtn.copied {
+  background: var(--color-accent);
+  color: var(--color-text-strong); /* dark text keeps AA contrast on vibrant orange */
+}
+
+/* Progress row: bar + full/almost-full badge */
+.progressRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.memberProgress {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+  min-width: 200px;
+}
+
+.progressBar {
+  flex: 1;
+  height: 8px;
+  background: var(--color-border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--gradient-brand);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.progressFill.full {
+  background: var(--color-success);
+}
+
+.progressFill.almostFull {
+  background: var(--color-accent);
+}
+
+.progressText {
+  font-weight: 600;
+  color: var(--color-text-body);
+  min-width: 60px;
+}
+
+.statusBadge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.statusBadge.full {
+  background: var(--color-success-soft);
+  color: var(--color-success);
+}
+
+.statusBadge.almostFull {
+  background: var(--color-accent-soft);
+  color: #b83000; /* darkened brand orange so the small label clears AA */
+}
+
+/* Members header */
+.membersHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.membersHeader h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin: 0;
+}
+
+.membersControls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.searchBox {
+  position: relative;
+}
+
+.searchBox svg {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.searchInput {
+  padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 16px; /* prevents iOS zoom on focus */
+  min-width: 200px;
+  color: var(--color-text-strong);
+  background: var(--color-surface);
+  transition: border-color 0.2s ease;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+.roleFilter {
+  padding: 0.5rem 0.75rem;
+  min-height: 44px;
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 16px; /* prevents iOS zoom on focus */
+  color: var(--color-text-strong);
+  background: var(--color-surface);
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.roleFilter:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+/* Loading / Empty / Error */
+.membersLoading,
+.errorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 3rem 1rem;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.loadingSpinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--color-border);
+  border-top: 3px solid var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.errorIcon {
+  font-size: 2.5rem;
+}
+
+.emptyMembers {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--color-text-muted);
+}
+
+.emptyIcon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.emptyMembers h3 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--color-text-body);
+}
+
+.emptyMembers p {
+  margin-bottom: 1.5rem;
+}
+
+/* Members Grid */
+.membersGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  gap: 1.5rem;
+}
+
+.memberCard {
+  position: relative;
+  background: var(--color-surface);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 2px solid var(--color-surface-muted);
+  transition: all 0.2s ease;
+}
+
+.memberAvatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.avatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatarInitial {
+  width: 100%;
+  height: 100%;
+  background: var(--gradient-brand);
+  color: var(--color-text-inverse);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+.memberInfo {
+  flex: 1;
+}
+
+.memberName {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin: 0 0 0.25rem 0;
+  overflow-wrap: anywhere;
+}
+
+.memberRole {
+  color: var(--color-text-muted);
+  font-weight: 500;
+  margin: 0 0 0.75rem 0;
+}
+
+.memberDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.detailItem {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.memberActions {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.actionBtnMember {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface-muted);
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.actionBtnMember svg {
+  color: var(--color-text-muted);
+}
+
+/* Buttons */
+.btnPrimary,
+.btnRetry {
+  padding: 0.75rem 1.5rem;
+  min-height: 44px;
+  border-radius: 8px;
+  font-weight: 600;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+  white-space: nowrap;
+  color: var(--color-text-inverse);
+  background: var(--gradient-brand);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btnPrimary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Hover only on real pointer devices */
+@media (hover: hover) {
+  .memberCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+    border-color: var(--color-accent);
+  }
+
+  .memberCard:hover .memberActions {
+    opacity: 1;
+  }
+
+  .actionBtnMember.edit:hover {
+    background: var(--color-primary);
+  }
+
+  .actionBtnMember.edit:hover svg {
+    color: var(--color-text-inverse);
+  }
+
+  .actionBtnMember.delete:hover {
+    background: var(--color-danger);
+  }
+
+  .actionBtnMember.delete:hover svg {
+    color: var(--color-text-inverse);
+  }
+
+  .btnPrimary:hover:not(:disabled),
+  .btnRetry:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 48, 135, 0.3);
+  }
+
+  .inviteBtn:hover {
+    background: var(--color-primary-dark);
+  }
+
+  .inviteBtn.copied:hover {
+    background: var(--color-accent);
+  }
+}
+
+/* Keyboard focus */
+.btnPrimary:focus-visible,
+.btnRetry:focus-visible,
+.actionBtnMember:focus-visible,
+.inviteBtn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .inviteBox {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .teamStats {
+    gap: 1rem;
+  }
+
+  .membersHeader {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .membersControls {
+    flex-direction: column;
+    width: 100%;
+    align-items: stretch;
+  }
+
+  .searchBox {
+    width: 100%;
+  }
+
+  .searchInput {
+    min-width: auto;
+    width: 100%;
+  }
+
+  .roleFilter,
+  .membersControls .btnPrimary {
+    width: 100%;
+  }
+
+  .membersGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .memberActions {
+    opacity: 1;
+  }
+
+  .actionBtnMember {
+    width: 40px;
+    height: 40px;
+  }
+}

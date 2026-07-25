@@ -21,7 +21,8 @@ const dateRange = ref({
 const showCreateModal = ref(false)
 
 // Computed
-const teamId = computed(() => route.params.teamId)
+// Param comes from the parent team layout route (/teams/:id)
+const teamId = computed(() => route.params.id)
 
 const teamName = computed(() => {
   const team = teamsStore.getTeamById(teamId.value)
@@ -211,26 +212,9 @@ onMounted(() => {
 
 <template>
   <div :class="styles.teamTrainingsView">
-    <!-- Header -->
+    <!-- Toolbar: create action (team name + tabs are provided by the parent layout) -->
     <div :class="styles.header">
       <div :class="styles.headerContent">
-        <router-link :to="`/teams/${teamId}`" :class="styles.backLink">
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-          Back to {{ teamName }}
-        </router-link>
-
-        <div :class="styles.pageInfo">
-          <h1>Training Sessions</h1>
-          <p :class="styles.teamSubtitle">{{ teamName }}</p>
-        </div>
-
         <div :class="styles.headerActions">
           <button @click="showCreateModal = true" :class="styles.btnPrimary">
             <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -254,19 +238,19 @@ onMounted(() => {
         <div :class="styles.filterTabs">
           <button
             @click="timeFilter = 'upcoming'"
-            :class="[styles.tabBtn, { active: timeFilter === 'upcoming' }]"
+            :class="[styles.tabBtn, { [styles.active]: timeFilter === 'upcoming' }]"
           >
             Upcoming ({{ upcomingCount }})
           </button>
           <button
             @click="timeFilter = 'past'"
-            :class="[styles.tabBtn, { active: timeFilter === 'past' }]"
+            :class="[styles.tabBtn, { [styles.active]: timeFilter === 'past' }]"
           >
             Past ({{ pastCount }})
           </button>
           <button
             @click="timeFilter = 'all'"
-            :class="[styles.tabBtn, { active: timeFilter === 'all' }]"
+            :class="[styles.tabBtn, { [styles.active]: timeFilter === 'all' }]"
           >
             All ({{ totalCount }})
           </button>
@@ -357,7 +341,7 @@ onMounted(() => {
         <div
           v-for="training in filteredTrainings"
           :key="training.id"
-          :class="[styles.trainingCard, { past: isPastTraining(training) }]"
+          :class="[styles.trainingCard, { [styles.past]: isPastTraining(training) }]"
         >
           <!-- Training Header -->
           <div :class="styles.trainingHeader">

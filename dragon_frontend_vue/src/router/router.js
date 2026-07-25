@@ -5,13 +5,14 @@ import LoginView from '@/views/LoginView.vue'
 import TeamsView from '@/views/teams/TeamsView.vue'
 import CreateTeamView from '@/views/teams/CreateTeamView.vue'
 import EditTeamView from '@/views/teams/EditTeamView.vue'
-import TeamDetailView from '@/views/teams/TeamDetailView.vue'
+import TeamLayout from '@/views/teams/TeamLayout.vue'
+import TeamMembersView from '@/views/teams/TeamMembersView.vue'
 import EditPersonView from '@/views/teams/EditPersonView.vue'
 import TeamTrainingsView from '@/views/trainings/TeamTrainingsView.vue'
 import TrainingDetailsView from '@/views/trainings/TrainingDetailsView.vue'
 import PersonView from '@/views/PersonView.vue'
 import SettingsView from '@/views/SettingsView.vue'
-import RegisterView from "@/views/RegisterView.vue";
+import RegisterView from '@/views/RegisterView.vue'
 
 const routes = [
   // Auth Routes (Auth Layout)
@@ -46,12 +47,7 @@ const routes = [
     meta: { requiresAuth: true, layout: 'app' },
   },
   {
-    path: '/teams/:id',
-    name: 'team-detail',
-    component: TeamDetailView,
-    meta: { requiresAuth: true, layout: 'app' },
-  },
-  {
+    // Static segment first so it wins over the dynamic /teams/:id
     path: '/teams/create',
     name: 'team-create',
     component: CreateTeamView,
@@ -61,6 +57,33 @@ const routes = [
     path: '/teams/:id/edit',
     name: 'team-edit',
     component: EditTeamView,
+    meta: { requiresAuth: true, layout: 'app' },
+  },
+  {
+    // Tabbed team layout: header + Members/Trainings tabs
+    path: '/teams/:id',
+    component: TeamLayout,
+    meta: { requiresAuth: true, layout: 'app' },
+    children: [
+      {
+        path: '', // default tab -> Members
+        name: 'team-detail',
+        component: TeamMembersView,
+        meta: { requiresAuth: true, layout: 'app' },
+      },
+      {
+        path: 'trainings',
+        name: 'trainings',
+        component: TeamTrainingsView,
+        meta: { requiresAuth: true, layout: 'app' },
+      },
+    ],
+  },
+  {
+    // Training drill-down: full page, no team tabs
+    path: '/teams/:teamId/trainings/:id',
+    name: 'trainings-detail',
+    component: TrainingDetailsView,
     meta: { requiresAuth: true, layout: 'app' },
   },
   {
@@ -76,24 +99,13 @@ const routes = [
     meta: { requiresAuth: true, layout: 'app' },
   },
   {
-    path: '/teams/:teamId/trainings',
-    name: 'trainings',
-    component: TeamTrainingsView,
-    meta: { requiresAuth: true, layout: 'app' },
-  },
-  {
-    path: '/teams/:teamId/trainings/:id',
-    name: 'trainings-detail',
-    component: TrainingDetailsView,
-    meta: { requiresAuth: true, layout: 'app' },
-  },
-  {
     path: '/settings',
     name: 'settings',
     component: SettingsView,
     meta: { requiresAuth: true, layout: 'app' },
   },
 ]
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
