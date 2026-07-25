@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTeamsStore } from '@/stores/teams.js'
 
@@ -8,12 +8,14 @@ import styles from '@/assets/styles/teams-list.module.css'
 const router = useRouter()
 const teamsStore = useTeamsStore()
 
-// Roles allowed to edit/delete a team. "Player" (the default member role)
-// is intentionally excluded. Kept here so the rule lives in the frontend.
+// Membership.Role is an IntegerChoices enum:
+//   1 = Player, 2 = Captain, 3 = Coach, 4 = Manager
+// Captain/Coach/Manager may edit or delete; Player (the default member) may not.
 const EDIT_ROLES = [2, 3, 4]
 
 // Can the current user manage (edit/delete) this team?
-// Relies on `my_role` returned per team by TeamSerializer.
+// `my_role` is the integer role returned per team by TeamSerializer (null if
+// the user has no membership on that team).
 const canManage = (team) => EDIT_ROLES.includes(Number(team?.my_role))
 
 // Join-modal state
@@ -21,6 +23,10 @@ const showJoinModal = ref(false)
 const joinCode = ref('')
 const joinError = ref('')
 const joinSubmitting = ref(false)
+
+// Team-code "Copied!" feedback (keyed by the code, cleared after a short delay)
+const copiedCode = ref(null)
+let copiedTimer = null
 
 // Computed properties from store
 const teams = computed(() => teamsStore.filteredTeams)
@@ -34,6 +40,10 @@ const searchQuery = computed({
 // Load teams when component mounts
 onMounted(async () => {
   await teamsStore.fetchTeams()
+})
+
+onUnmounted(() => {
+  clearTimeout(copiedTimer)
 })
 
 // Methods
@@ -75,11 +85,42 @@ const submitJoin = async () => {
 }
 
 const copyCode = async (code) => {
-  try {
-    await navigator.clipboard.writeText(code)
-    showNotification('success', `Code ${code} copied`)
-  } catch {
+  const ok = await copyToClipboard(code)
+  if (ok) {
+    copiedCode.value = code
+    clearTimeout(copiedTimer)
+    copiedTimer = setTimeout(() => {
+      copiedCode.value = null
+    }, 1500)
+  } else {
     showNotification('error', 'Could not copy code')
+  }
+}
+
+// Copy helper with a fallback for non-secure contexts (e.g. opening the app
+// over a LAN IP on http, where navigator.clipboard is unavailable).
+const copyToClipboard = async (text) => {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text)
+      return true
+    }
+  } catch {
+    // fall through to the legacy path below
+  }
+  try {
+    const ta = document.createElement('textarea')
+    ta.value = text
+    ta.setAttribute('readonly', '')
+    ta.style.position = 'fixed'
+    ta.style.opacity = '0'
+    document.body.appendChild(ta)
+    ta.select()
+    const ok = document.execCommand('copy')
+    document.body.removeChild(ta)
+    return ok
+  } catch {
+    return false
   }
 }
 
@@ -315,18 +356,40 @@ const actionsStyle = {
               <button
                 v-if="team.code"
                 @click.stop="copyCode(team.code)"
-                title="Copy team code"
+                :title="copiedCode === team.code ? 'Copied!' : 'Copy team code'"
                 :class="styles.codeBadge"
+                :style="
+                  copiedCode === team.code
+                    ? {
+                        backgroundColor: 'var(--color-accent)',
+                        color: 'var(--color-text-strong)',
+                        borderColor: 'var(--color-accent)',
+                      }
+                    : null
+                "
               >
-                {{ team.code }}
-                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                  />
-                </svg>
+                <template v-if="copiedCode === team.code">
+                  Copied!
+                  <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                </template>
+                <template v-else>
+                  {{ team.code }}
+                  <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                    />
+                  </svg>
+                </template>
               </button>
             </div>
             <!-- Edit/Delete only enabled for manager/coach/captain -->

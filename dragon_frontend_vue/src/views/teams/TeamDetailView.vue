@@ -17,6 +17,12 @@ const membershipStore = useMembershipStore()
 const team = ref(null)
 const showAddPerson = ref(false)
 const codeCopied = ref(false)
+let copyTimer = null
+
+// Roles allowed to manage a team (edit/delete team, add/remove members).
+// Membership.Role: 1 = Player, 2 = Captain, 3 = Coach, 4 = Manager.
+const EDIT_ROLES = [2, 3, 4]
+const canManage = computed(() => EDIT_ROLES.includes(Number(team.value?.my_role)))
 
 // Computed
 const currentMemberCount = computed(() => {
@@ -77,12 +83,60 @@ const loadMembers = async () => {
 
 const copyTeamCode = async () => {
   if (!team.value?.code) return
-  try {
-    await navigator.clipboard.writeText(team.value.code)
+  const ok = await copyToClipboard(team.value.code)
+  if (ok) {
     codeCopied.value = true
-    setTimeout(() => (codeCopied.value = false), 1500)
+    clearTimeout(copyTimer)
+    copyTimer = setTimeout(() => (codeCopied.value = false), 1500)
+  }
+}
+
+// Copy helper with a fallback for non-secure contexts (e.g. opening the app
+// over a LAN IP on http, where navigator.clipboard is unavailable).
+const copyToClipboard = async (text) => {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text)
+      return true
+    }
+  } catch {
+    // fall through to the legacy path below
+  }
+  try {
+    const ta = document.createElement('textarea')
+    ta.value = text
+    ta.setAttribute('readonly', '')
+    ta.style.position = 'fixed'
+    ta.style.opacity = '0'
+    document.body.appendChild(ta)
+    ta.select()
+    const ok = document.execCommand('copy')
+    document.body.removeChild(ta)
+    return ok
+  } catch {
+    return false
+  }
+}
+
+const deleteTeam = async () => {
+  if (!canManage.value || !team.value) return
+
+  const confirmed = confirm(
+    `Delete "${team.value.name}"?\n\n` +
+      `This action cannot be undone and will remove the team and all associated data.`,
+  )
+  if (!confirmed) return
+
+  try {
+    const result = await teamsStore.deleteTeam(team.value.id)
+    if (result.success) {
+      router.push('/teams')
+    } else {
+      alert(result.error || 'Failed to delete team')
+    }
   } catch (error) {
-    console.error('Could not copy code:', error)
+    console.error('Delete team error:', error)
+    alert('An unexpected error occurred while deleting the team.')
   }
 }
 
@@ -106,10 +160,13 @@ const getInitials = (name) => {
 }
 
 const editPerson = (membership) => {
+  if (!canManage.value) return
   router.push(`/persons/${membership.person.id}/edit`)
 }
 
 const removePerson = async (membership) => {
+  if (!canManage.value) return
+
   const confirmed = confirm(
     `Remove "${membership.person.name}" from the team?\n\nThis action cannot be undone.`,
   )
@@ -155,48 +212,10 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  clearTimeout(copyTimer)
   membershipStore.clearTeamMemberships()
   membershipStore.clearFilters()
 })
-
-// Inline styles for the invite-code block
-const shareBoxStyle = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: '12px',
-  marginTop: '16px',
-  padding: '12px 16px',
-  background: '#f9fafb',
-  border: '1px solid #e5e7eb',
-  borderRadius: '10px',
-}
-const shareLabelStyle = {
-  fontSize: '12px',
-  color: '#6b7280',
-  textTransform: 'uppercase',
-  letterSpacing: '0.5px',
-}
-const shareCodeStyle = {
-  fontSize: '22px',
-  fontFamily: 'monospace',
-  fontWeight: '700',
-  letterSpacing: '3px',
-  color: '#111827',
-}
-const shareBtnStyle = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: '6px',
-  padding: '8px 14px',
-  fontSize: '14px',
-  color: '#fff',
-  background: '#3b82f6',
-  border: 'none',
-  borderRadius: '8px',
-  cursor: 'pointer',
-  whiteSpace: 'nowrap',
-}
 </script>
 
 <template>
@@ -218,46 +237,131 @@ const shareBtnStyle = {
 
     <!-- Team Details -->
     <div v-else-if="team" :class="styles.teamDetailContainer">
+      <!-- Back link (above the header card) -->
+      <router-link to="/teams" :class="styles.backLink">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15 19l-7-7 7-7"
+          />
+        </svg>
+        Back to Teams
+      </router-link>
+
       <!-- Team Header -->
       <div :class="styles.teamHeader">
         <div :class="styles.headerContent">
-          <router-link to="/teams" :class="styles.backLink">
-            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-            Back to Teams
-          </router-link>
-
           <div :class="styles.teamInfo">
+            <!-- Title + grouped team actions -->
             <div :class="styles.teamTitle">
-              <h1>{{ team.name }}</h1>
-              <div :class="styles.teamBadges">
-                <span v-if="isTeamFull" :class="[styles.statusBadge, styles.full]">Team Full</span>
-                <span v-else-if="isAlmostFull" :class="[styles.statusBadge, styles.almostFull]"
-                  >Almost Full</span
-                >
+              <div :class="styles.teamTitleLeft">
+                <h1>{{ team.name }}</h1>
+                <div :class="styles.teamBadges">
+                  <span v-if="isTeamFull" :class="[styles.statusBadge, styles.full]"
+                    >Team Full</span
+                  >
+                  <span v-else-if="isAlmostFull" :class="[styles.statusBadge, styles.almostFull]"
+                    >Almost Full</span
+                  >
+                </div>
+              </div>
+
+              <div :class="styles.teamHeaderActions">
+                <router-link :to="`/teams/${team.id}/trainings`" :class="styles.btnSecondary">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  View Trainings
+                </router-link>
+
+                <!-- edit/delete: only for manager/coach/captain -->
+                <template v-if="canManage">
+                  <router-link
+                    :to="`/teams/${team.id}/edit?from=detail`"
+                    :class="styles.actionBtnTeam"
+                    title="Edit Team"
+                  >
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      />
+                    </svg>
+                  </router-link>
+                  <button
+                    @click="deleteTeam"
+                    :class="[styles.actionBtnTeam, styles.delete]"
+                    title="Delete Team"
+                  >
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
+                    </svg>
+                  </button>
+                </template>
               </div>
             </div>
 
-            <div :class="styles.teamStats">
-              <div :class="styles.statItem">
-                <span :class="styles.statLabel">Members</span>
-                <span :class="styles.statValue"
-                  >{{ currentMemberCount }}/{{ team.max_members || 22 }}</span
+            <!-- Meta row: stats + compact invite chip -->
+            <div :class="styles.teamMeta">
+              <div :class="styles.teamStats">
+                <div :class="styles.statItem">
+                  <span :class="styles.statLabel">Members</span>
+                  <span :class="styles.statValue"
+                    >{{ currentMemberCount }}/{{ team.max_members || 22 }}</span
+                  >
+                </div>
+                <div v-if="team.city" :class="styles.statItem">
+                  <span :class="styles.statLabel">Location</span>
+                  <span :class="styles.statValue">{{ team.city }}</span>
+                </div>
+                <div :class="styles.statItem">
+                  <span :class="styles.statLabel">Created</span>
+                  <span :class="styles.statValue">{{ formatDate(team.created_at) }}</span>
+                </div>
+              </div>
+
+              <!-- Invite Code (compact) -->
+              <div v-if="team.code" :class="styles.inviteBox">
+                <div>
+                  <div :class="styles.inviteLabel">Invite code</div>
+                  <div :class="styles.inviteCode">{{ team.code }}</div>
+                </div>
+                <button
+                  @click="copyTeamCode"
+                  :class="[styles.inviteBtn, codeCopied ? styles.copied : '']"
                 >
-              </div>
-              <div v-if="team.city" :class="styles.statItem">
-                <span :class="styles.statLabel">Location</span>
-                <span :class="styles.statValue">{{ team.city }}</span>
-              </div>
-              <div :class="styles.statItem">
-                <span :class="styles.statLabel">Created</span>
-                <span :class="styles.statValue">{{ formatDate(team.created_at) }}</span>
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      v-if="codeCopied"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M5 13l4 4L19 7"
+                    />
+                    <path
+                      v-else
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                    />
+                  </svg>
+                  {{ codeCopied ? 'Copied!' : 'Copy' }}
+                </button>
               </div>
             </div>
 
@@ -274,62 +378,6 @@ const shareBtnStyle = {
               </div>
               <span :class="styles.progressText">{{ memberProgress.toFixed(0) }}% Full</span>
             </div>
-
-            <!-- Invite Code -->
-            <div v-if="team.code" :style="shareBoxStyle">
-              <div>
-                <div :style="shareLabelStyle">Invite code</div>
-                <div :style="shareCodeStyle">{{ team.code }}</div>
-              </div>
-              <button @click="copyTeamCode" :style="shareBtnStyle">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                  />
-                </svg>
-                {{ codeCopied ? 'Copied!' : 'Copy' }}
-              </button>
-            </div>
-          </div>
-
-          <!-- Action Buttons -->
-          <div :class="styles.teamDetailActions">
-            <router-link :to="`/teams/${team.id}/edit?from=detail`" :class="styles.btnEdit">
-              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                />
-              </svg>
-              Edit Team
-            </router-link>
-            <router-link :to="`/teams/${team.id}/trainings`" :class="styles.btnTrainings">
-              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              View Trainings
-            </router-link>
-            <button @click="showAddPerson = true" :class="styles.btnPrimary" :disabled="isTeamFull">
-              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                />
-              </svg>
-              Add Person
-            </button>
           </div>
         </div>
       </div>
@@ -372,6 +420,24 @@ const shareBtnStyle = {
                 <option value="3">Coach</option>
                 <option value="4">Manager</option>
               </select>
+
+              <!-- Add Person lives with the members it affects -->
+              <button
+                v-if="canManage"
+                @click="showAddPerson = true"
+                :class="styles.btnPrimary"
+                :disabled="isTeamFull"
+              >
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
+                </svg>
+                Add Person
+              </button>
             </div>
           </div>
 
@@ -407,7 +473,7 @@ const shareBtnStyle = {
               }}
             </p>
             <button
-              v-if="!membershipStore.searchQuery && !membershipStore.filters.role"
+              v-if="canManage && !membershipStore.searchQuery && !membershipStore.filters.role"
               @click="showAddPerson = true"
               :class="styles.btnPrimary"
             >
@@ -457,11 +523,11 @@ const shareBtnStyle = {
                   </span>
                 </div>
               </div>
-              <!-- Member Actions -->
-              <div :class="styles.memberActions">
+              <!-- Member Actions: only for manager/coach/captain -->
+              <div v-if="canManage" :class="styles.memberActions">
                 <button
                   @click="editPerson(membership)"
-                  :class="[styles.actionBtnMember, 'edit']"
+                  :class="[styles.actionBtnMember, styles.edit]"
                   title="Edit Person"
                 >
                   <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -475,7 +541,7 @@ const shareBtnStyle = {
                 </button>
                 <button
                   @click="removePerson(membership)"
-                  :class="[styles.actionBtnMember, 'delete']"
+                  :class="[styles.actionBtnMember, styles.delete]"
                   title="Remove Person"
                 >
                   <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">

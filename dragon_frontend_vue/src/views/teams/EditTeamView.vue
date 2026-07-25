@@ -26,6 +26,12 @@ const isFormValid = computed(() => {
   return formData.name.trim().length > 0 && Object.keys(errors).length === 0
 })
 
+// Where to return to, based on where the user came from (?from=detail|list)
+const backTarget = computed(() =>
+  route.query.from === 'detail' ? `/teams/${route.params.id}` : '/teams',
+)
+const backLabel = computed(() => (route.query.from === 'detail' ? 'Back to Team' : 'Back to Teams'))
+
 // Methods
 const loadTeam = async () => {
   const teamId = route.params.id
@@ -89,13 +95,7 @@ const handleSubmit = async () => {
     const result = await teamsStore.updateTeam(route.params.id, formData)
 
     if (result.success) {
-      const from = route.query.from
-
-      if (from === 'detail') {
-        router.push(`/teams/${route.params.id}`)
-      } else {
-        router.push('/teams')
-      }
+      router.push(backTarget.value)
     } else {
       formError.value = result.error || 'Failed to update team'
     }
@@ -133,7 +133,7 @@ onMounted(() => {
       <!-- Header -->
       <div :class="styles.pageHeader">
         <div :class="styles.headerContent">
-          <router-link to="/teams" :class="styles.backLink">
+          <router-link :to="backTarget" :class="styles.backLink">
             <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 stroke-linecap="round"
@@ -142,7 +142,7 @@ onMounted(() => {
                 d="M15 19l-7-7 7-7"
               />
             </svg>
-            Back to Teams
+            {{ backLabel }}
           </router-link>
           <h1>Edit Team: {{ team.name }}</h1>
           <!--          <p :class="styles.subtitle">Update your dragon boat team information</p>-->
@@ -202,7 +202,7 @@ onMounted(() => {
 
         <!-- Form Actions -->
         <div :class="styles.formActions">
-          <router-link to="/teams" :class="styles.btnCancel">Cancel</router-link>
+          <router-link :to="backTarget" :class="styles.btnCancel">Cancel</router-link>
           <button
             type="submit"
             :class="styles.btnPrimary"

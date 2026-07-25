@@ -107,8 +107,8 @@ const handleLogout = async () => {
             alt="Vue logo"
             :class="styles.logo"
             src="../../assets/images/logo.png"
-            width="96"
-            height="96"
+            width="196"
+            height="196"
           />
         </div>
       </div>
