@@ -236,19 +236,15 @@
   color: #b83000; /* darkened brand orange so the small label clears AA */
 }
 
-/* Tab strip: underline style, orange active accent */
+/* Tabs as a segmented control - clearly shows the active section */
 .tabStrip {
-  display: flex;
+  display: inline-flex;
   gap: 0.25rem;
   margin: 0 0 1.5rem;
-  border-bottom: 2px solid var(--color-border);
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-
-.tabStrip::-webkit-scrollbar {
-  display: none;
+  padding: 0.25rem;
+  background: var(--color-surface-muted);
+  border-radius: 12px;
+  max-width: 100%;
 }
 
 .tab {
@@ -256,18 +252,15 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  min-height: 48px;
+  padding: 0.5rem 1.5rem;
+  min-height: 44px;
+  border-radius: 9px;
   font-size: 0.9375rem;
   font-weight: 600;
   color: var(--color-text-muted);
   text-decoration: none;
   white-space: nowrap;
-  border-bottom: 3px solid transparent;
-  margin-bottom: -2px; /* overlap the strip's bottom border */
-  transition:
-    color 0.2s ease,
-    border-color 0.2s ease;
+  transition: all 0.2s ease;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -275,10 +268,11 @@
   flex-shrink: 0;
 }
 
-/* yardimci renk: active tab underline (matches the old app's active-tab accent) */
+/* Active segment: white pill lifts out of the grey track */
 .tabActive {
+  background: var(--color-surface);
   color: var(--color-primary);
-  border-bottom-color: var(--color-accent);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
 }
 
 /* Buttons (error state) */
@@ -372,7 +366,12 @@
     gap: 1rem;
   }
 
+  .tabStrip {
+    display: flex; /* full width on mobile */
+  }
+
   .tab {
     flex: 1; /* tabs share the width evenly on mobile */
+    padding: 0.5rem 0.75rem;
   }
 }

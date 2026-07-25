@@ -1,8 +1,8 @@
 <script setup>
 import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { usePersonsStore } from '@/stores/persons'
-import { PERSON_SIDE_LABELS } from '@/constants'
+import { usePersonsStore } from '@/stores/persons.js'
+import { PERSON_SIDE_LABELS } from '@/constants.js'
 import styles from '@/assets/styles/edit-person.module.css'
 
 const route = useRoute()
@@ -192,7 +192,17 @@ onMounted(() => {
   <div :class="styles.editPersonView">
     <!-- Header -->
     <div :class="styles.header">
-      <button @click="handleBack" :class="styles.backBtn" :disabled="isLoading">← Back</button>
+      <button @click="handleBack" :class="styles.backBtn" :disabled="isLoading">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15 19l-7-7 7-7"
+          />
+        </svg>
+        Back
+      </button>
       <h1 :class="styles.title">Edit Person</h1>
     </div>
 
@@ -223,7 +233,7 @@ onMounted(() => {
             id="name"
             v-model.trim="formData.name"
             type="text"
-            :class="[styles.formInput, { error: errors.name }]"
+            :class="[styles.formInput, { [styles.error]: errors.name }]"
             placeholder="Enter full name"
             maxlength="100"
             :disabled="isSubmitting"
@@ -238,7 +248,7 @@ onMounted(() => {
             id="phone"
             v-model.trim="formData.phone"
             type="tel"
-            :class="[styles.formInput, { error: errors.phone }]"
+            :class="[styles.formInput, { [styles.error]: errors.phone }]"
             placeholder="Enter phone number"
             maxlength="20"
             :disabled="isSubmitting"
@@ -253,7 +263,7 @@ onMounted(() => {
             id="height"
             v-model.number="formData.height"
             type="number"
-            :class="[styles.formInput, { error: errors.height }]"
+            :class="[styles.formInput, { [styles.error]: errors.height }]"
             placeholder="Enter height in cm"
             min="100"
             max="250"
@@ -270,7 +280,7 @@ onMounted(() => {
             id="weight"
             v-model.number="formData.weight"
             type="number"
-            :class="[styles.formInput, { error: errors.weight }]"
+            :class="[styles.formInput, { [styles.error]: errors.weight }]"
             placeholder="Enter weight in kg"
             min="30"
             max="200"
@@ -286,7 +296,7 @@ onMounted(() => {
           <select
             id="side"
             v-model="formData.side"
-            :class="[styles.formInput, { error: errors.side }]"
+            :class="[styles.formInput, { [styles.error]: errors.side }]"
             :disabled="isSubmitting"
           >
             <option value="">Select preferred side</option>

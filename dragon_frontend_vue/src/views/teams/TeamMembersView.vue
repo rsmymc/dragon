@@ -75,6 +75,23 @@ const removePerson = async (membership) => {
 const getRoleLabel = (role) => MEMBERSHIP_ROLE_LABELS[role] || 'Unknown'
 const getSideLabel = (side) => PERSON_SIDE_LABELS[side] || 'Unknown'
 
+// Icon matches the actual side: left arrow for Left, right for Right,
+// double arrow for Both/Either. Keyed off the human label so it stays
+// correct regardless of the raw side code.
+const getSidePath = (side) => {
+  const label = String(getSideLabel(side)).toLowerCase()
+  if (label.includes('both') || label.includes('either')) {
+    return 'M7 8l-4 4 4 4M3 12h18M17 8l4 4-4 4' // double arrow
+  }
+  if (label.includes('left')) {
+    return 'M11 8l-4 4 4 4M7 12h14' // left arrow
+  }
+  if (label.includes('right')) {
+    return 'M13 8l4 4-4 4M17 12H3' // right arrow
+  }
+  return 'M7 8l-4 4 4 4M3 12h18M17 8l4 4-4 4'
+}
+
 const handlePersonAdded = () => {
   showAddPerson.value = false
 }
@@ -248,14 +265,48 @@ const setRoleFilter = (value) => {
 
         <div :class="styles.memberDetails">
           <span v-if="membership.person.height" :class="styles.detailItem">
-            📏 {{ membership.person.height }} cm
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 3v18M8 7l4-4 4 4M8 17l4 4 4-4"
+              />
+            </svg>
+            {{ membership.person.height }} cm
           </span>
           <span v-if="membership.person.weight" :class="styles.detailItem">
-            ⚖️ {{ membership.person.weight }} kg
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 9v6M6.5 7v10M6.5 12h11M17.5 7v10M20 9v6"
+              />
+            </svg>
+            {{ membership.person.weight }} kg
           </span>
-          <span :class="styles.detailItem">🧭 {{ getSideLabel(membership.person.side) }}</span>
+          <span :class="styles.detailItem">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                :d="getSidePath(membership.person.side)"
+              />
+            </svg>
+            {{ getSideLabel(membership.person.side) }}
+          </span>
           <span v-if="membership.person.phone" :class="styles.detailItem">
-            📱 {{ membership.person.phone }}
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.13.96.36 1.9.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0122 16.92z"
+              />
+            </svg>
+            {{ membership.person.phone }}
           </span>
         </div>
       </div>

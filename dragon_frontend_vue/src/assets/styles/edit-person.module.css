@@ -1,31 +1,33 @@
 .editPersonView {
-  max-width: 600px;
+  /* sits inside .mainContent, which provides gutter + background */
+  padding: 0;
+  max-width: 640px;
   margin: 0 auto;
-  padding: 2rem;
-  min-height: calc(100vh - 4rem);
 }
 
+/* Header */
 .header {
   display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
 }
 
 .backBtn {
-  padding: 0.5rem 1rem;
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.25rem 0;
   background: transparent;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  border: none;
   cursor: pointer;
-  color: #666;
-  font-size: 0.9rem;
-  transition: all 0.2s ease;
-}
-
-.backBtn:hover:not(:disabled) {
-  background: #f5f5f5;
-  border-color: #ccc;
+  color: var(--color-primary);
+  font-weight: 500;
+  font-size: 0.9375rem;
+  transition: color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .backBtn:disabled {
@@ -35,47 +37,55 @@
 
 .title {
   margin: 0;
-  font-size: 1.8rem;
-  color: #333;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  /* yardimci renk: orange underline, consistent with the other pages */
+  padding-bottom: 0.5rem;
+  border-bottom: 3px solid var(--color-accent);
+  display: inline-block;
 }
 
+/* Loading */
 .loading {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 3rem;
-  color: #666;
+  color: var(--color-text-muted);
 }
 
 .spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid #e5e5e5;
-  border-top: 3px solid #007bff;
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--color-border);
+  border-top: 3px solid var(--color-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 1rem;
 }
 
+/* Error */
 .errorContainer {
   display: flex;
   justify-content: center;
-  padding: 3rem;
+  padding: 2rem 0;
 }
 
 .errorMessage {
+  width: 100%;
   text-align: center;
-  padding: 2rem;
-  background: #fee;
-  border: 1px solid #fcc;
+  padding: 1.25rem;
+  background: var(--color-danger-soft);
+  border: 1px solid var(--color-danger-border);
   border-radius: 8px;
-  color: #c33;
+  color: var(--color-danger);
 }
 
 .errorMessage h3 {
   margin: 0 0 0.5rem 0;
-  color: #c33;
+  color: var(--color-danger);
 }
 
 .errorMessage p {
@@ -83,24 +93,38 @@
 }
 
 .retryBtn {
-  padding: 0.5rem 1rem;
-  background: #c33;
-  color: white;
+  padding: 0.625rem 1.25rem;
+  min-height: 44px;
+  background: var(--color-danger);
+  color: var(--color-text-inverse);
   border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.retryBtn:hover {
-  background: #a22;
-}
-
-.formContainer {
-  background: white;
   border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Form card */
+.formContainer {
+  position: relative;
+  background: var(--color-surface);
+  border: 2px solid var(--color-surface-muted);
+  border-radius: 12px;
   padding: 2rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+/* yardimci renk: orange accent strip along the top of the form card */
+.formContainer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--color-accent);
 }
 
 .editForm {
@@ -116,88 +140,90 @@
 }
 
 .formLabel {
-  font-weight: 500;
-  color: #333;
-  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-body);
+  font-size: 0.875rem;
 }
 
 .required {
-  color: #c33;
+  color: var(--color-danger);
+  margin-left: 0.25rem;
 }
 
 .formInput {
   padding: 0.75rem;
-  border: 2px solid #ddd;
-  border-radius: 6px;
-  font-size: 1rem;
-  transition: border-color 0.2s ease;
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 16px; /* 16px stops iOS Safari from auto-zooming on focus */
+  color: var(--color-text-strong);
+  background: var(--color-surface);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .formInput:focus {
   outline: none;
-  border-color: #007bff;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
 }
 
 .formInput.error {
-  border-color: #c33;
+  border-color: var(--color-danger);
+  background-color: var(--color-danger-soft);
 }
 
 .formInput:disabled {
-  background: #f5f5f5;
+  background: var(--color-surface-subtle);
   cursor: not-allowed;
 }
 
 .fieldError {
-  color: #c33;
+  color: var(--color-danger);
   font-size: 0.8rem;
   margin-top: 0.25rem;
 }
 
+/* Actions */
 .formActions {
   display: flex;
   gap: 1rem;
   justify-content: flex-end;
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid #eee;
+  margin-top: 0.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border);
 }
 
 .cancelBtn,
 .saveBtn {
   padding: 0.75rem 1.5rem;
-  border-radius: 6px;
-  font-size: 1rem;
+  min-height: 44px;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  border: none;
+  border: 2px solid transparent;
   min-width: 120px;
   display: flex;
   align-items: center;
   justify-content: center;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .cancelBtn {
-  background: #f8f9fa;
-  color: #6c757d;
-  border: 1px solid #ddd;
-}
-
-.cancelBtn:hover:not(:disabled) {
-  background: #e9ecef;
-  border-color: #ccc;
+  background: var(--color-surface);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
 }
 
 .saveBtn {
-  background: #007bff;
-  color: white;
-}
-
-.saveBtn:hover:not(:disabled) {
-  background: #0056b3;
+  background: var(--gradient-brand);
+  color: var(--color-text-inverse);
 }
 
 .saveBtn:disabled {
-  background: #ccc;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
@@ -210,7 +236,7 @@
 .btnSpinner {
   width: 16px;
   height: 16px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.4);
   border-top: 2px solid white;
   border-radius: 50%;
   animation: spin 1s linear infinite;
@@ -225,14 +251,44 @@
   }
 }
 
-/* Responsive design */
+/* Hover only on real pointer devices */
+@media (hover: hover) {
+  .backBtn:hover:not(:disabled) {
+    color: var(--color-primary-dark);
+  }
+
+  .retryBtn:hover {
+    opacity: 0.9;
+  }
+
+  .cancelBtn:hover:not(:disabled) {
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+  }
+
+  .saveBtn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 48, 135, 0.3);
+  }
+}
+
+/* Keyboard focus */
+.backBtn:focus-visible,
+.retryBtn:focus-visible,
+.cancelBtn:focus-visible,
+.saveBtn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-  .editPersonView {
-    padding: 1rem;
+  .title {
+    font-size: 1.5rem;
   }
 
   .formContainer {
-    padding: 1rem;
+    padding: 1.5rem;
   }
 
   .formActions {
