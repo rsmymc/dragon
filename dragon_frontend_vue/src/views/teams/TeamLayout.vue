@@ -219,34 +219,44 @@ onUnmounted(() => {
             </div>
           </div>
 
-          <div v-if="team.code" :class="styles.inviteBox">
-            <div>
-              <div :class="styles.inviteLabel">Invite code</div>
-              <div :class="styles.inviteCode">{{ team.code }}</div>
-            </div>
-            <button
-              @click="copyTeamCode"
-              :class="[styles.inviteBtn, codeCopied ? styles.copied : '']"
-            >
-              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <button
+            v-if="team.code"
+            @click="copyTeamCode"
+            :title="codeCopied ? 'Copied!' : 'Copy team code'"
+            :class="styles.codeBadge"
+            :style="
+              codeCopied
+                ? {
+                    backgroundColor: 'var(--color-accent)',
+                    color: 'var(--color-text-strong)',
+                    borderColor: 'var(--color-accent)',
+                  }
+                : null
+            "
+          >
+            <template v-if="codeCopied">
+              Copied!
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
-                  v-if="codeCopied"
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   stroke-width="2"
                   d="M5 13l4 4L19 7"
                 />
+              </svg>
+            </template>
+            <template v-else>
+              {{ team.code }}
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
-                  v-else
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   stroke-width="2"
                   d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
                 />
               </svg>
-              {{ codeCopied ? 'Copied!' : 'Copy' }}
-            </button>
-          </div>
+            </template>
+          </button>
         </div>
 
         <!-- Progress -->
