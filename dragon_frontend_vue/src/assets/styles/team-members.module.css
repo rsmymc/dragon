@@ -27,6 +27,7 @@
 
 .searchInput {
   width: 100%;
+  min-width: 0; /* allow the field to shrink instead of pushing the row wider */
   padding: 0.625rem 0.75rem 0.625rem 2.5rem;
   border: 2px solid var(--color-border);
   border-radius: 8px;
@@ -340,8 +341,8 @@
   }
 }
 
-/* Very small screens: Add Person collapses to just the icon to save room */
-@media (max-width: 400px) {
+/* On phones the Add Person button collapses to just the icon to save room */
+@media (max-width: 600px) {
   .addLabel {
     display: none;
   }
