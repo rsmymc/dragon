@@ -1,184 +1,19 @@
 .membersTab {
-  /* renders inside the layout's container; no own max-width needed */
+  /* renders inside the layout's container */
 }
 
-/* Meta row: stats + compact invite chip */
-.teamMeta {
+/* Toolbar: search grows, Add Person sits beside it */
+.membersToolbar {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-  margin-bottom: 1.25rem;
-}
-
-.teamStats {
-  display: flex;
-  gap: 2rem;
-  flex-wrap: wrap;
-  flex: 1;
-  min-width: 0;
-}
-
-.statItem {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.statLabel {
-  font-size: 0.875rem;
-  color: var(--color-text-muted);
-  font-weight: 500;
-}
-
-.statValue {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--color-primary);
-}
-
-/* Compact invite chip */
-.inviteBox {
-  display: flex;
-  align-items: center;
   gap: 0.75rem;
-  padding: 0.5rem 0.75rem;
-  background: var(--color-surface-subtle);
-  border: 1px solid var(--color-border);
-  border-radius: 10px;
-  flex-shrink: 0;
-}
-
-.inviteLabel {
-  font-size: 11px;
-  color: var(--color-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.inviteCode {
-  font-size: 16px;
-  font-family: monospace;
-  font-weight: 700;
-  letter-spacing: 2px;
-  color: var(--color-text-strong);
-}
-
-.inviteBtn {
-  display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 0.5rem 0.75rem;
-  min-height: 40px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--color-text-inverse);
-  background: var(--color-primary);
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.2s ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.inviteBtn.copied {
-  background: var(--color-accent);
-  color: var(--color-text-strong); /* dark text keeps AA contrast on vibrant orange */
-}
-
-/* Progress row: bar + full/almost-full badge */
-.progressRow {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-  margin-bottom: 2rem;
-}
-
-.memberProgress {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex: 1;
-  min-width: 200px;
-}
-
-.progressBar {
-  flex: 1;
-  height: 8px;
-  background: var(--color-border);
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.progressFill {
-  height: 100%;
-  background: var(--gradient-brand);
-  border-radius: 4px;
-  transition: width 0.3s ease;
-}
-
-.progressFill.full {
-  background: var(--color-success);
-}
-
-.progressFill.almostFull {
-  background: var(--color-accent);
-}
-
-.progressText {
-  font-weight: 600;
-  color: var(--color-text-body);
-  min-width: 60px;
-}
-
-.statusBadge {
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  white-space: nowrap;
-}
-
-.statusBadge.full {
-  background: var(--color-success-soft);
-  color: var(--color-success);
-}
-
-.statusBadge.almostFull {
-  background: var(--color-accent-soft);
-  color: #b83000; /* darkened brand orange so the small label clears AA */
-}
-
-/* Members header */
-.membersHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.membersHeader h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--color-primary);
-  margin: 0;
-}
-
-.membersControls {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
+  margin-bottom: 1rem;
 }
 
 .searchBox {
   position: relative;
+  flex: 1;
+  min-width: 0;
 }
 
 .searchBox svg {
@@ -191,11 +26,11 @@
 }
 
 .searchInput {
-  padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+  width: 100%;
+  padding: 0.625rem 0.75rem 0.625rem 2.5rem;
   border: 2px solid var(--color-border);
   border-radius: 8px;
   font-size: 16px; /* prevents iOS zoom on focus */
-  min-width: 200px;
   color: var(--color-text-strong);
   background: var(--color-surface);
   transition: border-color 0.2s ease;
@@ -207,22 +42,41 @@
   box-shadow: 0 0 0 3px var(--color-focus-ring);
 }
 
-.roleFilter {
-  padding: 0.5rem 0.75rem;
-  min-height: 44px;
-  border: 2px solid var(--color-border);
-  border-radius: 8px;
-  font-size: 16px; /* prevents iOS zoom on focus */
-  color: var(--color-text-strong);
-  background: var(--color-surface);
-  cursor: pointer;
-  transition: border-color 0.2s ease;
+/* Role filter chips */
+.filterChips {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 2px;
 }
 
-.roleFilter:focus {
-  outline: none;
+.filterChips::-webkit-scrollbar {
+  display: none;
+}
+
+.chip {
+  flex-shrink: 0;
+  padding: 0.375rem 0.875rem;
+  min-height: 36px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-body);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.chipActive {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-focus-ring);
 }
 
 /* Loading / Empty / Error */
@@ -385,7 +239,7 @@
 /* Buttons */
 .btnPrimary,
 .btnRetry {
-  padding: 0.75rem 1.5rem;
+  padding: 0.625rem 1.25rem;
   min-height: 44px;
   border-radius: 8px;
   font-weight: 600;
@@ -397,6 +251,7 @@
   gap: 0.5rem;
   justify-content: center;
   white-space: nowrap;
+  flex-shrink: 0;
   color: var(--color-text-inverse);
   background: var(--gradient-brand);
   -webkit-tap-highlight-color: transparent;
@@ -410,6 +265,15 @@
 
 /* Hover only on real pointer devices */
 @media (hover: hover) {
+  .chip:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+
+  .chipActive:hover {
+    color: var(--color-text-inverse);
+  }
+
   .memberCard:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
@@ -441,61 +305,19 @@
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 48, 135, 0.3);
   }
-
-  .inviteBtn:hover {
-    background: var(--color-primary-dark);
-  }
-
-  .inviteBtn.copied:hover {
-    background: var(--color-accent);
-  }
 }
 
 /* Keyboard focus */
+.chip:focus-visible,
 .btnPrimary:focus-visible,
 .btnRetry:focus-visible,
-.actionBtnMember:focus-visible,
-.inviteBtn:focus-visible {
+.actionBtnMember:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .inviteBox {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .teamStats {
-    gap: 1rem;
-  }
-
-  .membersHeader {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .membersControls {
-    flex-direction: column;
-    width: 100%;
-    align-items: stretch;
-  }
-
-  .searchBox {
-    width: 100%;
-  }
-
-  .searchInput {
-    min-width: auto;
-    width: 100%;
-  }
-
-  .roleFilter,
-  .membersControls .btnPrimary {
-    width: 100%;
-  }
-
   .membersGrid {
     grid-template-columns: 1fr;
   }
@@ -507,5 +329,16 @@
   .actionBtnMember {
     width: 40px;
     height: 40px;
+  }
+}
+
+/* Very small screens: Add Person collapses to just the icon to save room */
+@media (max-width: 400px) {
+  .addLabel {
+    display: none;
+  }
+
+  .membersToolbar .btnPrimary {
+    padding: 0.625rem;
   }
 }

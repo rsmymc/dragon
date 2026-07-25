@@ -89,64 +89,69 @@ const handleSearchChange = (event) => {
   membershipStore.setSearchQuery(event.target.value)
 }
 
-const handleRoleFilterChange = (event) => {
-  membershipStore.updateFilters({ role: event.target.value })
+// Role filter chips (values match Membership.Role; '' = All)
+const roleFilters = [
+  { value: '', label: 'All' },
+  { value: '1', label: 'Players' },
+  { value: '2', label: 'Captains' },
+  { value: '3', label: 'Coaches' },
+  { value: '4', label: 'Managers' },
+]
+const setRoleFilter = (value) => {
+  membershipStore.updateFilters({ role: value })
 }
 </script>
 
 <template>
   <div :class="styles.membersTab">
-    <!-- Members Header -->
-    <div :class="styles.membersHeader">
-      <h2>Team Members</h2>
-      <div :class="styles.membersControls">
-        <div :class="styles.searchBox">
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
-          <input
-            :value="membershipStore.searchQuery"
-            @input="handleSearchChange"
-            type="text"
-            placeholder="Search members..."
-            :class="styles.searchInput"
+    <!-- Toolbar: search + add -->
+    <div :class="styles.membersToolbar">
+      <div :class="styles.searchBox">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
           />
-        </div>
-
-        <select
-          :value="membershipStore.filters.role"
-          @change="handleRoleFilterChange"
-          :class="styles.roleFilter"
-        >
-          <option value="">All Roles</option>
-          <option value="1">Player</option>
-          <option value="2">Captain</option>
-          <option value="3">Coach</option>
-          <option value="4">Manager</option>
-        </select>
-
-        <button
-          v-if="canManage"
-          @click="showAddPerson = true"
-          :class="styles.btnPrimary"
-          :disabled="isTeamFull"
-        >
-          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-            />
-          </svg>
-          Add Person
-        </button>
+        </svg>
+        <input
+          :value="membershipStore.searchQuery"
+          @input="handleSearchChange"
+          type="text"
+          placeholder="Search members..."
+          :class="styles.searchInput"
+        />
       </div>
+
+      <button
+        v-if="canManage"
+        @click="showAddPerson = true"
+        :class="styles.btnPrimary"
+        :disabled="isTeamFull"
+      >
+        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+          />
+        </svg>
+        <span :class="styles.addLabel">Add Person</span>
+      </button>
+    </div>
+
+    <!-- Role filter chips -->
+    <div :class="styles.filterChips">
+      <button
+        v-for="rf in roleFilters"
+        :key="rf.value"
+        @click="setRoleFilter(rf.value)"
+        :class="[styles.chip, { [styles.chipActive]: membershipStore.filters.role === rf.value }]"
+      >
+        {{ rf.label }}
+      </button>
     </div>
 
     <!-- Members Loading -->
