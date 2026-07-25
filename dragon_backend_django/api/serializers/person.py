@@ -22,4 +22,4 @@ class PersonSerializer(serializers.ModelSerializer):
 class PersonCompactSerializer(serializers.ModelSerializer):
     class Meta:
         model = Person
-        fields = ["id", "name", "phone"]
+        fields = ["id", "name", "phone", "height", "weight", "side", "profile_picture_url",]
