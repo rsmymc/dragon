@@ -59,27 +59,9 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Header card */
+/* Header block (flat - the content below provides the cards) */
 .teamHeader {
-  position: relative;
-  background: var(--color-surface);
-  border: 2px solid var(--color-surface-muted);
-  border-radius: 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
   margin-bottom: 1.5rem;
-  padding: 1.5rem 1.5rem 0;
-}
-
-/* yardimci renk: orange accent strip along the top of the header card */
-.teamHeader::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: var(--color-accent);
 }
 
 .headerTop {
@@ -403,10 +385,6 @@
 }
 
 @media (max-width: 768px) {
-  .teamHeader {
-    padding: 1.25rem 1.25rem 0;
-  }
-
   .teamName {
     font-size: 1.5rem;
   }
