@@ -1,10 +1,7 @@
 .modalOverlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  background: rgba(0, 34, 95, 0.55); /* brand-blue tinted scrim */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -13,49 +10,62 @@
 }
 
 .modalContent {
-  background: white;
+  position: relative;
+  background: var(--color-surface);
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  max-width: 500px;
   width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
+  max-width: 560px;
+  max-height: 90dvh;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.25);
+}
+
+/* yardimci renk: orange accent strip along the top of the modal */
+.modalContent::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--color-accent);
+  z-index: 1;
 }
 
 .modalHeader {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 1.5rem 1.5rem 0 1.5rem;
-  border-bottom: 1px solid #eee;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .modalHeader h3 {
   margin: 0;
-  color: #333;
   font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-primary);
 }
 
 .modalClose {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: #666;
-  width: 30px;
-  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-}
-
-.modalClose:hover:not(:disabled) {
-  background: #f5f5f5;
-  color: #333;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  font-size: 1.75rem;
+  line-height: 1;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .modalClose:disabled {
@@ -64,20 +74,21 @@
 }
 
 .modalBody {
-  padding: 1.5rem;
   flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
 }
 
 .trainingForm {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.25rem;
 }
 
 .formGroup {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.375rem;
 }
 
 .formRow {
@@ -87,183 +98,184 @@
 }
 
 .formLabel {
-  font-weight: 500;
-  color: #333;
-  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-body);
+  font-size: 0.875rem;
 }
 
 .required {
-  color: #c33;
+  color: var(--color-danger);
+  margin-left: 0.25rem;
 }
 
 .formInput {
+  width: 100%;
   padding: 0.75rem;
-  border: 2px solid #ddd;
-  border-radius: 6px;
-  font-size: 1rem;
-  transition: border-color 0.2s ease;
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 16px; /* 16px stops iOS Safari from auto-zooming on focus */
+  color: var(--color-text-strong);
+  background: var(--color-surface);
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 
 .formInput:focus {
   outline: none;
-  border-color: #007bff;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
 }
 
 .formInput.error {
-  border-color: #c33;
+  border-color: var(--color-danger);
+  background-color: var(--color-danger-soft);
 }
 
 .formInput:disabled {
-  background: #f5f5f5;
+  background: var(--color-surface-subtle);
   cursor: not-allowed;
-  opacity: 0.7;
 }
 
 .fieldError {
-  color: #c33;
-  font-size: 0.8rem;
+  color: var(--color-danger);
+  font-size: 0.75rem;
+  font-weight: 500;
 }
 
 .fieldHelp {
-  color: #666;
-  font-size: 0.8rem;
-}
-
-.noLocationsSection {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin-top: 0.5rem;
-}
-
-.btnCreateLocation {
-  padding: 0.5rem 1rem;
-  background: #28a745;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: background 0.2s ease;
-  align-self: flex-start;
-}
-
-.btnCreateLocation:hover:not(:disabled) {
-  background: #218838;
-}
-
-.btnCreateLocation:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-}
-
-.createLocationForm {
-  background: #f8f9fa;
-  border: 1px solid #dee2e6;
-  border-radius: 6px;
-  padding: 1rem;
-  margin-top: 0.5rem;
-}
-
-.locationActions {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
-  margin-top: 0.75rem;
-}
-
-.btnCancelSmall,
-.btnCreateSmall {
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btnCancelSmall {
-  background: #f8f9fa;
-  color: #6c757d;
-  border: 1px solid #ddd;
-}
-
-.btnCancelSmall:hover:not(:disabled) {
-  background: #e9ecef;
-}
-
-.btnCreateSmall {
-  background: #007bff;
-  color: white;
-}
-
-.btnCreateSmall:hover:not(:disabled) {
-  background: #0056b3;
-}
-
-.btnCreateSmall:disabled {
-  background: #ccc;
-  cursor: not-allowed;
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
 }
 
 .errorMessage {
-  background: #fee;
-  border: 1px solid #fcc;
-  border-radius: 6px;
-  padding: 0.75rem;
-  color: #c33;
-  font-size: 0.9rem;
+  padding: 0.875rem;
+  background: var(--color-danger-soft);
+  border: 1px solid var(--color-danger-border);
+  border-radius: 8px;
+  color: var(--color-danger);
+  font-size: 0.875rem;
 }
 
 .errorMessage p {
   margin: 0;
 }
 
-.modalFooter {
-  padding: 1rem 1.5rem;
-  border-top: 1px solid #eee;
+/* Label row: label + inline "Add location" link */
+.labelRow {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.addLocationLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  min-height: 32px;
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  border-radius: 6px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.addLocationLink:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Quick location creation form */
+.createLocationForm {
+  display: flex;
+  flex-direction: column;
   gap: 1rem;
+  margin-top: 0.75rem;
+  padding: 1rem;
+  background: var(--color-surface-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+}
+
+.locationActions {
+  display: flex;
   justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.btnCancelSmall,
+.btnCreateSmall {
+  padding: 0.5rem 1rem;
+  min-height: 40px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btnCancelSmall {
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  border-color: var(--color-border);
+}
+
+.btnCreateSmall {
+  background: var(--gradient-brand);
+  color: var(--color-text-inverse);
+}
+
+.btnCreateSmall:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Footer */
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface-subtle);
 }
 
 .btnCancel,
 .btnPrimary {
   padding: 0.75rem 1.5rem;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: 500;
+  min-height: 44px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9375rem;
   cursor: pointer;
-  transition: all 0.2s ease;
-  border: none;
-  min-width: 100px;
-  display: flex;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .btnCancel {
-  background: #f8f9fa;
-  color: #6c757d;
-  border: 1px solid #ddd;
-}
-
-.btnCancel:hover:not(:disabled) {
-  background: #e9ecef;
-  border-color: #ccc;
+  background: var(--color-surface);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
 }
 
 .btnPrimary {
-  background: #007bff;
-  color: white;
-}
-
-.btnPrimary:hover:not(:disabled) {
-  background: #0056b3;
+  background: var(--gradient-brand);
+  color: var(--color-text-inverse);
 }
 
 .btnPrimary:disabled {
-  background: #ccc;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
@@ -276,7 +288,7 @@
 .btnSpinner {
   width: 16px;
   height: 16px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.4);
   border-top: 2px solid white;
   border-radius: 50%;
   animation: spin 1s linear infinite;
@@ -291,18 +303,62 @@
   }
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
+/* Hover only on real pointer devices */
+@media (hover: hover) {
+  .modalClose:hover:not(:disabled) {
+    background: var(--color-surface-muted);
+    color: var(--color-text-strong);
+  }
+
+  .addLocationLink:hover:not(:disabled) {
+    background: var(--color-primary-soft);
+  }
+
+  .btnCancel:hover:not(:disabled) {
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+  }
+
+  .btnPrimary:hover:not(:disabled),
+  .btnCreateSmall:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 48, 135, 0.3);
+  }
+
+  .btnCancelSmall:hover:not(:disabled) {
+    background: var(--color-surface-muted);
+    border-color: var(--color-border-strong);
+  }
+}
+
+/* Keyboard focus */
+.modalClose:focus-visible,
+.addLocationLink:focus-visible,
+.btnCancel:focus-visible,
+.btnPrimary:focus-visible,
+.btnCancelSmall:focus-visible,
+.btnCreateSmall:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
   .modalOverlay {
     padding: 0.5rem;
   }
 
   .modalContent {
-    max-width: none;
+    max-height: 95dvh;
   }
 
   .formRow {
     grid-template-columns: 1fr;
+  }
+
+  .modalHeader,
+  .modalBody,
+  .modalFooter {
+    padding: 1rem;
   }
 
   .modalFooter {

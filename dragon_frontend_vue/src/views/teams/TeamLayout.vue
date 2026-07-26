@@ -273,6 +273,28 @@ onUnmounted(() => {
       <!-- Tab strip (outside the header panel) -->
       <nav :class="styles.tabStrip">
         <router-link
+          :to="`/teams/${teamId}/trainings`"
+          :class="[styles.tab, { [styles.tabActive]: isTrainingsActive }]"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <g transform="rotate(45 12 12)">
+              <rect x="11.2" y="2.5" width="1.6" height="12" rx="0.8" />
+              <circle cx="12" cy="2.6" r="1.5" />
+              <path
+                d="M12 12c-2.6 0-3.7 2.9-3.7 5.4 0 2.1 1.6 3.9 3.7 3.9s3.7-1.8 3.7-3.9c0-2.5-1.1-5.4-3.7-5.4z"
+              />
+            </g>
+            <g transform="rotate(-45 12 12)">
+              <rect x="11.2" y="2.5" width="1.6" height="12" rx="0.8" />
+              <circle cx="12" cy="2.6" r="1.5" />
+              <path
+                d="M12 12c-2.6 0-3.7 2.9-3.7 5.4 0 2.1 1.6 3.9 3.7 3.9s3.7-1.8 3.7-3.9c0-2.5-1.1-5.4-3.7-5.4z"
+              />
+            </g>
+          </svg>
+          Trainings
+        </router-link>
+        <router-link
           :to="`/teams/${teamId}`"
           :class="[styles.tab, { [styles.tabActive]: isMembersActive }]"
         >
@@ -286,22 +308,7 @@ onUnmounted(() => {
           </svg>
           Members
         </router-link>
-        <router-link
-          :to="`/teams/${teamId}/trainings`"
-          :class="[styles.tab, { [styles.tabActive]: isTrainingsActive }]"
-        >
-          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          Trainings
-        </router-link>
       </nav>
-
       <!-- Active tab renders here -->
       <router-view />
     </div>

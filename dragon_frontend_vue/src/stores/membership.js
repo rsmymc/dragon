@@ -3,6 +3,7 @@ import {
   fetchMembershipsByTeam,
   createMembership,
   updateMembership,
+  patchMembership,
   deleteMembership,
 } from '@/services/membership'
 
@@ -40,8 +41,6 @@ export const useMembershipStore = defineStore('membership', {
 
       // Apply role filter
       if (state.filters.role) {
-        console.log(state.filters.role)
-        console.log(state.teamMemberships)
         filtered = filtered.filter((membership) => membership.role == state.filters.role)
       }
 
@@ -112,7 +111,7 @@ export const useMembershipStore = defineStore('membership', {
       }
     },
 
-    // Update membership
+    // Update membership (full replace - PUT)
     async updateMembership(membershipId, membershipData) {
       this.isLoading = true
       this.error = null
@@ -131,6 +130,32 @@ export const useMembershipStore = defineStore('membership', {
         return { success: true, membership: updatedMembership }
       } catch (error) {
         console.error('Failed to update membership:', error)
+        this.error = error.response?.data?.message || error.message || 'Failed to update membership'
+        return { success: false, error: this.error }
+      } finally {
+        this.isLoading = false
+      }
+    },
+
+    // Partially update membership (PATCH - only the given fields, e.g. { role })
+    async patchMembership(membershipId, membershipData) {
+      this.isLoading = true
+      this.error = null
+
+      try {
+        console.log(`Patching membership ${membershipId}...`, membershipData)
+        const updatedMembership = await patchMembership(membershipId, membershipData)
+
+        // Update in team memberships list
+        const membershipIndex = this.teamMemberships.findIndex((m) => m.id === membershipId)
+        if (membershipIndex !== -1) {
+          this.teamMemberships[membershipIndex] = updatedMembership
+        }
+
+        console.log('Membership patched')
+        return { success: true, membership: updatedMembership }
+      } catch (error) {
+        console.error('Failed to patch membership:', error)
         this.error = error.response?.data?.message || error.message || 'Failed to update membership'
         return { success: false, error: this.error }
       } finally {

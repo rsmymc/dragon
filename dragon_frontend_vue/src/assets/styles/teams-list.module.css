@@ -323,7 +323,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.5rem;
+  width: 36px;
+  height: 36px;
   background: var(--color-surface-muted);
   border: none;
   border-radius: 0.375rem;
@@ -475,15 +476,19 @@
   }
 
   .actionBtnTeamList:hover {
-    background: var(--color-border);
+    background: var(--color-primary);
+  }
+
+  .actionBtnTeamList:hover svg {
+    color: var(--color-text-inverse);
   }
 
   .actionBtnTeamList.delete:hover {
-    background: var(--color-danger-soft);
+    background: var(--color-danger);
   }
 
   .actionBtnTeamList.delete:hover svg {
-    color: var(--color-danger);
+    color: var(--color-text-inverse);
   }
 
   .codeBadge:hover {
@@ -541,12 +546,6 @@
   /* card actions are always visible on touch (there is no hover to reveal them) */
   .teamActions {
     opacity: 1;
-  }
-
-  /* full-size touch targets for the edit/delete icons */
-  .actionBtnTeamList {
-    min-width: 44px;
-    min-height: 44px;
   }
 
   .teamStats {

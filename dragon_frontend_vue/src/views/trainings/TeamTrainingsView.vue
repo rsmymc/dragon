@@ -5,6 +5,7 @@ import { useTrainingsStore } from '@/stores/trainings'
 import { useLocationsStore } from '@/stores/locations'
 import { useTeamsStore } from '@/stores/teams'
 import CreateTrainingModal from '@/components/modals/CreateTrainingModal.vue'
+import EditTrainingModal from '@/components/modals/EditTrainingModal.vue'
 import styles from '@/assets/styles/team-trainings.module.css'
 
 const route = useRoute()
@@ -14,13 +15,9 @@ const teamsStore = useTeamsStore()
 
 // Reactive state
 const timeFilter = ref('upcoming')
-const dateRange = ref({
-  start: '',
-  end: '',
-})
 const showCreateModal = ref(false)
+const editingTraining = ref(null)
 
-// Computed
 // Param comes from the parent team layout route (/teams/:id)
 const teamId = computed(() => route.params.id)
 
@@ -29,49 +26,31 @@ const teamName = computed(() => {
   return team?.name || 'Team'
 })
 
-const teamTrainings = computed(() => {
-  return trainingsStore.getTrainingsByTeam(teamId.value)
+// Only Captain/Coach/Manager can create/delete trainings (Player = 1)
+const EDIT_ROLES = [2, 3, 4]
+const canManage = computed(() => {
+  const team = teamsStore.getTeamById(teamId.value)
+  return EDIT_ROLES.includes(Number(team?.my_role))
 })
 
 const filteredTrainings = computed(() => {
   return trainingsStore.getFilteredTrainings({
     teamId: teamId.value,
     timeFilter: timeFilter.value,
-    dateRange: dateRange.value.start || dateRange.value.end ? dateRange.value : null,
+    dateRange: null,
   })
 })
 
-const upcomingCount = computed(() => {
-  return trainingsStore.getUpcomingTrainingsByTeam(teamId.value).length
-})
+const upcomingCount = computed(() => trainingsStore.getUpcomingTrainingsByTeam(teamId.value).length)
+const pastCount = computed(() => trainingsStore.getPastTrainingsByTeam(teamId.value).length)
+const totalCount = computed(() => trainingsStore.getTrainingsByTeam(teamId.value).length)
 
-const pastCount = computed(() => {
-  return trainingsStore.getPastTrainingsByTeam(teamId.value).length
-})
-
-const totalCount = computed(() => {
-  return trainingsStore.getTrainingsByTeam(teamId.value).length
-})
-
-const uniqueLocationsCount = computed(() => {
-  const locationIds = [...new Set(teamTrainings.value.map((t) => t.location.id))]
-  return locationIds.length
-})
-
-const nextTrainingDays = computed(() => {
-  const now = new Date()
-  const upcomingTrainings = teamTrainings.value
-    .filter((training) => new Date(training.start_at) > now)
-    .sort((a, b) => new Date(a.start_at) - new Date(b.start_at))
-
-  if (upcomingTrainings.length === 0) return '-'
-
-  const nextTraining = upcomingTrainings[0]
-  const diffTime = new Date(nextTraining.start_at) - now
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-
-  return diffDays
-})
+// Filter chips
+const timeFilters = computed(() => [
+  { value: 'upcoming', label: `Upcoming (${upcomingCount.value})` },
+  { value: 'past', label: `Past (${pastCount.value})` },
+  { value: 'all', label: `All (${totalCount.value})` },
+])
 
 // Methods
 const loadTrainings = async () => {
@@ -111,45 +90,8 @@ const formatTrainingTime = (dateString) => {
   })
 }
 
-const getRelativeDate = (dateString) => {
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffTime = date - now
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-
-  if (diffDays === 0) return 'Today'
-  if (diffDays === 1) return 'Tomorrow'
-  if (diffDays === -1) return 'Yesterday'
-  if (diffDays > 1) return `In ${diffDays} days`
-  if (diffDays < -1) return `${Math.abs(diffDays)} days ago`
-  return 'Unknown'
-}
-
 const isPastTraining = (training) => {
   return new Date(training.start_at) <= new Date()
-}
-
-const isToday = (dateString) => {
-  const date = new Date(dateString)
-  const today = new Date()
-  return date.toDateString() === today.toDateString()
-}
-
-const isTomorrow = (dateString) => {
-  const date = new Date(dateString)
-  const tomorrow = new Date()
-  tomorrow.setDate(tomorrow.getDate() + 1)
-  return date.toDateString() === tomorrow.toDateString()
-}
-
-const isThisWeek = (dateString) => {
-  const date = new Date(dateString)
-  const now = new Date()
-  const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()))
-  const endOfWeek = new Date(startOfWeek)
-  endOfWeek.setDate(startOfWeek.getDate() + 6)
-
-  return date >= startOfWeek && date <= endOfWeek && !isToday(dateString) && !isTomorrow(dateString)
 }
 
 const getEmptyTitle = () => {
@@ -164,10 +106,6 @@ const getEmptyTitle = () => {
 }
 
 const getEmptyMessage = () => {
-  if (dateRange.value.start || dateRange.value.end) {
-    return 'No trainings found in the selected date range.'
-  }
-
   switch (timeFilter.value) {
     case 'upcoming':
       return 'Schedule your next training session to keep the team sharp!'
@@ -178,12 +116,13 @@ const getEmptyMessage = () => {
   }
 }
 
-const clearDateRange = () => {
-  dateRange.value.start = ''
-  dateRange.value.end = ''
-}
+const emptyActionLabel = computed(() =>
+  totalCount.value === 0 ? 'Create First Training' : 'Create Training',
+)
 
 const deleteTraining = async (training) => {
+  if (!canManage.value) return
+
   const confirmed = confirm(
     `Delete training on ${formatTrainingDate(training.start_at)} at ${formatTrainingTime(training.start_at)}?\n\nThis action cannot be undone.`,
   )
@@ -191,7 +130,6 @@ const deleteTraining = async (training) => {
   if (confirmed) {
     try {
       await trainingsStore.deleteTraining(training.id)
-      console.log('✅ Training deleted successfully')
     } catch (error) {
       console.error('Delete training error:', error)
       alert('Failed to delete training. Please try again.')
@@ -199,9 +137,12 @@ const deleteTraining = async (training) => {
   }
 }
 
-const handleTrainingCreated = (newTraining) => {
-  console.log('✅ Training created successfully:', newTraining)
+const handleTrainingCreated = () => {
   showCreateModal.value = false
+}
+
+const handleTrainingUpdated = () => {
+  editingTraining.value = null
 }
 
 // Lifecycle
@@ -212,75 +153,30 @@ onMounted(() => {
 
 <template>
   <div :class="styles.teamTrainingsView">
-    <!-- Toolbar: create action (team name + tabs are provided by the parent layout) -->
-    <div :class="styles.header">
-      <div :class="styles.headerContent">
-        <div :class="styles.headerActions">
-          <button @click="showCreateModal = true" :class="styles.btnPrimary">
-            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-              />
-            </svg>
-            Create Training
-          </button>
-        </div>
+    <!-- Toolbar: filter chips + create (matches the members tab) -->
+    <div :class="styles.toolbar">
+      <div :class="styles.filterChips">
+        <button
+          v-for="tf in timeFilters"
+          :key="tf.value"
+          @click="timeFilter = tf.value"
+          :class="[styles.chip, { [styles.chipActive]: timeFilter === tf.value }]"
+        >
+          {{ tf.label }}
+        </button>
       </div>
-    </div>
 
-    <!-- Filters -->
-    <div :class="styles.filtersSection">
-      <div :class="styles.filtersContent">
-        <!-- Time Filter Tabs -->
-        <div :class="styles.filterTabs">
-          <button
-            @click="timeFilter = 'upcoming'"
-            :class="[styles.tabBtn, { [styles.active]: timeFilter === 'upcoming' }]"
-          >
-            Upcoming ({{ upcomingCount }})
-          </button>
-          <button
-            @click="timeFilter = 'past'"
-            :class="[styles.tabBtn, { [styles.active]: timeFilter === 'past' }]"
-          >
-            Past ({{ pastCount }})
-          </button>
-          <button
-            @click="timeFilter = 'all'"
-            :class="[styles.tabBtn, { [styles.active]: timeFilter === 'all' }]"
-          >
-            All ({{ totalCount }})
-          </button>
-        </div>
-
-        <!-- Date Range Picker -->
-        <div :class="styles.dateFilters">
-          <input
-            v-model="dateRange.start"
-            type="date"
-            :class="styles.dateInput"
-            placeholder="Start date"
+      <button v-if="canManage" @click="showCreateModal = true" :class="styles.btnPrimary">
+        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
           />
-          <span :class="styles.dateSeparator">to</span>
-          <input
-            v-model="dateRange.end"
-            type="date"
-            :class="styles.dateInput"
-            placeholder="End date"
-          />
-          <button
-            v-if="dateRange.start || dateRange.end"
-            @click="clearDateRange"
-            :class="styles.clearDatesBtn"
-            title="Clear date filter"
-          >
-            ✕
-          </button>
-        </div>
-      </div>
+        </svg>
+        <span :class="styles.addLabel">Create Training</span>
+      </button>
     </div>
 
     <!-- Loading State -->
@@ -299,10 +195,10 @@ onMounted(() => {
 
     <!-- Empty State -->
     <div v-else-if="filteredTrainings.length === 0" :class="styles.emptyState">
-      <div :class="styles.emptyIcon">🏃‍♂️</div>
+<!--      <div :class="styles.emptyIcon">🚣</div>-->
       <h3>{{ getEmptyTitle() }}</h3>
-      <p>{{ getEmptyMessage() }}</p>
-      <button @click="showCreateModal = true" :class="styles.btnPrimary">
+<!--      <p>{{ getEmptyMessage() }}</p>-->
+      <button v-if="canManage" @click="showCreateModal = true" :class="styles.btnPrimary">
         <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             stroke-linecap="round"
@@ -311,152 +207,106 @@ onMounted(() => {
             d="M12 6v6m0 0v6m0-6h6m-6 0H6"
           />
         </svg>
-        Create First Training
+        <span>{{ emptyActionLabel }}</span>
       </button>
     </div>
 
     <!-- Trainings Grid -->
-    <div v-else :class="styles.trainingsContainer">
-      <div :class="styles.trainingsStats">
-        <div :class="styles.statCard">
-          <div :class="styles.statNumber">{{ filteredTrainings.length }}</div>
-          <div :class="styles.statLabel">
-            {{
-              timeFilter === 'upcoming' ? 'Upcoming' : timeFilter === 'past' ? 'Completed' : 'Total'
-            }}
-            Trainings
+    <div v-else :class="styles.trainingsGrid">
+      <router-link
+        v-for="training in filteredTrainings"
+        :key="training.id"
+        :to="`/teams/${teamId}/trainings/${training.id}`"
+        :class="[styles.trainingCard, { [styles.past]: isPastTraining(training) }]"
+      >
+        <!-- Header: date/time + badge + actions -->
+        <div :class="styles.trainingHeader">
+          <div :class="styles.trainingDateTime">
+            <div :class="styles.trainingDate">{{ formatTrainingDate(training.start_at) }}</div>
+            <div :class="styles.trainingTime">{{ formatTrainingTime(training.start_at) }}</div>
+          </div>
+
+          <div :class="styles.headerRight">
+            <span v-if="isPastTraining(training)" :class="[styles.statusBadge, styles.past]">
+              Completed
+            </span>
+
+            <div v-if="canManage" :class="styles.cardActions">
+              <button
+                @click.stop.prevent="editingTraining = training"
+                :class="[styles.actionBtn, styles.edit]"
+                title="Edit training"
+              >
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                  />
+                </svg>
+              </button>
+              <button
+                @click.stop.prevent="deleteTraining(training)"
+                :class="[styles.actionBtn, styles.delete]"
+                title="Delete training"
+              >
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
-        <div :class="styles.statCard">
-          <div :class="styles.statNumber">{{ uniqueLocationsCount }}</div>
-          <div :class="styles.statLabel">Training Locations</div>
-        </div>
-        <div :class="styles.statCard">
-          <div :class="styles.statNumber">{{ nextTrainingDays }}</div>
-          <div :class="styles.statLabel">Days to Next Training</div>
-        </div>
-      </div>
 
-      <div :class="styles.trainingsGrid">
-        <div
-          v-for="training in filteredTrainings"
-          :key="training.id"
-          :class="[styles.trainingCard, { [styles.past]: isPastTraining(training) }]"
+        <!-- Location (name links to the map coordinates) -->
+        <a
+          v-if="getLocationCoordinates(training.location.id) !== 'N/A'"
+          :href="getLocationCoordinates(training.location.id).url"
+          target="_blank"
+          rel="noopener noreferrer"
+          :class="styles.trainingLocation"
+          @click.stop
         >
-          <!-- Training Header -->
-          <div :class="styles.trainingHeader">
-            <div :class="styles.trainingDateTime">
-              <div :class="styles.trainingDate">
-                {{ formatTrainingDate(training.start_at) }}
-              </div>
-              <div :class="styles.trainingTime">
-                {{ formatTrainingTime(training.start_at) }}
-              </div>
-            </div>
-
-            <div :class="styles.trainingStatusBadges">
-              <span v-if="isPastTraining(training)" :class="[styles.statusBadge, styles.past]">
-                Completed
-              </span>
-              <span
-                v-else-if="isToday(training.start_at)"
-                :class="[styles.statusBadge, styles.today]"
-              >
-                Today
-              </span>
-              <span
-                v-else-if="isTomorrow(training.start_at)"
-                :class="[styles.statusBadge, styles.soon]"
-              >
-                Tomorrow
-              </span>
-              <span
-                v-else-if="isThisWeek(training.start_at)"
-                :class="[styles.statusBadge, styles.thisWeek]"
-              >
-                This Week
-              </span>
-            </div>
-          </div>
-
-          <!-- Training Content -->
-          <div :class="styles.trainingContent">
-            <div :class="styles.trainingLocation">
-              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                />
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-              </svg>
-              <span>{{ training.location.name }}</span>
-            </div>
-
-            <div :class="styles.trainingDetails">
-              <div :class="styles.detailRow">
-                <span :class="styles.detailLabel">📅 Date:</span>
-                <span :class="styles.detailValue">{{ getRelativeDate(training.start_at) }}</span>
-              </div>
-              <div :class="styles.detailRow">
-                <span :class="styles.detailLabel">📍 Coordinates:</span>
-                <a
-                  v-if="getLocationCoordinates(training.location.id) !== 'N/A'"
-                  :href="getLocationCoordinates(training.location.id).url"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  :class="styles.detailLink"
-                >
-                  {{ getLocationCoordinates(training.location.id).text }}
-                </a>
-                <span v-else :class="styles.detailValue">N/A</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Training Actions -->
-          <div :class="styles.trainingActions">
-            <router-link
-              :to="`/teams/${teamId}/trainings/${training.id}`"
-              :class="[styles.actionBtn, styles.primary]"
-            >
-              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                />
-              </svg>
-              Details
-            </router-link>
-
-            <button @click="deleteTraining(training)" :class="[styles.actionBtn, styles.danger]">
-              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                />
-              </svg>
-              Delete
-            </button>
-          </div>
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+            />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+            />
+          </svg>
+          <span>{{ training.location.name }}</span>
+        </a>
+        <div v-else :class="styles.trainingLocation">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+            />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+            />
+          </svg>
+          <span>{{ training.location.name }}</span>
         </div>
-      </div>
+      </router-link>
     </div>
 
     <!-- Create Training Modal -->
@@ -466,6 +316,15 @@ onMounted(() => {
       :team-name="teamName"
       @close="showCreateModal = false"
       @success="handleTrainingCreated"
+    />
+
+    <!-- Edit Training Modal -->
+    <EditTrainingModal
+      v-if="editingTraining"
+      :training="editingTraining"
+      :team-id="teamId"
+      @close="editingTraining = null"
+      @success="handleTrainingUpdated"
     />
   </div>
 </template>

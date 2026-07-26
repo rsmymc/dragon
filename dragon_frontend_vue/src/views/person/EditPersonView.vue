@@ -117,12 +117,31 @@ const handleSubmit = async () => {
   submitError.value = ''
 
   try {
-    const updateData = {
+    // Normalize a form value for comparison/submission:
+    // '' or undefined -> null; numbers stay numbers (0 is preserved).
+    const norm = (v) => (v === '' || v === undefined ? null : v)
+
+    const candidate = {
       name: formData.name.trim(),
-      phone: formData.phone?.trim() || null,
-      height: formData.height || null,
-      weight: formData.weight || null,
-      side: formData.side || null,
+      phone: norm(formData.phone?.trim()),
+      height: norm(formData.height),
+      weight: norm(formData.weight),
+      side: norm(formData.side),
+    }
+
+    // Only send fields that actually changed from the loaded person,
+    // so untouched fields are never overwritten (e.g. with null).
+    const updateData = {}
+    for (const key of Object.keys(candidate)) {
+      if (candidate[key] !== norm(person.value?.[key])) {
+        updateData[key] = candidate[key]
+      }
+    }
+
+    // Nothing changed - just go back without a pointless request.
+    if (Object.keys(updateData).length === 0) {
+      handleCancel()
+      return
     }
 
     await personsStore.updatePerson(personId.value, updateData)

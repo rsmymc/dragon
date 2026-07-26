@@ -17,7 +17,7 @@ export async function createPerson(personData) {
 }
 
 export async function updatePerson(id, personData) {
-  const { data } = await api.put(`/person/${id}/`, personData)
+  const { data } = await api.patch(`/person/${id}/`, personData)
   return data
 }
 

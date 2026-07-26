@@ -94,19 +94,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
   background: var(--color-surface-muted);
   border: none;
-  border-radius: 0.5rem;
+  border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
   -webkit-tap-highlight-color: transparent;
 }
 
 .actionBtnTeam svg {
-  width: 1.125rem;
-  height: 1.125rem;
+  width: 1rem;
+  height: 1rem;
   color: var(--color-text-muted);
 }
 
@@ -311,15 +311,19 @@
   }
 
   .actionBtnTeam:hover {
-    background: var(--color-border);
+    background: var(--color-primary);
+  }
+
+  .actionBtnTeam:hover svg {
+    color: var(--color-text-inverse);
   }
 
   .actionBtnTeam.delete:hover {
-    background: var(--color-danger-soft);
+    background: var(--color-danger);
   }
 
   .actionBtnTeam.delete:hover svg {
-    color: var(--color-danger);
+    color: var(--color-text-inverse);
   }
 
   .codeBadge:hover {

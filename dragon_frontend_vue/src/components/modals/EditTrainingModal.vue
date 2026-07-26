@@ -1,35 +1,31 @@
 <script setup>
 import { ref, reactive, computed, onMounted, watch } from 'vue'
-import { useTeamsStore } from '@/stores/teams.js'
 import { useLocationsStore } from '@/stores/locations.js'
 import { useTrainingsStore } from '@/stores/trainings.js'
 import styles from '@/assets/styles/create-training.module.css'
 
 // Props
 const props = defineProps({
+  training: {
+    type: Object,
+    required: true,
+  },
   teamId: {
     type: String,
-    default: null,
-  },
-  teamName: {
-    type: String,
-    default: '',
+    required: true,
   },
 })
 
 // Emits
 const emit = defineEmits(['close', 'success'])
 
-// Composables
-const teamsStore = useTeamsStore()
+// Stores
 const locationsStore = useLocationsStore()
 const trainingsStore = useTrainingsStore()
 
-// Reactive state
-const teams = ref([])
+// State
 const locations = ref([])
 const isSubmitting = ref(false)
-const teamsLoading = ref(false)
 const locationsLoading = ref(false)
 const submitError = ref('')
 
@@ -43,32 +39,36 @@ const newLocationLatError = ref('')
 const newLocationLonError = ref('')
 const isCreatingLocation = ref(false)
 
+// Split the existing start_at back into local date + time for the inputs
+const splitDateTime = (iso) => {
+  if (!iso) return { date: '', time: '09:00' }
+  const d = new Date(iso)
+  const pad = (n) => String(n).padStart(2, '0')
+  return {
+    date: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`,
+    time: `${pad(d.getHours())}:${pad(d.getMinutes())}`,
+  }
+}
+
+const initial = splitDateTime(props.training.start_at)
+
 const formData = reactive({
-  teamId: props.teamId || '',
-  locationId: '',
-  date: '',
-  time: '09:00',
+  locationId: props.training.location?.id || '',
+  date: initial.date,
+  time: initial.time,
 })
 
 const errors = reactive({
-  teamId: '',
   locationId: '',
   date: '',
   time: '',
 })
 
 // Computed
-const todayDate = computed(() => {
-  return new Date().toISOString().split('T')[0]
-})
-
-const selectedTeamId = computed(() => {
-  return props.teamId || formData.teamId
-})
+const todayDate = computed(() => new Date().toISOString().split('T')[0])
 
 const filteredLocations = computed(() => {
-  if (!selectedTeamId.value) return []
-  return locations.value.filter((location) => location.team?.id === selectedTeamId.value)
+  return locations.value.filter((location) => location.team?.id === props.teamId)
 })
 
 const isLocationFormValid = computed(() => {
@@ -77,7 +77,6 @@ const isLocationFormValid = computed(() => {
 
 const isFormValid = computed(() => {
   return (
-    selectedTeamId.value &&
     formData.locationId &&
     formData.date &&
     formData.time &&
@@ -87,29 +86,17 @@ const isFormValid = computed(() => {
 
 // Methods
 const validateForm = () => {
-  // Reset errors
   Object.keys(errors).forEach((key) => (errors[key] = ''))
-
   let isValid = true
-
-  if (!selectedTeamId.value) {
-    errors.teamId = 'Please select a team'
-    isValid = false
-  }
 
   if (!formData.locationId) {
     errors.locationId = 'Please select a location'
     isValid = false
   }
-
   if (!formData.date) {
     errors.date = 'Please select a date'
     isValid = false
-  } else if (formData.date < todayDate.value) {
-    errors.date = 'Training date cannot be in the past'
-    isValid = false
   }
-
   if (!formData.time) {
     errors.time = 'Please select a start time'
     isValid = false
@@ -118,106 +105,48 @@ const validateForm = () => {
   return isValid
 }
 
-const loadInitialData = async () => {
+const loadLocations = async () => {
+  locationsLoading.value = true
   try {
-    // Load teams if not pre-selected
-    if (!props.teamId) {
-      teamsLoading.value = true
-      teams.value = (await teamsStore.fetchTeams()) || []
-    }
-
-    // Load locations for the selected team (locations are team-scoped)
-    locationsLoading.value = true
-    if (selectedTeamId.value) {
-      locations.value = (await locationsStore.fetchLocationsByTeam(selectedTeamId.value)) || []
-    } else {
-      locations.value = []
-    }
-
-    // Set default date to today
-    if (!formData.date) {
-      formData.date = todayDate.value
-    }
-
-    // Auto-select location if only one available
-    if (filteredLocations.value.length === 1) {
-      formData.locationId = filteredLocations.value[0].id
-    }
+    locations.value = (await locationsStore.fetchLocationsByTeam(props.teamId)) || []
   } catch (error) {
-    console.error('Error loading initial data:', error)
-    submitError.value = 'Failed to load teams and locations'
+    console.error('Error loading locations:', error)
   } finally {
-    teamsLoading.value = false
     locationsLoading.value = false
   }
 }
 
-const onTeamChange = async () => {
-  formData.locationId = ''
-  showCreateLocation.value = false
-  cancelCreateLocation()
-
-  if (formData.teamId) {
-    locationsLoading.value = true
-    try {
-      await locationsStore.fetchLocationsByTeam(formData.teamId)
-
-      // Auto-select if only one location
-      if (filteredLocations.value.length === 1) {
-        formData.locationId = filteredLocations.value[0].id
-      }
-    } catch (error) {
-      console.error('Error loading team locations:', error)
-    } finally {
-      locationsLoading.value = false
-    }
-  }
-}
-
 const createLocation = async () => {
-  // Reset errors
   newLocationError.value = ''
   newLocationLatError.value = ''
   newLocationLonError.value = ''
 
   let isValid = true
-
   if (!newLocationName.value.trim()) {
     newLocationError.value = 'Location name is required'
     isValid = false
   }
-
   if (!newLocationLat.value) {
     newLocationLatError.value = 'Latitude is required'
     isValid = false
   }
-
   if (!newLocationLon.value) {
     newLocationLonError.value = 'Longitude is required'
     isValid = false
   }
-
   if (!isValid) return
 
   isCreatingLocation.value = true
-
   try {
     const locationData = {
       name: newLocationName.value.trim(),
-      team: selectedTeamId.value,
+      team: props.teamId,
       lat: parseFloat(newLocationLat.value),
       lon: parseFloat(newLocationLon.value),
     }
-
     const newLocation = await locationsStore.createLocation(locationData)
-
-    // Add to local locations list
     locations.value.push(newLocation)
-
-    // Auto-select the new location
     formData.locationId = newLocation.id
-
-    // Reset form
     cancelCreateLocation()
   } catch (error) {
     console.error('Error creating location:', error)
@@ -244,22 +173,20 @@ const handleSubmit = async () => {
   submitError.value = ''
 
   try {
-    // Combine date and time into start_at datetime
     const startAt = new Date(`${formData.date}T${formData.time}:00`)
-
     const trainingData = {
-      team: selectedTeamId.value,
+      team: props.teamId,
       location: formData.locationId,
       start_at: startAt.toISOString(),
     }
 
-    const newTraining = await trainingsStore.createTraining(trainingData)
+    const updated = await trainingsStore.updateTraining(props.training.id, trainingData)
 
-    emit('success', newTraining)
+    emit('success', updated)
     handleClose()
   } catch (error) {
-    console.error('Error creating training:', error)
-    submitError.value = error.message || 'Failed to create training. Please try again.'
+    console.error('Error updating training:', error)
+    submitError.value = error.message || 'Failed to update training. Please try again.'
   } finally {
     isSubmitting.value = false
   }
@@ -270,33 +197,22 @@ const handleClose = () => {
 }
 
 const handleOverlayClick = () => {
-  if (!isSubmitting.value) {
-    handleClose()
-  }
+  if (!isSubmitting.value) handleClose()
 }
 
-// Watchers - re-validate a field once it already has an error
-watch(
-  () => formData.teamId,
-  () => {
-    if (errors.teamId) validateForm()
-  },
-)
-
+// Re-validate a field once it already has an error
 watch(
   () => formData.locationId,
   () => {
     if (errors.locationId) validateForm()
   },
 )
-
 watch(
   () => formData.date,
   () => {
     if (errors.date) validateForm()
   },
 )
-
 watch(
   () => formData.time,
   () => {
@@ -304,9 +220,8 @@ watch(
   },
 )
 
-// Lifecycle
 onMounted(() => {
-  loadInitialData()
+  loadLocations()
 })
 </script>
 
@@ -315,33 +230,13 @@ onMounted(() => {
     <div :class="styles.modalContent" @click.stop>
       <!-- Modal Header -->
       <div :class="styles.modalHeader">
-        <h3>Create Training Session</h3>
+        <h3>Edit Training Session</h3>
         <button @click="handleClose" :class="styles.modalClose" :disabled="isSubmitting">×</button>
       </div>
 
       <!-- Modal Body -->
       <div :class="styles.modalBody">
         <form @submit.prevent="handleSubmit" :class="styles.trainingForm">
-          <!-- Team Selection (if not pre-selected) -->
-          <div v-if="!teamId" :class="styles.formGroup">
-            <label for="team-select" :class="styles.formLabel">
-              Team <span :class="styles.required">*</span>
-            </label>
-            <select
-              id="team-select"
-              v-model="formData.teamId"
-              :class="[styles.formInput, { [styles.error]: errors.teamId }]"
-              :disabled="isSubmitting || teamsLoading"
-              @change="onTeamChange"
-            >
-              <option value="">Choose a team...</option>
-              <option v-for="team in teams" :key="team.id" :value="team.id">
-                {{ team.name }}
-              </option>
-            </select>
-            <div v-if="errors.teamId" :class="styles.fieldError">{{ errors.teamId }}</div>
-          </div>
-
           <!-- Location Selection -->
           <div :class="styles.formGroup">
             <div :class="styles.labelRow">
@@ -349,7 +244,7 @@ onMounted(() => {
                 Location <span :class="styles.required">*</span>
               </label>
               <button
-                v-if="selectedTeamId && !showCreateLocation"
+                v-if="!showCreateLocation"
                 type="button"
                 @click="showCreateLocation = true"
                 :class="styles.addLocationLink"
@@ -370,35 +265,16 @@ onMounted(() => {
               id="location-select"
               v-model="formData.locationId"
               :class="[styles.formInput, { [styles.error]: errors.locationId }]"
-              :disabled="isSubmitting || !selectedTeamId || locationsLoading"
+              :disabled="isSubmitting || locationsLoading"
             >
               <option value="">
-                {{
-                  !selectedTeamId
-                    ? 'Select a team first...'
-                    : locationsLoading
-                      ? 'Loading locations...'
-                      : 'Choose a location...'
-                }}
+                {{ locationsLoading ? 'Loading locations...' : 'Choose a location...' }}
               </option>
               <option v-for="location in filteredLocations" :key="location.id" :value="location.id">
                 {{ location.name }}
               </option>
             </select>
             <div v-if="errors.locationId" :class="styles.fieldError">{{ errors.locationId }}</div>
-
-            <!-- Helper when the team has no locations yet -->
-            <div
-              v-if="
-                !filteredLocations.length &&
-                selectedTeamId &&
-                !locationsLoading &&
-                !showCreateLocation
-              "
-              :class="styles.fieldHelp"
-            >
-              No locations for this team yet — use "Add location" above to create one.
-            </div>
 
             <!-- Quick Location Creation Form -->
             <div v-if="showCreateLocation" :class="styles.createLocationForm">
@@ -485,7 +361,6 @@ onMounted(() => {
                 v-model="formData.date"
                 type="date"
                 :class="[styles.formInput, { [styles.error]: errors.date }]"
-                :min="todayDate"
                 :disabled="isSubmitting"
               />
               <div v-if="errors.date" :class="styles.fieldError">{{ errors.date }}</div>
@@ -531,9 +406,9 @@ onMounted(() => {
         >
           <span v-if="isSubmitting" :class="styles.btnLoading">
             <div :class="styles.btnSpinner"></div>
-            Creating...
+            Saving...
           </span>
-          <span v-else>Create Training</span>
+          <span v-else>Save Changes</span>
         </button>
       </div>
     </div>

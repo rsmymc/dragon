@@ -1,18 +1,19 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { useTeamsStore } from '@/stores/teams'
 import { useMembershipStore } from '@/stores/membership'
 import { MEMBERSHIP_ROLE_LABELS, PERSON_SIDE_LABELS } from '@/constants'
 import AddPersonModal from '@/components/modals/AddPersonModal.vue'
+import EditPersonModal from '@/components/modals/EditPersonModal.vue'
 import styles from '@/assets/styles/team-members.module.css'
 
 const route = useRoute()
-const router = useRouter()
 const teamsStore = useTeamsStore()
 const membershipStore = useMembershipStore()
 
 const showAddPerson = ref(false)
+const editingMembership = ref(null)
 
 const teamId = computed(() => route.params.id)
 
@@ -50,7 +51,12 @@ const getInitials = (name) => {
 
 const editPerson = (membership) => {
   if (!canManage.value) return
-  router.push(`/persons/${membership.person.id}/edit`)
+  editingMembership.value = membership
+}
+
+const handlePersonUpdated = () => {
+  editingMembership.value = null
+  loadMembers()
 }
 
 const removePerson = async (membership) => {
@@ -319,6 +325,14 @@ const setRoleFilter = (value) => {
       :team-name="team.name"
       @close="showAddPerson = false"
       @success="handlePersonAdded"
+    />
+
+    <!-- Edit Person Modal -->
+    <EditPersonModal
+      v-if="editingMembership"
+      :membership="editingMembership"
+      @close="editingMembership = null"
+      @success="handlePersonUpdated"
     />
   </div>
 </template>
