@@ -69,10 +69,6 @@ const availableMembers = computed(() => {
   return members.value.filter((member) => !assignedPersonIds.includes(member.id))
 })
 
-const assignedMembers = computed(() => {
-  return localLineupSeats.value.filter((seat) => seat.person).map((seat) => seat.person)
-})
-
 const maxSeatNumber = computed(() => {
   if (!lineup.value?.seats || lineup.value.seats.length === 0) {
     return 8
@@ -80,6 +76,10 @@ const maxSeatNumber = computed(() => {
   const maxSeat = Math.max(...lineup.value.seats.map((seat) => seat.seat_number))
   return Math.max(maxSeat, 8)
 })
+
+// Instructions tooltip text
+const dragTip =
+  'Drag members from the left into boat seats, or drag between seats to rearrange or swap. Changes stay local until you publish.'
 
 // Watch for changes
 watch(
@@ -169,11 +169,6 @@ const checkForUnsavedChanges = () => {
 const getSeatPerson = (side, seatNumber) => {
   const seat = localLineupSeats.value.find((s) => s.side === side && s.seat_number === seatNumber)
   return seat?.person || null
-}
-
-const getSeatPosition = (personId) => {
-  const seat = localLineupSeats.value.find((s) => s.person?.id === personId)
-  return seat ? `${seat.side}${seat.seat_number}` : ''
 }
 
 const hasLocalSeatChange = (side, seatNumber) => {
@@ -308,28 +303,31 @@ const removeSeatAssignment = (side, seatNumber) => {
   }
 }
 
-const clearLineup = () => {
-  const confirmed = confirm('Clear all seat assignments? This action cannot be undone.')
-  if (!confirmed) return
-
-  localLineupSeats.value = localLineupSeats.value.map((seat) => ({
-    ...seat,
-    person: null,
-  }))
-}
-
-const highlightSeat = (personId) => {
-  const position = getSeatPosition(personId)
-  highlightedSeat.value = position
-  setTimeout(() => {
-    highlightedSeat.value = null
-  }, 2000)
-}
-
 const discardChanges = () => {
   const confirmed = confirm('Discard all unsaved changes? This action cannot be undone.')
   if (!confirmed) return
   initializeLocalState()
+}
+
+const saveDraft = async () => {
+  isUpdatingLineup.value = true
+
+  try {
+    if (hasUnsavedChanges.value) {
+      await syncLocalChangesToServer()
+    }
+
+    await lineupsStore.updateLineupState(lineup.value.id, 1)
+    lineup.value.state = 1
+
+    originalSeatsSnapshot.value = JSON.parse(JSON.stringify(localLineupSeats.value))
+    hasUnsavedChanges.value = false
+  } catch (err) {
+    console.error('Error saving draft:', err)
+    alert('Failed to save draft. Please try again.')
+  } finally {
+    isUpdatingLineup.value = false
+  }
 }
 
 const publishLineup = async () => {
@@ -348,20 +346,6 @@ const publishLineup = async () => {
   } catch (err) {
     console.error('Error publishing lineup:', err)
     alert('Failed to publish lineup. Please try again.')
-  } finally {
-    isUpdatingLineup.value = false
-  }
-}
-
-const unpublishLineup = async () => {
-  isUpdatingLineup.value = true
-
-  try {
-    await lineupsStore.updateLineupState(lineup.value.id, 1)
-    lineup.value.state = 1
-  } catch (err) {
-    console.error('Error unpublishing lineup:', err)
-    alert('Failed to unpublish lineup. Please try again.')
   } finally {
     isUpdatingLineup.value = false
   }
@@ -413,6 +397,13 @@ const getRoleLabel = (role) => {
 
 const getSideLabel = (side) => {
   return PERSON_SIDE_LABELS[side] || 'Unknown'
+}
+
+// Side chip colour: 1 = Left/Port (red), 2 = Right/Starboard (green), 0 = Both (none)
+const sideClass = (side) => {
+  if (side === 1) return styles.sideL
+  if (side === 2) return styles.sideR
+  return ''
 }
 
 // which membership row belongs to a given person (from the team roster already loaded)
@@ -523,23 +514,9 @@ onMounted(() => {
 
           <div :class="styles.trainingInfo">
             <div :class="styles.trainingTitle">
-              <h1>Training Session</h1>
               <div :class="styles.trainingBadges">
                 <span v-if="isPastTraining" :class="[styles.statusBadge, styles.past]"
                   >Completed</span
-                >
-                <span v-else-if="isToday" :class="[styles.statusBadge, styles.today]">Today</span>
-                <span v-else-if="isTomorrow" :class="[styles.statusBadge, styles.soon]"
-                  >Tomorrow</span
-                >
-                <span v-if="lineup?.state === 2" :class="[styles.statusBadge, styles.published]"
-                  >Lineup Published</span
-                >
-                <span v-else-if="lineup?.state === 1" :class="[styles.statusBadge, styles.draft]"
-                  >Draft Lineup</span
-                >
-                <span v-if="hasUnsavedChanges" :class="[styles.statusBadge, styles.unsaved]"
-                  >Unsaved Changes</span
                 >
               </div>
             </div>
@@ -561,97 +538,74 @@ onMounted(() => {
               </div>
             </div>
           </div>
-
-          <!-- Action Buttons -->
-          <div :class="styles.headerActions">
-            <button
-              v-if="hasUnsavedChanges"
-              @click="discardChanges"
-              :class="styles.btnSecondary"
-              :disabled="isUpdatingLineup"
-            >
-              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-              Discard Changes
-            </button>
-            <button
-              v-if="lineup && (lineup.state === 1 || hasUnsavedChanges)"
-              @click="publishLineup"
-              :class="styles.btnPublish"
-              :disabled="isUpdatingLineup"
-            >
-              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-                />
-              </svg>
-              {{ hasUnsavedChanges ? 'Save & Publish Lineup' : 'Publish Lineup' }}
-            </button>
-            <button
-              v-if="lineup && lineup.state === 2 && !hasUnsavedChanges"
-              @click="unpublishLineup"
-              :class="styles.btnSecondary"
-              :disabled="isUpdatingLineup"
-            >
-              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5"
-                />
-              </svg>
-              Edit Lineup
-            </button>
-          </div>
         </div>
       </div>
 
       <!-- Lineup Section -->
       <div :class="styles.lineupSection">
         <div :class="styles.sectionContent">
-          <div :class="styles.lineupHeader">
-            <h2>Dragon Boat Lineup</h2>
-            <div :class="styles.lineupStats">
-              <span class="stat">{{ assignedSeatsCount }}/16 seats filled</span>
+          <!-- Consolidated lineup bar: title + state + counter + actions -->
+          <div :class="styles.lineupBar">
+            <div :class="styles.lineupBarInfo">
+              <div :class="styles.lineupTitleRow">
+                <!-- Draft / Published pill -->
+                <span v-if="lineup?.state === 2" :class="[styles.lineupPill, styles.published]"
+                  >Published</span
+                >
+                <span v-else :class="[styles.lineupPill, styles.draft]">Draft</span>
+
+                <!-- Instructions tooltip -->
+                <span
+                  :class="styles.infoTip"
+                  tabindex="0"
+                  :data-tip="dragTip"
+                  aria-label="How to build the lineup"
+                >
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </span>
+              </div>
+            </div>
+
+            <div :class="styles.lineupActions">
               <button
-                v-if="lineup"
-                @click="clearLineup"
-                :class="styles.btnClear"
+                v-if="hasUnsavedChanges"
+                @click="discardChanges"
+                :class="styles.btnGhost"
                 :disabled="isUpdatingLineup"
               >
-                Clear All
+                Discard
               </button>
-            </div>
-          </div>
-
-          <!-- Drag and Drop Instructions -->
-          <div v-if="!lineup || assignedSeatsCount === 0" :class="styles.instructions">
-            <p>
-              <strong>Drag & Drop:</strong> Drag team members from the left panel into boat seats on
-              the right to create your lineup. You can also drag between seats to rearrange or swap
-              positions. Changes are saved locally until you publish.
-            </p>
-          </div>
-
-          <!-- Unsaved Changes Warning -->
-          <div v-if="hasUnsavedChanges" :class="styles.unsavedWarning">
-            <div :class="styles.warningIcon">💾</div>
-            <div :class="styles.warningContent">
-              <p><strong>You have unsaved changes!</strong></p>
-              <p>
-                Your lineup changes are saved locally. Click "Save & Publish Lineup" to make them
-                permanent.
-              </p>
+              <button
+                v-if="hasUnsavedChanges"
+                @click="saveDraft"
+                :class="styles.btnSecondary"
+                :disabled="isUpdatingLineup"
+              >
+                Save Draft
+              </button>
+              <button
+                v-if="lineup && (lineup.state === 1 || hasUnsavedChanges)"
+                @click="publishLineup"
+                :class="styles.btnPublish"
+                :disabled="isUpdatingLineup"
+              >
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                  />
+                </svg>
+                Publish
+              </button>
             </div>
           </div>
 
@@ -701,11 +655,7 @@ onMounted(() => {
                           >{{ member.weight }}kg</span
                         >
                         <span
-                          :class="[
-                            styles.statItem,
-                            styles.preferredSide,
-                            `side-${member.side?.toLowerCase()}`,
-                          ]"
+                          :class="[styles.statItem, styles.preferredSide, sideClass(member.side)]"
                         >
                           {{ getSideLabel(member.side) }}
                         </span>
@@ -734,25 +684,6 @@ onMounted(() => {
                   <div :class="styles.emptyIcon">✨</div>
                   <p>All team members are in the lineup!</p>
                 </div>
-
-                <!-- Assigned Members Summary -->
-                <div v-if="assignedMembers.length > 0" :class="styles.assignedSummary">
-                  <h4>In Lineup ({{ assignedMembers.length }})</h4>
-                  <div :class="styles.assignedChips">
-                    <div
-                      v-for="member in assignedMembers"
-                      :key="member.id"
-                      :class="styles.assignedChip"
-                      @click="highlightSeat(member.id)"
-                    >
-                      <div :class="styles.chipAvatar">
-                        {{ getInitials(member.name) }}
-                      </div>
-                      <span :class="styles.chipName">{{ member.name }}</span>
-                      <span :class="styles.chipPosition">{{ getSeatPosition(member.id) }}</span>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
 
@@ -769,7 +700,7 @@ onMounted(() => {
                 <div :class="styles.dragonBoatEnhanced">
                   <!-- Dragon Head -->
                   <div :class="styles.dragonHeadSection">
-                    <div :class="styles.dragonHead">🐲</div>
+                    <div :class="styles.dragonHead">🥁</div>
                   </div>
 
                   <!-- Boat Body with Seats -->
@@ -830,7 +761,6 @@ onMounted(() => {
                           </div>
                           <div v-else :class="styles.emptySeat">
                             <div :class="styles.seatNumber">L{{ seatNum }}</div>
-                            <div :class="styles.seatHint">Drop Here</div>
                             <div :class="styles.dropZone"></div>
                           </div>
                         </div>
@@ -886,7 +816,6 @@ onMounted(() => {
                           </div>
                           <div v-else :class="styles.emptySeat">
                             <div :class="styles.seatNumber">R{{ seatNum }}</div>
-                            <div :class="styles.seatHint">Drop Here</div>
                             <div :class="styles.dropZone"></div>
                           </div>
                         </div>
@@ -913,38 +842,44 @@ onMounted(() => {
   position: relative;
   display: inline-flex;
   flex: 0 0 auto;
-  width: 44px;
-  min-width: 44px;
-  height: 24px;
-  min-height: 24px;
+  width: 38px;
+  min-width: 38px;
+  height: 22px;
+  min-height: 22px;
   border-radius: 999px;
   border: none;
   cursor: pointer;
   padding: 0;
-  background: #cbd5e1;
-  transition: background 0.15s ease;
+  background: var(--color-border);
+  opacity: 0.7; /* recede while unmarked so it doesn't fight the drag UI */
+  transition:
+    background 0.15s ease,
+    opacity 0.15s ease;
+}
+.att-toggle.present,
+.att-toggle.absent {
+  opacity: 1; /* a recorded state is full-strength */
 }
 .att-toggle.present {
-  background: #16a34a;
+  background: var(--color-success);
 }
 .att-toggle.absent {
-  background: #ef4444;
+  background: var(--color-danger);
 }
 .att-toggle:disabled {
   cursor: default;
-  opacity: 0.7;
 }
 .att-knob {
   position: absolute;
   top: 3px;
   left: 3px;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   background: #fff;
   transition: transform 0.15s ease;
 }
 .att-toggle.present .att-knob {
-  transform: translateX(20px);
+  transform: translateX(16px);
 }
 </style>
