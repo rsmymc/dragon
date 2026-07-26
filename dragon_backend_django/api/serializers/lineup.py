@@ -32,10 +32,13 @@ class LineupSerializer(serializers.ModelSerializer):
         rep["state_display"] = instance.get_state_display()
         return rep
 
+
 class LineupSeatSerializer(serializers.ModelSerializer):
     # write with PKs; read nested person
     lineup = serializers.PrimaryKeyRelatedField(queryset=Lineup.objects.all())
-    person = serializers.PrimaryKeyRelatedField(queryset=Person.objects.all(), allow_null=True, required=False)
+    person = serializers.PrimaryKeyRelatedField(
+        queryset=Person.objects.all(), allow_null=True, required=False
+    )
 
     class Meta:
         model = LineupSeat
@@ -50,8 +53,16 @@ class LineupSeatSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["id", "created_at", "updated_at"]
 
+    def validate(self, attrs):
+        # Drummer / Steerer are single positions - pin them to seat_number 1
+        side = attrs.get("side", getattr(self.instance, "side", None))
+        if side in LineupSeat.SPECIAL_SIDES:
+            attrs["seat_number"] = 1
+        return attrs
+
     def to_representation(self, instance):
         rep = super().to_representation(instance)
+        rep["side_display"] = instance.get_side_display()
         if instance.person_id:
             rep["person"] = PersonSerializer(instance.person).data
         return rep

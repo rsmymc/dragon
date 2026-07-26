@@ -6,7 +6,7 @@ import { useMembershipStore } from '@/stores/membership'
 import { useLineupsStore } from '@/stores/lineups'
 import { useAttendanceStore } from '@/stores/attendance'
 import { useAuthStore } from '@/stores/auth'
-import { MEMBERSHIP_ROLE_LABELS, PERSON_SIDE_LABELS } from '@/constants'
+import { PERSON_SIDE_LABELS } from '@/constants'
 import styles from '@/assets/styles/training-details.module.css'
 
 // Composables
@@ -69,6 +69,25 @@ const availableMembers = computed(() => {
   return members.value.filter((member) => !assignedPersonIds.includes(member.id))
 })
 
+// Left-panel filters
+const onlyPresent = ref(false)
+const sideFilter = ref('') // '' = all, 1 = left, 2 = right, 0 = both
+
+const sideFilters = [
+  { value: '', label: 'All' },
+  { value: 1, label: 'Left' },
+  { value: 2, label: 'Right' },
+  { value: 0, label: 'Both' },
+]
+
+const filteredAvailableMembers = computed(() => {
+  return availableMembers.value.filter((member) => {
+    if (onlyPresent.value && attendanceForPerson(member.id) !== true) return false
+    if (sideFilter.value !== '' && Number(member.side) !== Number(sideFilter.value)) return false
+    return true
+  })
+})
+
 const maxSeatNumber = computed(() => {
   if (!lineup.value?.seats || lineup.value.seats.length === 0) {
     return 8
@@ -80,6 +99,19 @@ const maxSeatNumber = computed(() => {
 // Instructions tooltip text
 const dragTip =
   'Drag members from the left into boat seats, or drag between seats to rearrange or swap. Changes stay local until you publish.'
+
+// Google Maps link for the training location (coords if available, else name search)
+const locationMapUrl = computed(() => {
+  const loc = training.value?.location
+  if (!loc) return null
+  if (loc.lat != null && loc.lon != null) {
+    return `https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lon}`
+  }
+  if (loc.name) {
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc.name)}`
+  }
+  return null
+})
 
 // Watch for changes
 watch(
@@ -391,10 +423,6 @@ const getInitials = (name) => {
     .slice(0, 2)
 }
 
-const getRoleLabel = (role) => {
-  return MEMBERSHIP_ROLE_LABELS[role] || 'Unknown'
-}
-
 const getSideLabel = (side) => {
   return PERSON_SIDE_LABELS[side] || 'Unknown'
 }
@@ -530,7 +558,18 @@ onMounted(() => {
               </div>
               <div :class="styles.statItem">
                 <span :class="styles.statLabel">Location</span>
-                <span :class="styles.statValue">{{ training.location?.name || 'Unknown' }}</span>
+                <a
+                  v-if="locationMapUrl"
+                  :href="locationMapUrl"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  :class="[styles.statValue, styles.locationLink]"
+                >
+                  {{ training.location?.name || 'Unknown' }}
+                </a>
+                <span v-else :class="styles.statValue">{{
+                  training.location?.name || 'Unknown'
+                }}</span>
               </div>
               <div :class="styles.statItem">
                 <span :class="styles.statLabel">Team</span>
@@ -615,14 +654,35 @@ onMounted(() => {
             <div :class="styles.membersPanel">
               <div :class="styles.panelHeader">
                 <h3>Available Members</h3>
-                <div :class="styles.membersCount">{{ availableMembers.length }} available</div>
+              </div>
+
+              <!-- Filters -->
+              <div :class="styles.panelFilters">
+                <label :class="styles.presentToggle">
+                  <input type="checkbox" v-model="onlyPresent" />
+                  Present only
+                </label>
+                <div :class="styles.sideChips">
+                  <button
+                    v-for="sf in sideFilters"
+                    :key="sf.label"
+                    type="button"
+                    @click="sideFilter = sf.value"
+                    :class="[styles.sideChip, { [styles.sideChipActive]: sideFilter === sf.value }]"
+                  >
+                    {{ sf.label }}
+                  </button>
+                </div>
               </div>
 
               <div :class="styles.membersScroll">
                 <!-- Available Members -->
-                <div v-if="availableMembers.length > 0" :class="styles.availableMembersList">
+                <div
+                  v-if="filteredAvailableMembers.length > 0"
+                  :class="styles.availableMembersList"
+                >
                   <div
-                    v-for="member in availableMembers"
+                    v-for="member in filteredAvailableMembers"
                     :key="member.id"
                     :class="[
                       styles.memberCard,
@@ -646,22 +706,18 @@ onMounted(() => {
                     </div>
                     <div :class="styles.memberInfo">
                       <h4 :class="styles.memberName">{{ member.name }}</h4>
-                      <p :class="styles.memberRole">{{ getRoleLabel(member.role) }}</p>
                       <div :class="styles.memberStats">
-                        <span v-if="member.height" :class="styles.statItem"
-                          >{{ member.height }}cm</span
-                        >
-                        <span v-if="member.weight" :class="styles.statItem"
+                        <span v-if="member.weight" :class="styles.statChip"
                           >{{ member.weight }}kg</span
                         >
-                        <span
-                          :class="[styles.statItem, styles.preferredSide, sideClass(member.side)]"
+                        <span v-if="member.height" :class="styles.statChip"
+                          >{{ member.height }}cm</span
                         >
+                        <span :class="[styles.statChip, styles.sideStat, sideClass(member.side)]">
                           {{ getSideLabel(member.side) }}
                         </span>
                       </div>
                     </div>
-                    <div :class="styles.dragHandle">⋮⋮</div>
                     <!-- Attendance toggle -->
                     <button
                       type="button"
@@ -679,28 +735,87 @@ onMounted(() => {
                   </div>
                 </div>
 
-                <!-- No Available Members -->
+                <!-- Empty states -->
                 <div v-else :class="styles.noAvailableMembers">
-                  <div :class="styles.emptyIcon">✨</div>
-                  <p>All team members are in the lineup!</p>
+                  <div :class="styles.emptyIcon">
+                    {{ availableMembers.length === 0 ? '✨' : '🔍' }}
+                  </div>
+                  <p>
+                    {{
+                      availableMembers.length === 0
+                        ? 'All team members are in the lineup!'
+                        : 'No members match the filters.'
+                    }}
+                  </p>
                 </div>
               </div>
             </div>
 
             <!-- Right Panel: Dragon Boat -->
             <div :class="styles.boatPanel">
-              <div :class="styles.panelHeader">
-                <div :class="styles.boatLegend">
-                  <span :class="[styles.legendItem, styles.port]">Port (Left)</span>
-                  <span :class="[styles.legendItem, styles.starboard]">Starboard (Right)</span>
-                </div>
-              </div>
-
               <div :class="[styles.dragonBoatContainer, { dropActive: dragActive }]">
                 <div :class="styles.dragonBoatEnhanced">
-                  <!-- Dragon Head -->
-                  <div :class="styles.dragonHeadSection">
-                    <div :class="styles.dragonHead">🥁</div>
+                  <!-- Legend aligned over the seat columns -->
+                  <div :class="styles.boatLegend">
+                    <span :class="[styles.legendItem, styles.port]">Port (Left)</span>
+                    <span></span>
+                    <span :class="[styles.legendItem, styles.starboard]">Starboard (Right)</span>
+                  </div>
+
+                  <!-- Drummer (front) -->
+                  <div :class="styles.specialSection">
+                    <div
+                      :class="[
+                        styles.specialSeat,
+                        {
+                          occupied: getSeatPerson('D', 1),
+                          dropTarget: dragActive,
+                          localChange: hasLocalSeatChange('D', 1),
+                        },
+                      ]"
+                      @dragover.prevent
+                      @dragenter.prevent="handleDragEnter"
+                      @dragleave.prevent="handleDragLeave"
+                      @drop="handleSeatDrop($event, 'D', 1)"
+                    >
+                      <div
+                        v-if="getSeatPerson('D', 1)"
+                        :class="[
+                          styles.seatPerson,
+                          { dragging: dragActive && draggedFromSeat === 'D1' },
+                        ]"
+                        draggable="true"
+                        @dragstart="handleSeatDragStart($event, getSeatPerson('D', 1), 'D', 1)"
+                        @dragend="handleDragEnd"
+                      >
+                        <span :class="styles.posIcon">🥁</span>
+                        <div :class="styles.personName">{{ getSeatPerson('D', 1).name }}</div>
+                        <button
+                          @click="removeSeatAssignment('D', 1)"
+                          :class="styles.removeBtn"
+                          title="Remove from lineup"
+                        >
+                          <svg
+                            width="12"
+                            height="12"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2.5"
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                      <div v-else :class="styles.emptySpecial">
+                        <span :class="styles.posIcon">🥁</span>
+                        <span :class="styles.posLabel">Drummer</span>
+                      </div>
+                    </div>
                   </div>
 
                   <!-- Boat Body with Seats -->
@@ -742,9 +857,6 @@ onMounted(() => {
                             "
                             @dragend="handleDragEnd"
                           >
-                            <div :class="styles.personAvatar">
-                              {{ getInitials(getSeatPerson('L', seatNum).name) }}
-                            </div>
                             <div :class="styles.personDetails">
                               <div :class="styles.personName">
                                 {{ getSeatPerson('L', seatNum).name }}
@@ -756,7 +868,20 @@ onMounted(() => {
                               :class="styles.removeBtn"
                               title="Remove from lineup"
                             >
-                              ✕
+                              <svg
+                                width="12"
+                                height="12"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2.5"
+                                  d="M6 18L18 6M6 6l12 12"
+                                />
+                              </svg>
                             </button>
                           </div>
                           <div v-else :class="styles.emptySeat">
@@ -797,9 +922,6 @@ onMounted(() => {
                             "
                             @dragend="handleDragEnd"
                           >
-                            <div :class="styles.personAvatar">
-                              {{ getInitials(getSeatPerson('R', seatNum).name) }}
-                            </div>
                             <div :class="styles.personDetails">
                               <div :class="styles.personName">
                                 {{ getSeatPerson('R', seatNum).name }}
@@ -811,7 +933,20 @@ onMounted(() => {
                               :class="styles.removeBtn"
                               title="Remove from lineup"
                             >
-                              ✕
+                              <svg
+                                width="12"
+                                height="12"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2.5"
+                                  d="M6 18L18 6M6 6l12 12"
+                                />
+                              </svg>
                             </button>
                           </div>
                           <div v-else :class="styles.emptySeat">
@@ -823,10 +958,60 @@ onMounted(() => {
                     </div>
                   </div>
 
-                  <!-- Drummer Position -->
-                  <div :class="styles.drummerSection">
-                    <div :class="styles.drummerSeat">🥁</div>
-                    <div :class="styles.drummerLabel">Drummer</div>
+                  <!-- Steerer (back) -->
+                  <div :class="styles.specialSection">
+                    <div
+                      :class="[
+                        styles.specialSeat,
+                        {
+                          occupied: getSeatPerson('S', 1),
+                          dropTarget: dragActive,
+                          localChange: hasLocalSeatChange('S', 1),
+                        },
+                      ]"
+                      @dragover.prevent
+                      @dragenter.prevent="handleDragEnter"
+                      @dragleave.prevent="handleDragLeave"
+                      @drop="handleSeatDrop($event, 'S', 1)"
+                    >
+                      <div
+                        v-if="getSeatPerson('S', 1)"
+                        :class="[
+                          styles.seatPerson,
+                          { dragging: dragActive && draggedFromSeat === 'S1' },
+                        ]"
+                        draggable="true"
+                        @dragstart="handleSeatDragStart($event, getSeatPerson('S', 1), 'S', 1)"
+                        @dragend="handleDragEnd"
+                      >
+                        <span :class="styles.posIcon">🧭</span>
+                        <div :class="styles.personName">{{ getSeatPerson('S', 1).name }}</div>
+                        <button
+                          @click="removeSeatAssignment('S', 1)"
+                          :class="styles.removeBtn"
+                          title="Remove from lineup"
+                        >
+                          <svg
+                            width="12"
+                            height="12"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2.5"
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                      <div v-else :class="styles.emptySpecial">
+                        <span :class="styles.posIcon">🧭</span>
+                        <span :class="styles.posLabel">Steerer</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
