@@ -783,7 +783,7 @@ onMounted(() => {
                 <!-- Empty states -->
                 <div v-else :class="styles.noAvailableMembers">
                   <div :class="styles.emptyIcon">
-                    {{ availableMembers.length === 0 ? '✨' : '🔍' }}
+                    {{ availableMembers.length === 0 ? '' : '🔍' }}
                   </div>
                   <p>
                     {{

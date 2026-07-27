@@ -125,7 +125,7 @@ const copyToClipboard = async (text) => {
 }
 
 const viewTeam = (teamId) => {
-  router.push(`/teams/${teamId}`)
+  router.push(`/teams/${teamId}/trainings`)
 }
 
 const editTeam = (team) => {

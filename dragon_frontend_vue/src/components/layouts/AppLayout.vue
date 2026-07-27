@@ -13,18 +13,18 @@ const sidebarCollapsed = ref(false) // desktop collapse (unchanged)
 const mobileOpen = ref(false) // mobile drawer open/closed
 
 // Computed properties
-const currentUser = computed(() => auth.username)
+const currentUser = computed(() => auth.person?.name || auth.username)
 
 // Navigation items
 const navigationItems = [
   {
-    name: 'Teams',
+    name: 'My Teams',
     path: '/teams',
     icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10',
   },
   {
-    name: 'Persons',
-    path: '/persons',
+    name: 'Profile',
+    path: '/profile',
     icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z',
   },
   {
@@ -138,7 +138,6 @@ const handleLogout = async () => {
           </div>
           <div v-if="!sidebarCollapsed" :class="styles.userInfo">
             <div :class="styles.userName">{{ currentUser || 'User' }}</div>
-            <!--            <div :class="styles.userEmail">{{ currentUser?.email || 'user@example.com' }}</div>-->
           </div>
         </div>
         <button

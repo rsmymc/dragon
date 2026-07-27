@@ -7,10 +7,9 @@ import CreateTeamView from '@/views/teams/CreateTeamView.vue'
 import EditTeamView from '@/views/teams/EditTeamView.vue'
 import TeamLayout from '@/views/teams/TeamLayout.vue'
 import TeamMembersView from '@/views/teams/TeamMembersView.vue'
-import EditPersonView from '@/views/person/EditPersonView.vue'
+import ProfileView from '@/views/ProfileView.vue'
 import TeamTrainingsView from '@/views/trainings/TeamTrainingsView.vue'
 import TrainingDetailsView from '@/views/trainings/TrainingDetailsView.vue'
-import PersonView from '@/views/PersonView.vue'
 import SettingsView from '@/views/SettingsView.vue'
 import RegisterView from '@/views/RegisterView.vue'
 
@@ -87,15 +86,9 @@ const routes = [
     meta: { requiresAuth: true, layout: 'app' },
   },
   {
-    path: '/persons',
-    name: 'person',
-    component: PersonView,
-    meta: { requiresAuth: true, layout: 'app' },
-  },
-  {
-    path: '/persons/:id/edit',
-    name: 'person-edit',
-    component: EditPersonView,
+    path: '/profile',
+    name: 'profile',
+    component: ProfileView,
     meta: { requiresAuth: true, layout: 'app' },
   },
   {
