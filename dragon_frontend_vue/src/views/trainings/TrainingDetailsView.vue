@@ -203,6 +203,25 @@ const getSeatPerson = (side, seatNumber) => {
   return seat?.person || null
 }
 
+// Left vs right weight balance (drummer/steerer sit on the centerline, excluded).
+// Missing weights are simply ignored.
+const boatBalance = computed(() => {
+  let left = 0
+  let right = 0
+  for (const seat of localLineupSeats.value) {
+    const w = Number(seat.person?.weight)
+    if (!seat.person || !w) continue
+    if (seat.side === 'L') left += w
+    else if (seat.side === 'R') right += w
+  }
+  return {
+    left,
+    right,
+    diff: Math.abs(left - right),
+    heavier: left === right ? null : left > right ? 'L' : 'R',
+  }
+})
+
 const hasLocalSeatChange = (side, seatNumber) => {
   if (!hasUnsavedChanges.value) return false
 
@@ -432,6 +451,32 @@ const sideClass = (side) => {
   if (side === 1) return styles.sideL
   if (side === 2) return styles.sideR
   return ''
+}
+
+// True if the seated person paddles a side that doesn't match this seat.
+// person.side: 0 = both (never wrong), 1 = left only, 2 = right only.
+const isWrongSide = (seatSide, seatNum) => {
+  if (seatSide !== 'L' && seatSide !== 'R') return false
+  const person = getSeatPerson(seatSide, seatNum)
+  if (!person) return false
+  const pref = Number(person.side)
+  if (pref === 0) return false
+  if (seatSide === 'L' && pref === 2) return true
+  if (seatSide === 'R' && pref === 1) return true
+  return false
+}
+
+// During a drag, highlight only the EMPTY seats that suit the dragged person's side.
+// side 0 (both) suits any L/R seat; special seats (D/S) suit anyone.
+const isMatchingTarget = (seatSide, seatNum) => {
+  if (!dragActive.value || !draggedMember.value) return false
+  if (getSeatPerson(seatSide, seatNum)) return false
+  if (seatSide === 'D' || seatSide === 'S') return true
+  const pref = Number(draggedMember.value.side)
+  if (pref === 0) return true
+  if (seatSide === 'L' && pref === 1) return true
+  if (seatSide === 'R' && pref === 2) return true
+  return false
 }
 
 // which membership row belongs to a given person (from the team roster already loaded)
@@ -755,6 +800,27 @@ onMounted(() => {
             <div :class="styles.boatPanel">
               <div :class="[styles.dragonBoatContainer, { dropActive: dragActive }]">
                 <div :class="styles.dragonBoatEnhanced">
+                  <!-- Left/right weight balance (aligned under the columns) -->
+                  <div :class="styles.balanceBar">
+                    <span
+                      :class="[
+                        styles.balanceValue,
+                        { [styles.balanceHeavier]: boatBalance.heavier === 'L' },
+                      ]"
+                      >{{ boatBalance.left }} kg</span
+                    >
+                    <span :class="styles.balanceDiff">{{
+                      boatBalance.diff === 0 ? '=' : `Δ${boatBalance.diff}`
+                    }}</span>
+                    <span
+                      :class="[
+                        styles.balanceValue,
+                        { [styles.balanceHeavier]: boatBalance.heavier === 'R' },
+                      ]"
+                      >{{ boatBalance.right }} kg</span
+                    >
+                  </div>
+
                   <!-- Legend aligned over the seat columns -->
                   <div :class="styles.boatLegend">
                     <span :class="[styles.legendItem, styles.port]">Port (Left)</span>
@@ -768,9 +834,9 @@ onMounted(() => {
                       :class="[
                         styles.specialSeat,
                         {
-                          occupied: getSeatPerson('D', 1),
-                          dropTarget: dragActive,
-                          localChange: hasLocalSeatChange('D', 1),
+                          [styles.occupied]: getSeatPerson('D', 1),
+                          [styles.dropTarget]: isMatchingTarget('D', 1),
+                          [styles.localChange]: hasLocalSeatChange('D', 1),
                         },
                       ]"
                       @dragover.prevent
@@ -832,12 +898,12 @@ onMounted(() => {
                         <div
                           :class="[
                             styles.boatSeat,
-                            styles.portSeat,
                             {
-                              occupied: getSeatPerson('L', seatNum),
-                              dropTarget: dragActive,
-                              highlighted: highlightedSeat === `L${seatNum}`,
-                              localChange: hasLocalSeatChange('L', seatNum),
+                              [styles.occupied]: getSeatPerson('L', seatNum),
+                              [styles.dropTarget]: isMatchingTarget('L', seatNum),
+                              [styles.highlighted]: highlightedSeat === `L${seatNum}`,
+                              [styles.localChange]: hasLocalSeatChange('L', seatNum),
+                              [styles.wrongSide]: isWrongSide('L', seatNum),
                             },
                           ]"
                           @dragover.prevent
@@ -897,12 +963,12 @@ onMounted(() => {
                         <div
                           :class="[
                             styles.boatSeat,
-                            styles.starboardSeat,
                             {
-                              occupied: getSeatPerson('R', seatNum),
-                              dropTarget: dragActive,
-                              highlighted: highlightedSeat === `R${seatNum}`,
-                              localChange: hasLocalSeatChange('R', seatNum),
+                              [styles.occupied]: getSeatPerson('R', seatNum),
+                              [styles.dropTarget]: isMatchingTarget('R', seatNum),
+                              [styles.highlighted]: highlightedSeat === `R${seatNum}`,
+                              [styles.localChange]: hasLocalSeatChange('R', seatNum),
+                              [styles.wrongSide]: isWrongSide('R', seatNum),
                             },
                           ]"
                           @dragover.prevent
@@ -964,9 +1030,9 @@ onMounted(() => {
                       :class="[
                         styles.specialSeat,
                         {
-                          occupied: getSeatPerson('S', 1),
-                          dropTarget: dragActive,
-                          localChange: hasLocalSeatChange('S', 1),
+                          [styles.occupied]: getSeatPerson('S', 1),
+                          [styles.dropTarget]: isMatchingTarget('S', 1),
+                          [styles.localChange]: hasLocalSeatChange('S', 1),
                         },
                       ]"
                       @dragover.prevent
