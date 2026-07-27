@@ -1,4 +1,4 @@
-name: Deploy to Dev
+name: Deploy to AWS
 
 # Trigger on push to main branch or manually
 on:
