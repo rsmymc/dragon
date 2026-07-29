@@ -1,5 +1,6 @@
 <script setup>
 import { ref, reactive, computed, onMounted, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useTeamsStore } from '@/stores/teams.js'
 import { useLocationsStore } from '@/stores/locations.js'
 import { useTrainingsStore } from '@/stores/trainings.js'
@@ -24,6 +25,7 @@ const emit = defineEmits(['close', 'success'])
 const teamsStore = useTeamsStore()
 const locationsStore = useLocationsStore()
 const trainingsStore = useTrainingsStore()
+const { t } = useI18n()
 
 // Reactive state
 const teams = ref([])
@@ -93,25 +95,25 @@ const validateForm = () => {
   let isValid = true
 
   if (!selectedTeamId.value) {
-    errors.teamId = 'Please select a team'
+    errors.teamId = t('trainingModal.teamRequired')
     isValid = false
   }
 
   if (!formData.locationId) {
-    errors.locationId = 'Please select a location'
+    errors.locationId = t('trainingModal.locationRequired')
     isValid = false
   }
 
   if (!formData.date) {
-    errors.date = 'Please select a date'
+    errors.date = t('trainingModal.dateRequired')
     isValid = false
   } else if (formData.date < todayDate.value) {
-    errors.date = 'Training date cannot be in the past'
+    errors.date = t('trainingModal.datePast')
     isValid = false
   }
 
   if (!formData.time) {
-    errors.time = 'Please select a start time'
+    errors.time = t('trainingModal.timeRequired')
     isValid = false
   }
 
@@ -145,7 +147,7 @@ const loadInitialData = async () => {
     }
   } catch (error) {
     console.error('Error loading initial data:', error)
-    submitError.value = 'Failed to load teams and locations'
+    submitError.value = t('trainingModal.loadFailed')
   } finally {
     teamsLoading.value = false
     locationsLoading.value = false
@@ -183,17 +185,17 @@ const createLocation = async () => {
   let isValid = true
 
   if (!newLocationName.value.trim()) {
-    newLocationError.value = 'Location name is required'
+    newLocationError.value = t('trainingModal.locationNameRequired')
     isValid = false
   }
 
   if (!newLocationLat.value) {
-    newLocationLatError.value = 'Latitude is required'
+    newLocationLatError.value = t('trainingModal.latRequired')
     isValid = false
   }
 
   if (!newLocationLon.value) {
-    newLocationLonError.value = 'Longitude is required'
+    newLocationLonError.value = t('trainingModal.lonRequired')
     isValid = false
   }
 
@@ -221,7 +223,7 @@ const createLocation = async () => {
     cancelCreateLocation()
   } catch (error) {
     console.error('Error creating location:', error)
-    newLocationError.value = error.message || 'Failed to create location'
+    newLocationError.value = error.message || t('trainingModal.createLocationFailed')
   } finally {
     isCreatingLocation.value = false
   }
@@ -259,7 +261,7 @@ const handleSubmit = async () => {
     handleClose()
   } catch (error) {
     console.error('Error creating training:', error)
-    submitError.value = error.message || 'Failed to create training. Please try again.'
+    submitError.value = error.message || t('trainingModal.createFailed')
   } finally {
     isSubmitting.value = false
   }
@@ -315,7 +317,7 @@ onMounted(() => {
     <div :class="styles.modalContent" @click.stop>
       <!-- Modal Header -->
       <div :class="styles.modalHeader">
-        <h3>Create Training Session</h3>
+        <h3>{{ t('trainingModal.title') }}</h3>
         <button @click="handleClose" :class="styles.modalClose" :disabled="isSubmitting">×</button>
       </div>
 
@@ -325,7 +327,7 @@ onMounted(() => {
           <!-- Team Selection (if not pre-selected) -->
           <div v-if="!teamId" :class="styles.formGroup">
             <label for="team-select" :class="styles.formLabel">
-              Team <span :class="styles.required">*</span>
+              {{ t('trainingModal.team') }} <span :class="styles.required">*</span>
             </label>
             <select
               id="team-select"
@@ -334,7 +336,7 @@ onMounted(() => {
               :disabled="isSubmitting || teamsLoading"
               @change="onTeamChange"
             >
-              <option value="">Choose a team...</option>
+              <option value="">{{ t('trainingModal.chooseTeam') }}</option>
               <option v-for="team in teams" :key="team.id" :value="team.id">
                 {{ team.name }}
               </option>
@@ -346,7 +348,7 @@ onMounted(() => {
           <div :class="styles.formGroup">
             <div :class="styles.labelRow">
               <label for="location-select" :class="styles.formLabel">
-                Location <span :class="styles.required">*</span>
+                {{ t('trainingModal.location') }} <span :class="styles.required">*</span>
               </label>
               <button
                 v-if="selectedTeamId && !showCreateLocation"
@@ -363,7 +365,7 @@ onMounted(() => {
                     d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                   />
                 </svg>
-                Add location
+                {{ t('trainingModal.addLocation') }}
               </button>
             </div>
             <select
@@ -375,10 +377,10 @@ onMounted(() => {
               <option value="">
                 {{
                   !selectedTeamId
-                    ? 'Select a team first...'
+                    ? t('trainingModal.selectTeamFirst')
                     : locationsLoading
-                      ? 'Loading locations...'
-                      : 'Choose a location...'
+                      ? t('trainingModal.loadingLocations')
+                      : t('trainingModal.chooseLocation')
                 }}
               </option>
               <option v-for="location in filteredLocations" :key="location.id" :value="location.id">
@@ -397,20 +399,20 @@ onMounted(() => {
               "
               :class="styles.fieldHelp"
             >
-              No locations for this team yet — use "Add location" above to create one.
+              {{ t('trainingModal.noLocationsHelp') }}
             </div>
 
             <!-- Quick Location Creation Form -->
             <div v-if="showCreateLocation" :class="styles.createLocationForm">
               <div :class="styles.formGroup">
                 <label :class="styles.formLabel">
-                  Location Name <span :class="styles.required">*</span>
+                  {{ t('trainingModal.locationName') }} <span :class="styles.required">*</span>
                 </label>
                 <input
                   v-model="newLocationName"
                   type="text"
                   :class="[styles.formInput, { [styles.error]: newLocationError }]"
-                  placeholder="Enter location name..."
+                  :placeholder="t('trainingModal.locationNamePlaceholder')"
                   :disabled="isCreatingLocation"
                 />
                 <div v-if="newLocationError" :class="styles.fieldError">{{ newLocationError }}</div>
@@ -419,14 +421,14 @@ onMounted(() => {
               <div :class="styles.formRow">
                 <div :class="styles.formGroup">
                   <label :class="styles.formLabel">
-                    Latitude <span :class="styles.required">*</span>
+                    {{ t('trainingModal.latitude') }} <span :class="styles.required">*</span>
                   </label>
                   <input
                     v-model="newLocationLat"
                     type="number"
                     step="any"
                     :class="[styles.formInput, { [styles.error]: newLocationLatError }]"
-                    placeholder="e.g. 40.7128"
+                    :placeholder="t('trainingModal.latPlaceholder')"
                     :disabled="isCreatingLocation"
                   />
                   <div v-if="newLocationLatError" :class="styles.fieldError">
@@ -436,14 +438,14 @@ onMounted(() => {
 
                 <div :class="styles.formGroup">
                   <label :class="styles.formLabel">
-                    Longitude <span :class="styles.required">*</span>
+                    {{ t('trainingModal.longitude') }} <span :class="styles.required">*</span>
                   </label>
                   <input
                     v-model="newLocationLon"
                     type="number"
                     step="any"
                     :class="[styles.formInput, { [styles.error]: newLocationLonError }]"
-                    placeholder="e.g. -74.0060"
+                    :placeholder="t('trainingModal.lonPlaceholder')"
                     :disabled="isCreatingLocation"
                   />
                   <div v-if="newLocationLonError" :class="styles.fieldError">
@@ -459,7 +461,7 @@ onMounted(() => {
                   :class="styles.btnCancelSmall"
                   :disabled="isCreatingLocation"
                 >
-                  Cancel
+                  {{ t('common.cancel') }}
                 </button>
                 <button
                   type="button"
@@ -467,8 +469,8 @@ onMounted(() => {
                   :class="styles.btnCreateSmall"
                   :disabled="isCreatingLocation || !isLocationFormValid"
                 >
-                  <span v-if="isCreatingLocation">Creating...</span>
-                  <span v-else>Create</span>
+                  <span v-if="isCreatingLocation">{{ t('trainingModal.creatingLocation') }}</span>
+                  <span v-else>{{ t('common.create') }}</span>
                 </button>
               </div>
             </div>
@@ -478,7 +480,7 @@ onMounted(() => {
           <div :class="styles.formRow">
             <div :class="styles.formGroup">
               <label for="date" :class="styles.formLabel">
-                Date <span :class="styles.required">*</span>
+                {{ t('trainingModal.date') }} <span :class="styles.required">*</span>
               </label>
               <input
                 id="date"
@@ -493,7 +495,7 @@ onMounted(() => {
 
             <div :class="styles.formGroup">
               <label for="time" :class="styles.formLabel">
-                Start Time <span :class="styles.required">*</span>
+                {{ t('trainingModal.startTime') }} <span :class="styles.required">*</span>
               </label>
               <input
                 id="time"
@@ -521,7 +523,7 @@ onMounted(() => {
           :class="styles.btnCancel"
           :disabled="isSubmitting"
         >
-          Cancel
+          {{ t('common.cancel') }}
         </button>
         <button
           type="button"
@@ -531,9 +533,9 @@ onMounted(() => {
         >
           <span v-if="isSubmitting" :class="styles.btnLoading">
             <div :class="styles.btnSpinner"></div>
-            Creating...
+            {{ t('trainingModal.creating') }}
           </span>
-          <span v-else>Create Training</span>
+          <span v-else>{{ t('trainingModal.submit') }}</span>
         </button>
       </div>
     </div>

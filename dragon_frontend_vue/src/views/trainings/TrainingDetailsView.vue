@@ -1,12 +1,13 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useTrainingsStore } from '@/stores/trainings'
 import { useMembershipStore } from '@/stores/membership'
 import { useLineupsStore } from '@/stores/lineups'
 import { useAttendanceStore } from '@/stores/attendance'
 import { useAuthStore } from '@/stores/auth'
-import { PERSON_SIDE_LABELS } from '@/constants'
+import { PERSON_SIDE_KEYS } from '@/constants'
 import styles from '@/assets/styles/training-details.module.css'
 
 // Composables
@@ -16,6 +17,7 @@ const membershipStore = useMembershipStore()
 const lineupsStore = useLineupsStore()
 const attendanceStore = useAttendanceStore()
 const authStore = useAuthStore()
+const { t, locale } = useI18n()
 
 // Reactive state
 const training = ref(null)
@@ -73,11 +75,12 @@ const availableMembers = computed(() => {
 const onlyPresent = ref(false)
 const sideFilter = ref('') // '' = all, 1 = left, 2 = right, 0 = both
 
+// labelKey is resolved with t() in the template so the chips stay reactive
 const sideFilters = [
-  { value: '', label: 'All' },
-  { value: 1, label: 'Left' },
-  { value: 2, label: 'Right' },
-  { value: 0, label: 'Both' },
+  { value: '', labelKey: 'trainingDetail.sideFilters.all' },
+  { value: 1, labelKey: 'trainingDetail.sideFilters.left' },
+  { value: 2, labelKey: 'trainingDetail.sideFilters.right' },
+  { value: 0, labelKey: 'trainingDetail.sideFilters.both' },
 ]
 
 const filteredAvailableMembers = computed(() => {
@@ -96,9 +99,8 @@ const maxSeatNumber = computed(() => {
   return Math.max(maxSeat, 8)
 })
 
-// Instructions tooltip text
-const dragTip =
-  'Drag members from the left into boat seats, or drag between seats to rearrange or swap. Changes stay local until you publish.'
+// Instructions tooltip text (computed so it follows the active locale)
+const dragTip = computed(() => t('trainingDetail.dragTip'))
 
 // Google Maps link for the training location (coords if available, else name search)
 const locationMapUrl = computed(() => {
@@ -143,7 +145,7 @@ const loadTraining = async () => {
     await loadLineup()
   } catch (err) {
     console.error('Error loading training:', err)
-    error.value = err.message || 'Failed to load training details'
+    error.value = err.message || t('trainingDetail.loadFailed')
   } finally {
     isLoading.value = false
   }
@@ -355,7 +357,7 @@ const removeSeatAssignment = (side, seatNumber) => {
 }
 
 const discardChanges = () => {
-  const confirmed = confirm('Discard all unsaved changes? This action cannot be undone.')
+  const confirmed = confirm(t('trainingDetail.discardConfirm'))
   if (!confirmed) return
   initializeLocalState()
 }
@@ -375,7 +377,7 @@ const saveDraft = async () => {
     hasUnsavedChanges.value = false
   } catch (err) {
     console.error('Error saving draft:', err)
-    alert('Failed to save draft. Please try again.')
+    alert(t('trainingDetail.saveDraftFailed'))
   } finally {
     isUpdatingLineup.value = false
   }
@@ -396,7 +398,7 @@ const publishLineup = async () => {
     hasUnsavedChanges.value = false
   } catch (err) {
     console.error('Error publishing lineup:', err)
-    alert('Failed to publish lineup. Please try again.')
+    alert(t('trainingDetail.publishFailed'))
   } finally {
     isUpdatingLineup.value = false
   }
@@ -421,15 +423,16 @@ const syncLocalChangesToServer = async () => {
 }
 
 // Helper methods
+// Locale-aware: 'en' / 'tr' are valid BCP 47 tags, so the active locale
+// drives the format (including the 12- vs 24-hour convention).
 const formatTrainingDateTime = (dateString) => {
   const date = new Date(dateString)
-  return date.toLocaleDateString('en-US', {
+  return date.toLocaleDateString(locale.value, {
     weekday: 'short',
     month: 'short',
     day: 'numeric',
     hour: 'numeric',
     minute: '2-digit',
-    hour12: true,
   })
 }
 
@@ -443,7 +446,8 @@ const getInitials = (name) => {
 }
 
 const getSideLabel = (side) => {
-  return PERSON_SIDE_LABELS[side] || 'Unknown'
+  const key = PERSON_SIDE_KEYS[side]
+  return key ? t(`sides.${key}`) : t('common.unknown')
 }
 
 // Side chip colour: 1 = Left/Port (red), 2 = Right/Starboard (green), 0 = Both (none)
@@ -557,15 +561,15 @@ onMounted(() => {
     <!-- Loading State -->
     <div v-if="isLoading" :class="styles.loadingState">
       <div :class="styles.loadingSpinner"></div>
-      <p>Loading training details...</p>
+      <p>{{ t('trainingDetail.loading') }}</p>
     </div>
 
     <!-- Error State -->
     <div v-else-if="error" :class="styles.errorState">
       <div :class="styles.errorIcon">⚠️</div>
-      <h3>Error Loading Training</h3>
+      <h3>{{ t('trainingDetail.errorTitle') }}</h3>
       <p>{{ error }}</p>
-      <button @click="loadTraining" :class="styles.btnRetry">Try Again</button>
+      <button @click="loadTraining" :class="styles.btnRetry">{{ t('common.tryAgain') }}</button>
     </div>
 
     <!-- Training Details -->
@@ -582,27 +586,27 @@ onMounted(() => {
                 d="M15 19l-7-7 7-7"
               />
             </svg>
-            Back to Trainings
+            {{ t('trainingDetail.backToTrainings') }}
           </router-link>
 
           <div :class="styles.trainingInfo">
             <div :class="styles.trainingTitle">
               <div :class="styles.trainingBadges">
-                <span v-if="isPastTraining" :class="[styles.statusBadge, styles.past]"
-                  >Completed</span
-                >
+                <span v-if="isPastTraining" :class="[styles.statusBadge, styles.past]">{{
+                  t('trainings.completed')
+                }}</span>
               </div>
             </div>
 
             <div :class="styles.trainingStats">
               <div :class="styles.statItem">
-                <span :class="styles.statLabel">When</span>
+                <span :class="styles.statLabel">{{ t('trainingDetail.when') }}</span>
                 <span :class="styles.statValue">{{
                   formatTrainingDateTime(training.start_at)
                 }}</span>
               </div>
               <div :class="styles.statItem">
-                <span :class="styles.statLabel">Location</span>
+                <span :class="styles.statLabel">{{ t('trainingDetail.location') }}</span>
                 <a
                   v-if="locationMapUrl"
                   :href="locationMapUrl"
@@ -610,15 +614,17 @@ onMounted(() => {
                   rel="noopener noreferrer"
                   :class="[styles.statValue, styles.locationLink]"
                 >
-                  {{ training.location?.name || 'Unknown' }}
+                  {{ training.location?.name || t('common.unknown') }}
                 </a>
                 <span v-else :class="styles.statValue">{{
-                  training.location?.name || 'Unknown'
+                  training.location?.name || t('common.unknown')
                 }}</span>
               </div>
               <div :class="styles.statItem">
-                <span :class="styles.statLabel">Team</span>
-                <span :class="styles.statValue">{{ training.team?.name || 'Unknown' }}</span>
+                <span :class="styles.statLabel">{{ t('trainingDetail.team') }}</span>
+                <span :class="styles.statValue">{{
+                  training.team?.name || t('common.unknown')
+                }}</span>
               </div>
             </div>
           </div>
@@ -633,17 +639,19 @@ onMounted(() => {
             <div :class="styles.lineupBarInfo">
               <div :class="styles.lineupTitleRow">
                 <!-- Draft / Published pill -->
-                <span v-if="lineup?.state === 2" :class="[styles.lineupPill, styles.published]"
-                  >Published</span
-                >
-                <span v-else :class="[styles.lineupPill, styles.draft]">Draft</span>
+                <span v-if="lineup?.state === 2" :class="[styles.lineupPill, styles.published]">{{
+                  t('trainingDetail.published')
+                }}</span>
+                <span v-else :class="[styles.lineupPill, styles.draft]">{{
+                  t('trainingDetail.draft')
+                }}</span>
 
                 <!-- Instructions tooltip -->
                 <span
                   :class="styles.infoTip"
                   tabindex="0"
                   :data-tip="dragTip"
-                  aria-label="How to build the lineup"
+                  :aria-label="t('trainingDetail.howToBuild')"
                 >
                   <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
@@ -664,7 +672,7 @@ onMounted(() => {
                 :class="styles.btnGhost"
                 :disabled="isUpdatingLineup"
               >
-                Discard
+                {{ t('trainingDetail.discard') }}
               </button>
               <button
                 v-if="hasUnsavedChanges"
@@ -672,7 +680,7 @@ onMounted(() => {
                 :class="styles.btnSecondary"
                 :disabled="isUpdatingLineup"
               >
-                Save Draft
+                {{ t('trainingDetail.saveDraft') }}
               </button>
               <button
                 v-if="lineup && (lineup.state === 1 || hasUnsavedChanges)"
@@ -688,7 +696,7 @@ onMounted(() => {
                     d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
                   />
                 </svg>
-                Publish
+                {{ t('trainingDetail.publish') }}
               </button>
             </div>
           </div>
@@ -698,24 +706,24 @@ onMounted(() => {
             <!-- Left Panel: Available Members -->
             <div :class="styles.membersPanel">
               <div :class="styles.panelHeader">
-                <h3>Available Members</h3>
+                <h3>{{ t('trainingDetail.availableMembers') }}</h3>
               </div>
 
               <!-- Filters -->
               <div :class="styles.panelFilters">
                 <label :class="styles.presentToggle">
                   <input type="checkbox" v-model="onlyPresent" />
-                  Present only
+                  {{ t('trainingDetail.presentOnly') }}
                 </label>
                 <div :class="styles.sideChips">
                   <button
                     v-for="sf in sideFilters"
-                    :key="sf.label"
+                    :key="String(sf.value)"
                     type="button"
                     @click="sideFilter = sf.value"
                     :class="[styles.sideChip, { [styles.sideChipActive]: sideFilter === sf.value }]"
                   >
-                    {{ sf.label }}
+                    {{ t(sf.labelKey) }}
                   </button>
                 </div>
               </div>
@@ -769,7 +777,11 @@ onMounted(() => {
                       class="att-toggle"
                       :class="attendanceClass(member.id)"
                       :disabled="!canEditAttendance(member.id) || savingPersonId === member.id"
-                      :title="canEditAttendance(member.id) ? 'Toggle attendance' : 'View only'"
+                      :title="
+                        canEditAttendance(member.id)
+                          ? t('trainingDetail.toggleAttendance')
+                          : t('trainingDetail.viewOnly')
+                      "
                       role="switch"
                       :aria-checked="attendanceForPerson(member.id) === true"
                       @click.stop="toggleAttendance(member.id)"
@@ -788,8 +800,8 @@ onMounted(() => {
                   <p>
                     {{
                       availableMembers.length === 0
-                        ? 'All team members are in the lineup!'
-                        : 'No members match the filters.'
+                        ? t('trainingDetail.allInLineup')
+                        : t('trainingDetail.noFilterMatch')
                     }}
                   </p>
                 </div>
@@ -823,9 +835,13 @@ onMounted(() => {
 
                   <!-- Legend aligned over the seat columns -->
                   <div :class="styles.boatLegend">
-                    <span :class="[styles.legendItem, styles.port]">Port (Left)</span>
+                    <span :class="[styles.legendItem, styles.port]">{{
+                      t('trainingDetail.port')
+                    }}</span>
                     <span></span>
-                    <span :class="[styles.legendItem, styles.starboard]">Starboard (Right)</span>
+                    <span :class="[styles.legendItem, styles.starboard]">{{
+                      t('trainingDetail.starboard')
+                    }}</span>
                   </div>
 
                   <!-- Drummer (front) -->
@@ -859,7 +875,7 @@ onMounted(() => {
                         <button
                           @click="removeSeatAssignment('D', 1)"
                           :class="styles.removeBtn"
-                          title="Remove from lineup"
+                          :title="t('trainingDetail.removeFromLineup')"
                         >
                           <svg
                             width="12"
@@ -879,7 +895,7 @@ onMounted(() => {
                       </div>
                       <div v-else :class="styles.emptySpecial">
                         <span :class="styles.posIcon">🥁</span>
-                        <span :class="styles.posLabel">Drummer</span>
+                        <span :class="styles.posLabel">{{ t('trainingDetail.drummer') }}</span>
                       </div>
                     </div>
                   </div>
@@ -932,7 +948,7 @@ onMounted(() => {
                             <button
                               @click="removeSeatAssignment('L', seatNum)"
                               :class="styles.removeBtn"
-                              title="Remove from lineup"
+                              :title="t('trainingDetail.removeFromLineup')"
                             >
                               <svg
                                 width="12"
@@ -997,7 +1013,7 @@ onMounted(() => {
                             <button
                               @click="removeSeatAssignment('R', seatNum)"
                               :class="styles.removeBtn"
-                              title="Remove from lineup"
+                              :title="t('trainingDetail.removeFromLineup')"
                             >
                               <svg
                                 width="12"
@@ -1055,7 +1071,7 @@ onMounted(() => {
                         <button
                           @click="removeSeatAssignment('S', 1)"
                           :class="styles.removeBtn"
-                          title="Remove from lineup"
+                          :title="t('trainingDetail.removeFromLineup')"
                         >
                           <svg
                             width="12"
@@ -1075,7 +1091,7 @@ onMounted(() => {
                       </div>
                       <div v-else :class="styles.emptySpecial">
                         <span :class="styles.posIcon">🧭</span>
-                        <span :class="styles.posLabel">Steerer</span>
+                        <span :class="styles.posLabel">{{ t('trainingDetail.steerer') }}</span>
                       </div>
                     </div>
                   </div>

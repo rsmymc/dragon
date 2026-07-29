@@ -1,9 +1,10 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useTeamsStore } from '@/stores/teams'
 import { useMembershipStore } from '@/stores/membership'
-import { MEMBERSHIP_ROLE_LABELS, PERSON_SIDE_LABELS } from '@/constants'
+import { MEMBERSHIP_ROLE_KEYS, PERSON_SIDE_KEYS, PERSON_SIDES } from '@/constants'
 import AddPersonModal from '@/components/modals/AddPersonModal.vue'
 import EditPersonModal from '@/components/modals/EditPersonModal.vue'
 import styles from '@/assets/styles/team-members.module.css'
@@ -11,6 +12,7 @@ import styles from '@/assets/styles/team-members.module.css'
 const route = useRoute()
 const teamsStore = useTeamsStore()
 const membershipStore = useMembershipStore()
+const { t } = useI18n()
 
 const showAddPerson = ref(false)
 const editingMembership = ref(null)
@@ -62,41 +64,40 @@ const handlePersonUpdated = () => {
 const removePerson = async (membership) => {
   if (!canManage.value) return
 
-  const confirmed = confirm(
-    `Remove "${membership.person.name}" from the team?\n\nThis action cannot be undone.`,
-  )
+  const confirmed = confirm(t('teamDetail.removeConfirm', { name: membership.person.name }))
   if (confirmed) {
     try {
       const result = await membershipStore.removePersonFromTeam(teamId.value, membership.person.id)
       if (!result.success) {
-        alert(`Failed to remove person: ${result.error}`)
+        alert(t('teamDetail.removeFailed', { error: result.error }))
       }
     } catch (error) {
       console.error('Remove person error:', error)
-      alert('An unexpected error occurred while removing the person.')
+      alert(t('teamDetail.removeUnexpected'))
     }
   }
 }
 
-const getRoleLabel = (role) => MEMBERSHIP_ROLE_LABELS[role] || 'Unknown'
-const getSideLabel = (side) => PERSON_SIDE_LABELS[side] || 'Unknown'
+const getRoleLabel = (role) => {
+  const key = MEMBERSHIP_ROLE_KEYS[role]
+  return key ? t(`roles.${key}`) : t('common.unknown')
+}
+
+const getSideLabel = (side) => {
+  const key = PERSON_SIDE_KEYS[side]
+  return key ? t(`sides.${key}`) : t('common.unknown')
+}
 
 // Icon matches the actual side: left arrow for Left, right for Right,
-// double arrow for Both/Either. Keyed off the human label so it stays
-// correct regardless of the raw side code.
-const getSidePath = (side) => {
-  const label = String(getSideLabel(side)).toLowerCase()
-  if (label.includes('both') || label.includes('either')) {
-    return 'M7 8l-4 4 4 4M3 12h18M17 8l4 4-4 4' // double arrow
-  }
-  if (label.includes('left')) {
-    return 'M11 8l-4 4 4 4M7 12h14' // left arrow
-  }
-  if (label.includes('right')) {
-    return 'M13 8l4 4-4 4M17 12H3' // right arrow
-  }
-  return 'M7 8l-4 4 4 4M3 12h18M17 8l4 4-4 4'
+// double arrow for Both. Keyed off the side CODE (not the display label),
+// so the icon stays correct in every language.
+const SIDE_PATHS = {
+  [PERSON_SIDES.LEFT]: 'M11 8l-4 4 4 4M7 12h14', // left arrow
+  [PERSON_SIDES.RIGHT]: 'M13 8l4 4-4 4M17 12H3', // right arrow
+  [PERSON_SIDES.BOTH]: 'M7 8l-4 4 4 4M3 12h18M17 8l4 4-4 4', // double arrow
 }
+
+const getSidePath = (side) => SIDE_PATHS[side] ?? SIDE_PATHS[PERSON_SIDES.BOTH]
 
 const handlePersonAdded = () => {
   showAddPerson.value = false
@@ -106,13 +107,14 @@ const handleSearchChange = (event) => {
   membershipStore.setSearchQuery(event.target.value)
 }
 
-// Role filter chips (values match Membership.Role; '' = All)
+// Role filter chips (values match Membership.Role; '' = All).
+// labelKey is resolved with t() in the template so the chips stay reactive.
 const roleFilters = [
-  { value: '', label: 'All' },
-  { value: '1', label: 'Players' },
-  { value: '2', label: 'Captains' },
-  { value: '3', label: 'Coaches' },
-  { value: '4', label: 'Managers' },
+  { value: '', labelKey: 'teamMembers.filters.all' },
+  { value: '1', labelKey: 'teamMembers.filters.players' },
+  { value: '2', labelKey: 'teamMembers.filters.captains' },
+  { value: '3', labelKey: 'teamMembers.filters.coaches' },
+  { value: '4', labelKey: 'teamMembers.filters.managers' },
 ]
 const setRoleFilter = (value) => {
   membershipStore.updateFilters({ role: value })
@@ -136,7 +138,7 @@ const setRoleFilter = (value) => {
           :value="membershipStore.searchQuery"
           @input="handleSearchChange"
           type="text"
-          placeholder="Search members..."
+          :placeholder="t('teamDetail.searchPlaceholder')"
           :class="styles.searchInput"
         />
       </div>
@@ -155,7 +157,7 @@ const setRoleFilter = (value) => {
             d="M12 6v6m0 0v6m0-6h6m-6 0H6"
           />
         </svg>
-        <span :class="styles.addLabel">Add Person</span>
+        <span :class="styles.addLabel">{{ t('teamDetail.addPerson') }}</span>
       </button>
     </div>
 
@@ -167,22 +169,22 @@ const setRoleFilter = (value) => {
         @click="setRoleFilter(rf.value)"
         :class="[styles.chip, { [styles.chipActive]: membershipStore.filters.role === rf.value }]"
       >
-        {{ rf.label }}
+        {{ t(rf.labelKey) }}
       </button>
     </div>
 
     <!-- Members Loading -->
     <div v-if="membershipStore.isLoading" :class="styles.membersLoading">
       <div :class="styles.loadingSpinner"></div>
-      <p>Loading members...</p>
+      <p>{{ t('teamDetail.loadingMembers') }}</p>
     </div>
 
     <!-- Members Error -->
     <div v-else-if="membershipStore.error" :class="styles.errorState">
       <div :class="styles.errorIcon">⚠️</div>
-      <h3>Error Loading Members</h3>
+      <h3>{{ t('teamDetail.membersErrorTitle') }}</h3>
       <p>{{ membershipStore.error }}</p>
-      <button @click="loadMembers" :class="styles.btnRetry">Try Again</button>
+      <button @click="loadMembers" :class="styles.btnRetry">{{ t('common.tryAgain') }}</button>
     </div>
 
     <!-- Empty Members -->
@@ -191,15 +193,15 @@ const setRoleFilter = (value) => {
       <h3>
         {{
           membershipStore.searchQuery || membershipStore.filters.role
-            ? 'No members found'
-            : 'No members yet'
+            ? t('teamDetail.noMembersFound')
+            : t('teamDetail.noMembersYet')
         }}
       </h3>
       <p>
         {{
           membershipStore.searchQuery || membershipStore.filters.role
-            ? 'Try adjusting your search or filter'
-            : 'Start building your dragon boat team by adding members'
+            ? t('teamDetail.adjustFilter')
+            : t('teamDetail.startBuilding')
         }}
       </p>
       <button
@@ -207,7 +209,7 @@ const setRoleFilter = (value) => {
         @click="showAddPerson = true"
         :class="styles.btnPrimary"
       >
-        Add First Member
+        {{ t('teamDetail.addFirstMember') }}
       </button>
     </div>
 
@@ -241,7 +243,7 @@ const setRoleFilter = (value) => {
             <button
               @click="editPerson(membership)"
               :class="[styles.actionBtnMember, styles.edit]"
-              title="Edit Person"
+              :title="t('teamDetail.editPerson')"
             >
               <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -255,7 +257,7 @@ const setRoleFilter = (value) => {
             <button
               @click="removePerson(membership)"
               :class="[styles.actionBtnMember, styles.delete]"
-              title="Remove Person"
+              :title="t('teamDetail.removePerson')"
             >
               <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path

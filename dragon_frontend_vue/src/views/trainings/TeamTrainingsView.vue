@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useTrainingsStore } from '@/stores/trainings'
 import { useLocationsStore } from '@/stores/locations'
 import { useTeamsStore } from '@/stores/teams'
@@ -12,6 +13,7 @@ const route = useRoute()
 const trainingsStore = useTrainingsStore()
 const locationsStore = useLocationsStore()
 const teamsStore = useTeamsStore()
+const { t, locale } = useI18n()
 
 // Reactive state
 const timeFilter = ref('upcoming')
@@ -23,7 +25,7 @@ const teamId = computed(() => route.params.id)
 
 const teamName = computed(() => {
   const team = teamsStore.getTeamById(teamId.value)
-  return team?.name || 'Team'
+  return team?.name || t('trainings.defaultTeamName')
 })
 
 // Only Captain/Coach/Manager can create/delete trainings (Player = 1)
@@ -45,11 +47,12 @@ const upcomingCount = computed(() => trainingsStore.getUpcomingTrainingsByTeam(t
 const pastCount = computed(() => trainingsStore.getPastTrainingsByTeam(teamId.value).length)
 const totalCount = computed(() => trainingsStore.getTrainingsByTeam(teamId.value).length)
 
-// Filter chips
+// Filter chips: labels carry their own count via {count} interpolation,
+// so they stay correct in every language (no string concatenation).
 const timeFilters = computed(() => [
-  { value: 'upcoming', label: `Upcoming (${upcomingCount.value})` },
-  { value: 'past', label: `Past (${pastCount.value})` },
-  { value: 'all', label: `All (${totalCount.value})` },
+  { value: 'upcoming', label: t('trainings.filters.upcoming', { count: upcomingCount.value }) },
+  { value: 'past', label: t('trainings.filters.past', { count: pastCount.value }) },
+  { value: 'all', label: t('trainings.filters.all', { count: totalCount.value }) },
 ])
 
 // Methods
@@ -71,9 +74,11 @@ const getLocationCoordinates = (locationId) => {
   }
 }
 
+// Locale-aware formatting: 'en' / 'tr' are valid BCP 47 tags, so the active
+// locale drives both the date and time format directly.
 const formatTrainingDate = (dateString) => {
   const date = new Date(dateString)
-  return date.toLocaleDateString('en-US', {
+  return date.toLocaleDateString(locale.value, {
     weekday: 'short',
     month: 'short',
     day: 'numeric',
@@ -83,10 +88,9 @@ const formatTrainingDate = (dateString) => {
 
 const formatTrainingTime = (dateString) => {
   const date = new Date(dateString)
-  return date.toLocaleTimeString('en-US', {
+  return date.toLocaleTimeString(locale.value, {
     hour: 'numeric',
     minute: '2-digit',
-    hour12: true,
   })
 }
 
@@ -97,34 +101,26 @@ const isPastTraining = (training) => {
 const getEmptyTitle = () => {
   switch (timeFilter.value) {
     case 'upcoming':
-      return 'No upcoming trainings'
+      return t('trainings.emptyUpcomingTitle')
     case 'past':
-      return 'No past trainings'
+      return t('trainings.emptyPastTitle')
     default:
-      return 'No trainings yet'
-  }
-}
-
-const getEmptyMessage = () => {
-  switch (timeFilter.value) {
-    case 'upcoming':
-      return 'Schedule your next training session to keep the team sharp!'
-    case 'past':
-      return 'No training history found for this team.'
-    default:
-      return 'Start organizing training sessions to build team fitness and skills.'
+      return t('trainings.emptyAllTitle')
   }
 }
 
 const emptyActionLabel = computed(() =>
-  totalCount.value === 0 ? 'Create First Training' : 'Create Training',
+  totalCount.value === 0 ? t('trainings.createFirst') : t('trainings.create'),
 )
 
 const deleteTraining = async (training) => {
   if (!canManage.value) return
 
   const confirmed = confirm(
-    `Delete training on ${formatTrainingDate(training.start_at)} at ${formatTrainingTime(training.start_at)}?\n\nThis action cannot be undone.`,
+    t('trainings.deleteConfirm', {
+      date: formatTrainingDate(training.start_at),
+      time: formatTrainingTime(training.start_at),
+    }),
   )
 
   if (confirmed) {
@@ -132,7 +128,7 @@ const deleteTraining = async (training) => {
       await trainingsStore.deleteTraining(training.id)
     } catch (error) {
       console.error('Delete training error:', error)
-      alert('Failed to delete training. Please try again.')
+      alert(t('trainings.deleteFailed'))
     }
   }
 }
@@ -175,29 +171,29 @@ onMounted(() => {
             d="M12 6v6m0 0v6m0-6h6m-6 0H6"
           />
         </svg>
-        <span :class="styles.addLabel">Create Training</span>
+        <span :class="styles.addLabel">{{ t('trainings.create') }}</span>
       </button>
     </div>
 
     <!-- Loading State -->
     <div v-if="trainingsStore.isLoading" :class="styles.loadingState">
       <div :class="styles.loadingSpinner"></div>
-      <p>Loading trainings...</p>
+      <p>{{ t('trainings.loading') }}</p>
     </div>
 
     <!-- Error State -->
     <div v-else-if="trainingsStore.error" :class="styles.errorState">
       <div :class="styles.errorIcon">⚠️</div>
-      <h3>Error Loading Trainings</h3>
+      <h3>{{ t('trainings.errorTitle') }}</h3>
       <p>{{ trainingsStore.error }}</p>
-      <button @click="loadTrainings" :class="styles.btnRetry">Try Again</button>
+      <button @click="loadTrainings" :class="styles.btnRetry">{{ t('common.tryAgain') }}</button>
     </div>
 
     <!-- Empty State -->
     <div v-else-if="filteredTrainings.length === 0" :class="styles.emptyState">
-<!--      <div :class="styles.emptyIcon">🚣</div>-->
+      <!--      <div :class="styles.emptyIcon">🚣</div>-->
       <h3>{{ getEmptyTitle() }}</h3>
-<!--      <p>{{ getEmptyMessage() }}</p>-->
+      <!--      <p>{{ getEmptyMessage() }}</p>-->
       <button v-if="canManage" @click="showCreateModal = true" :class="styles.btnPrimary">
         <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
@@ -228,14 +224,14 @@ onMounted(() => {
 
           <div :class="styles.headerRight">
             <span v-if="isPastTraining(training)" :class="[styles.statusBadge, styles.past]">
-              Completed
+              {{ t('trainings.completed') }}
             </span>
 
             <div v-if="canManage" :class="styles.cardActions">
               <button
                 @click.stop.prevent="editingTraining = training"
                 :class="[styles.actionBtn, styles.edit]"
-                title="Edit training"
+                :title="t('trainings.editTitle')"
               >
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
@@ -249,7 +245,7 @@ onMounted(() => {
               <button
                 @click.stop.prevent="deleteTraining(training)"
                 :class="[styles.actionBtn, styles.delete]"
-                title="Delete training"
+                :title="t('trainings.deleteTitle')"
               >
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
