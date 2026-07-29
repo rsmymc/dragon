@@ -1,12 +1,14 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useTeamsStore } from '@/stores/teams.js'
 
 import styles from '@/assets/styles/teams-list.module.css'
 
 const router = useRouter()
 const teamsStore = useTeamsStore()
+const { t } = useI18n()
 
 // Membership.Role is an IntegerChoices enum:
 //   1 = Player, 2 = Captain, 3 = Coach, 4 = Manager
@@ -64,7 +66,7 @@ const closeJoinModal = () => {
 const submitJoin = async () => {
   const code = joinCode.value.trim()
   if (!code) {
-    joinError.value = 'Please enter a team code'
+    joinError.value = t('teams.joinCodeRequired')
     return
   }
 
@@ -77,7 +79,7 @@ const submitJoin = async () => {
 
   if (result.success) {
     showJoinModal.value = false
-    showNotification('success', `Joined "${result.team.name}"`)
+    showNotification('success', t('teams.joinedTeam', { name: result.team.name }))
   } else {
     // Show the backend reason inline (invalid code / already a member)
     joinError.value = result.error
@@ -93,7 +95,7 @@ const copyCode = async (code) => {
       copiedCode.value = null
     }, 1500)
   } else {
-    showNotification('error', 'Could not copy code')
+    showNotification('error', t('teams.copyFailed'))
   }
 }
 
@@ -144,26 +146,24 @@ const deleteTeam = async (team) => {
     const result = await teamsStore.deleteTeam(team.id)
     if (result.success) {
       // Show success message
-      showNotification('success', `Team "${team.name}" deleted successfully`)
+      showNotification('success', t('teams.deleteSuccess', { name: team.name }))
     } else {
       // Show error message
-      showNotification('error', result.error || 'Failed to delete team')
+      showNotification('error', result.error || t('teams.deleteFailed'))
     }
   } catch (error) {
     console.error('Error deleting team:', error)
-    showNotification('error', 'An unexpected error occurred')
+    showNotification('error', t('common.unexpectedError'))
   }
 }
 
 // Enhanced confirmation function
 const showDeleteConfirmation = (team) => {
   return new Promise((resolve) => {
-    const message =
-      `Are you sure you want to delete "${team.name}"?\n\n` +
-      `This action cannot be undone and will:\n` +
-      `• Remove the team permanently\n` +
-      `• Remove all associated data\n` +
-      `• Affect ${team.active_member_count || 0} team members`
+    const message = t('teams.deleteConfirm', {
+      name: team.name,
+      count: team.active_member_count || 0,
+    })
 
     const confirmed = confirm(message)
     resolve(confirmed)
@@ -189,9 +189,9 @@ const progressPercent = (team) => {
 }
 
 const progressColor = (team) =>
-  (team.active_member_count || 0) >= (team.max_members || 22)
-    ? 'var(--color-success)'
-    : 'var(--color-primary)'
+    (team.active_member_count || 0) >= (team.max_members || 22)
+        ? 'var(--color-success)'
+        : 'var(--color-primary)'
 
 // Inline styles for the join modal (self-contained, no CSS-module dependency).
 // Colours reference the brand tokens - custom properties resolve in inline styles.
@@ -250,20 +250,22 @@ const actionsStyle = {
     <!-- Page Header -->
     <div :class="styles.pageHeader">
       <div :class="styles.headerLeft">
-        <h1 :class="styles.pageTitle">Teams</h1>
+        <h1 :class="styles.pageTitle">{{ t('teams.title') }}</h1>
       </div>
       <div :class="styles.headerRight">
-        <button @click="openJoinModal" :class="styles.btnSecondary">Join Team</button>
+        <button @click="openJoinModal" :class="styles.btnSecondary">
+          {{ t('teams.joinButton') }}
+        </button>
         <button @click="createTeam" :class="styles.btnPrimary">
           <svg :class="styles.btnIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
             />
           </svg>
-          Create Team
+          {{ t('teams.createButton') }}
         </button>
       </div>
     </div>
@@ -307,58 +309,62 @@ const actionsStyle = {
       <!-- Loading State -->
       <div v-if="isLoading" :class="styles.loadingState">
         <div :class="styles.loadingSpinner"></div>
-        <p>Loading teams...</p>
+        <p>{{ t('teams.loading') }}</p>
       </div>
 
       <!-- Error State -->
       <div v-else-if="error" :class="styles.errorState">
         <svg :class="styles.errorIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
-        <h3>Error Loading Teams</h3>
+        <h3>{{ t('teams.errorTitle') }}</h3>
         <p>{{ error }}</p>
-        <button @click="teamsStore.fetchTeams()" :class="styles.btnSecondary">Try Again</button>
+        <button @click="teamsStore.fetchTeams()" :class="styles.btnSecondary">
+          {{ t('common.tryAgain') }}
+        </button>
       </div>
 
       <!-- Empty State -->
       <div v-else-if="teams.length === 0" :class="styles.emptyState">
         <svg :class="styles.emptyIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
           />
         </svg>
-        <h3>No Teams Found</h3>
-        <p v-if="searchQuery">No teams match your search criteria</p>
-        <p v-else>Get started by creating your first dragon boat team</p>
-        <button @click="createTeam" :class="styles.btnPrimary">Create Your First Team</button>
+        <h3>{{ t('teams.emptyTitle') }}</h3>
+        <p v-if="searchQuery">{{ t('teams.emptySearch') }}</p>
+        <p v-else>{{ t('teams.emptyHint') }}</p>
+        <button @click="createTeam" :class="styles.btnPrimary">
+          {{ t('teams.createFirst') }}
+        </button>
       </div>
 
       <!-- Teams Grid -->
       <div v-else :class="styles.teamsGrid">
         <div
-          v-for="team in teams"
-          :key="team.id"
-          :class="styles.teamCard"
-          @click="viewTeam(team.id)"
+            v-for="team in teams"
+            :key="team.id"
+            :class="styles.teamCard"
+            @click="viewTeam(team.id)"
         >
           <!-- Team Card Header -->
           <div :class="styles.cardHeader">
             <div>
               <h3 :class="styles.teamName">{{ team.name }}</h3>
               <button
-                v-if="team.code"
-                @click.stop="copyCode(team.code)"
-                :title="copiedCode === team.code ? 'Copied!' : 'Copy team code'"
-                :class="styles.codeBadge"
-                :style="
+                  v-if="team.code"
+                  @click.stop="copyCode(team.code)"
+                  :title="copiedCode === team.code ? t('common.copied') : t('teams.copyCodeTitle')"
+                  :class="styles.codeBadge"
+                  :style="
                   copiedCode === team.code
                     ? {
                         backgroundColor: 'var(--color-accent)',
@@ -369,13 +375,13 @@ const actionsStyle = {
                 "
               >
                 <template v-if="copiedCode === team.code">
-                  Copied!
+                  {{ t('common.copied') }}
                   <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M5 13l4 4L19 7"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M5 13l4 4L19 7"
                     />
                   </svg>
                 </template>
@@ -383,10 +389,10 @@ const actionsStyle = {
                   {{ team.code }}
                   <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
                     />
                   </svg>
                 </template>
@@ -394,27 +400,31 @@ const actionsStyle = {
             </div>
             <!-- Edit/Delete only enabled for manager/coach/captain -->
             <div v-if="canManage(team)" :class="styles.teamActions" @click.stop>
-              <button @click="editTeam(team)" :class="styles.actionBtnTeamList" title="Edit Team">
+              <button
+                  @click="editTeam(team)"
+                  :class="styles.actionBtnTeamList"
+                  :title="t('teams.editTeam')"
+              >
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                   />
                 </svg>
               </button>
               <button
-                @click="deleteTeam(team)"
-                :class="[styles.actionBtnTeamList, styles.delete]"
-                title="Delete Team"
+                  @click="deleteTeam(team)"
+                  :class="[styles.actionBtnTeamList, styles.delete]"
+                  :title="t('teams.deleteTeam')"
               >
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                   />
                 </svg>
               </button>
@@ -423,15 +433,15 @@ const actionsStyle = {
           <!-- Team Stats -->
           <div :class="styles.teamStats">
             <div :class="styles.statItem">
-              <span :class="styles.statLabel">Members</span>
+              <span :class="styles.statLabel">{{ t('teams.members') }}</span>
               <span :class="styles.statValue"
-                >{{ team.active_member_count || 0 }}/{{ team.max_members || 22 }}</span
+              >{{ team.active_member_count || 0 }}/{{ team.max_members || 22 }}</span
               >
             </div>
 
             <div :class="styles.statItem">
-              <span :class="styles.statLabel">City</span>
-              <span :class="styles.statValue">{{ team.city || 'Not assigned' }}</span>
+              <span :class="styles.statLabel">{{ t('teams.city') }}</span>
+              <span :class="styles.statValue">{{ team.city || t('teams.notAssigned') }}</span>
             </div>
           </div>
 
@@ -440,15 +450,15 @@ const actionsStyle = {
             <div :class="styles.memberProgress">
               <div :class="styles.progressBar">
                 <div
-                  :class="styles.progressFill"
-                  :style="{
+                    :class="styles.progressFill"
+                    :style="{
                     width: `${progressPercent(team)}%`,
                     backgroundColor: progressColor(team),
                   }"
                 ></div>
               </div>
               <span :class="styles.progressText">
-                {{ Math.round(progressPercent(team)) }}% full
+                {{ t('teams.percentFull', { percent: Math.round(progressPercent(team)) }) }}
               </span>
             </div>
           </div>
@@ -459,25 +469,25 @@ const actionsStyle = {
     <!-- Join Team Modal -->
     <div v-if="showJoinModal" :style="overlayStyle" @click.self="closeJoinModal">
       <div :style="modalStyle">
-        <h2 :style="modalTitleStyle">Join a Team</h2>
-        <p :style="modalHintStyle">Enter the team code shared with you.</p>
+        <h2 :style="modalTitleStyle">{{ t('teams.joinModalTitle') }}</h2>
+        <p :style="modalHintStyle">{{ t('teams.joinModalHint') }}</p>
 
         <input
-          v-model="joinCode"
-          type="text"
-          placeholder="e.g. ABC123"
-          :style="inputStyle"
-          @keyup.enter="submitJoin"
+            v-model="joinCode"
+            type="text"
+            :placeholder="t('teams.joinCodePlaceholder')"
+            :style="inputStyle"
+            @keyup.enter="submitJoin"
         />
 
         <p v-if="joinError" :style="errorTextStyle">{{ joinError }}</p>
 
         <div :style="actionsStyle">
           <button @click="closeJoinModal" :class="styles.btnSecondary" :disabled="joinSubmitting">
-            Cancel
+            {{ t('common.cancel') }}
           </button>
           <button @click="submitJoin" :class="styles.btnPrimary" :disabled="joinSubmitting">
-            {{ joinSubmitting ? 'Joining...' : 'Join' }}
+            {{ joinSubmitting ? t('teams.joining') : t('teams.join') }}
           </button>
         </div>
       </div>

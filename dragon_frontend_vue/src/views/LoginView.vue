@@ -1,12 +1,14 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
 import { login } from '@/services/auth'
 import styles from '@/assets/styles/login.module.css'
 
 const router = useRouter()
 const auth = useAuthStore()
+const { t } = useI18n()
 
 // Form data
 const username = ref('')
@@ -32,11 +34,11 @@ const isFormValid = computed(() => {
 // Validation functions
 function validateUsername() {
   if (!username.value.trim()) {
-    errors.value.username = 'Username is required'
+    errors.value.username = t('login.usernameRequired')
     return false
   }
   if (username.value.length < 3) {
-    errors.value.username = 'Username must be at least 3 characters'
+    errors.value.username = t('login.usernameMinLength')
     return false
   }
   errors.value.username = ''
@@ -45,11 +47,11 @@ function validateUsername() {
 
 function validatePassword() {
   if (!password.value) {
-    errors.value.password = 'Password is required'
+    errors.value.password = t('login.passwordRequired')
     return false
   }
   if (password.value.length < 6) {
-    errors.value.password = 'Password must be at least 6 characters'
+    errors.value.password = t('login.passwordMinLength')
     return false
   }
   errors.value.password = ''
@@ -93,13 +95,13 @@ async function onSubmit() {
 
     // Handle different error types
     if (e.response?.status === 401) {
-      errors.value.general = 'Invalid username or password'
+      errors.value.general = t('login.invalidCredentials')
     } else if (e.response?.status === 429) {
-      errors.value.general = 'Too many login attempts. Please try again later.'
+      errors.value.general = t('login.tooManyAttempts')
     } else if (e.response?.data?.message) {
       errors.value.general = e.response.data.message
     } else {
-      errors.value.general = 'Login failed. Please check your connection and try again.'
+      errors.value.general = t('login.loginFailed')
     }
   } finally {
     loading.value = false
@@ -116,14 +118,12 @@ async function onSubmit() {
           <img alt="DragonBoat Logo" src="../assets/images/logo.png" width="128" height="128" />
           <h1 :class="styles.appTitle">DragonBoat Manager</h1>
         </div>
-<!--        <h2>Welcome Back</h2>
-        <p>Sign in to manage your dragon boat teams</p>-->
       </div>
 
       <form @submit.prevent="onSubmit" :class="styles.loginForm">
         <!-- Username Field -->
         <div :class="styles.formGroup">
-          <label for="username">Username</label>
+          <label for="username">{{ t('login.username') }}</label>
           <div :class="styles.inputContainer">
             <input
               id="username"
@@ -133,8 +133,8 @@ async function onSubmit() {
               type="text"
               autocomplete="username"
               required
-              :class="{ error: errors.username }"
-              placeholder="Enter your username"
+              :class="{ [styles.error]: errors.username }"
+              :placeholder="t('login.usernamePlaceholder')"
             />
             <div v-if="username && !errors.username" :class="styles.inputSuccess">
               <svg
@@ -157,7 +157,7 @@ async function onSubmit() {
 
         <!-- Password Field -->
         <div :class="styles.formGroup">
-          <label for="password">Password</label>
+          <label for="password">{{ t('login.password') }}</label>
           <div :class="styles.inputContainer">
             <input
               id="password"
@@ -167,8 +167,8 @@ async function onSubmit() {
               :type="showPassword ? 'text' : 'password'"
               autocomplete="current-password"
               required
-              :class="{ error: errors.password }"
-              placeholder="Enter your password"
+              :class="{ [styles.error]: errors.password }"
+              :placeholder="t('login.passwordPlaceholder')"
             />
             <button type="button" @click="togglePasswordVisibility" :class="styles.passwordToggle">
               <svg
@@ -215,7 +215,7 @@ async function onSubmit() {
           <label :class="styles.checkboxContainer">
             <input v-model="rememberMe" type="checkbox" />
             <span class="checkmark"></span>
-            Remember me
+            {{ t('login.rememberMe') }}
           </label>
         </div>
 
@@ -235,7 +235,7 @@ async function onSubmit() {
         <button
           type="submit"
           :disabled="!isFormValid"
-          :class="[styles.loginButton, { loading: loading }]"
+          :class="[styles.loginButton, { [styles.loading]: loading }]"
         >
           <svg v-if="loading" :class="styles.loadingSpinner" fill="none" viewBox="0 0 24 24">
             <circle
@@ -252,21 +252,14 @@ async function onSubmit() {
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
             ></path>
           </svg>
-          <span>{{ loading ? 'Signing in...' : 'Sign In' }}</span>
+          <span>{{ loading ? t('login.submitting') : t('login.submit') }}</span>
         </button>
       </form>
-      <!--  <div :class="styles.demoHelp">
-         <p :class="styles.demoText">
-           <strong>Demo credentials:</strong><br />
-           Username: <code>test_user</code><br />
-           Password: <code>test_user1234</code>
-         </p>
-       </div>-->
       <!-- Sign up link -->
       <div :class="styles.loginFooter">
         <p>
-          Don't have an account?
-          <RouterLink to="/register">Sign up</RouterLink>
+          {{ t('login.noAccount') }}
+          <RouterLink to="/register">{{ t('login.signUp') }}</RouterLink>
         </p>
       </div>
     </div>

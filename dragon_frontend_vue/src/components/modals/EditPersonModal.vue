@@ -1,8 +1,9 @@
 <script setup>
 import { ref, reactive, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { usePersonsStore } from '@/stores/persons.js'
 import { useMembershipStore } from '@/stores/membership.js'
-import { MEMBERSHIP_ROLE_LABELS, PERSON_SIDE_LABELS, MEMBERSHIP_ROLES } from '@/constants.js'
+import { MEMBERSHIP_ROLE_KEYS, PERSON_SIDE_KEYS } from '@/constants.js'
 import styles from '@/assets/styles/add-person-to-team.module.css'
 
 // The full membership row (has .id, .role, and nested .person)
@@ -17,6 +18,7 @@ const emit = defineEmits(['close', 'success'])
 
 const personsStore = usePersonsStore()
 const membershipStore = useMembershipStore()
+const { t } = useI18n()
 
 const isSubmitting = ref(false)
 const submitError = ref('')
@@ -45,16 +47,16 @@ const validateForm = () => {
   formErrors.value = {}
 
   if (!form.name.trim()) {
-    formErrors.value.name = 'Name is required'
+    formErrors.value.name = t('personForm.nameRequired')
   }
   if (form.phone && !/^[\+]?[\d\s\-\(\)]+$/.test(form.phone)) {
-    formErrors.value.phone = 'Please enter a valid phone number'
+    formErrors.value.phone = t('personForm.phoneInvalid')
   }
   if (form.height && (form.height < 100 || form.height > 250)) {
-    formErrors.value.height = 'Height should be between 100-250 cm'
+    formErrors.value.height = t('personForm.heightRange')
   }
   if (form.weight && (form.weight < 30 || form.weight > 200)) {
-    formErrors.value.weight = 'Weight should be between 30-200 kg'
+    formErrors.value.weight = t('personForm.weightRange')
   }
 
   return Object.keys(formErrors.value).length === 0
@@ -86,7 +88,7 @@ const submitForm = async () => {
     if (Object.keys(personChanges).length > 0) {
       const result = await personsStore.updatePerson(person.id, personChanges)
       if (result && result.success === false) {
-        throw new Error(result.error || 'Failed to update person')
+        throw new Error(result.error || t('personModal.updateFailed'))
       }
     }
 
@@ -98,7 +100,7 @@ const submitForm = async () => {
     emit('success')
   } catch (error) {
     console.error('Edit person error:', error)
-    submitError.value = error.message || 'Failed to save changes. Please try again.'
+    submitError.value = error.message || t('personModal.saveFailed')
   } finally {
     isSubmitting.value = false
   }
@@ -114,8 +116,8 @@ const closeModal = () => {
     <div :class="styles.modalContent" @click.stop>
       <!-- Header -->
       <div :class="styles.modalHeader">
-        <h2>Edit {{ person.name }}</h2>
-        <button @click="closeModal" :class="styles.closeBtn" aria-label="Close">
+        <h2>{{ t('personModal.editTitle', { name: person.name }) }}</h2>
+        <button @click="closeModal" :class="styles.closeBtn" :aria-label="t('common.close')">
           <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
@@ -132,29 +134,31 @@ const closeModal = () => {
         <form @submit.prevent="submitForm">
           <!-- Person Details -->
           <div :class="styles.formSection">
-            <h3>Person Details</h3>
+            <h3>{{ t('personForm.personDetails') }}</h3>
 
             <div :class="styles.formGroup">
-              <label for="name">Name <span :class="styles.required">*</span></label>
+              <label for="name">
+                {{ t('personForm.name') }} <span :class="styles.required">*</span>
+              </label>
               <input
                 id="name"
                 v-model="form.name"
                 type="text"
                 :class="[styles.formInput, { [styles.error]: formErrors.name }]"
-                placeholder="Enter full name"
+                :placeholder="t('personForm.namePlaceholder')"
                 required
               />
               <span v-if="formErrors.name" :class="styles.errorMessage">{{ formErrors.name }}</span>
             </div>
 
             <div :class="styles.formGroup">
-              <label for="phone">Phone</label>
+              <label for="phone">{{ t('personForm.phone') }}</label>
               <input
                 id="phone"
                 v-model="form.phone"
                 type="tel"
                 :class="[styles.formInput, { [styles.error]: formErrors.phone }]"
-                placeholder="Enter phone number"
+                :placeholder="t('personForm.phonePlaceholder')"
               />
               <span v-if="formErrors.phone" :class="styles.errorMessage">{{
                 formErrors.phone
@@ -163,7 +167,7 @@ const closeModal = () => {
 
             <div :class="styles.formRow">
               <div :class="styles.formGroup">
-                <label for="height">Height (cm)</label>
+                <label for="height">{{ t('personForm.height') }}</label>
                 <input
                   id="height"
                   v-model="form.height"
@@ -179,7 +183,7 @@ const closeModal = () => {
               </div>
 
               <div :class="styles.formGroup">
-                <label for="weight">Weight (kg)</label>
+                <label for="weight">{{ t('personForm.weight') }}</label>
                 <input
                   id="weight"
                   v-model="form.weight"
@@ -196,15 +200,15 @@ const closeModal = () => {
             </div>
 
             <div :class="styles.formGroup">
-              <label for="side">Side Preference</label>
+              <label for="side">{{ t('personForm.sideLabel') }}</label>
               <select id="side" v-model="form.side" :class="styles.formSelect">
-                <option value="" disabled>Select preferred side</option>
+                <option value="" disabled>{{ t('personForm.selectSide') }}</option>
                 <option
-                  v-for="(label, value) in PERSON_SIDE_LABELS"
+                  v-for="(key, value) in PERSON_SIDE_KEYS"
                   :key="value"
                   :value="Number(value)"
                 >
-                  {{ label }}
+                  {{ t(`sides.${key}`) }}
                 </option>
               </select>
             </div>
@@ -212,21 +216,16 @@ const closeModal = () => {
 
           <!-- Team Role (membership - scoped to this team) -->
           <div :class="styles.formSection">
-            <h3>Team Role</h3>
+            <h3>{{ t('personModal.teamRole') }}</h3>
             <div :class="styles.formGroup">
-              <label for="role">Role on this team</label>
+              <label for="role">{{ t('personModal.roleOnTeam') }}</label>
               <select id="role" v-model="form.role" :class="styles.formSelect">
-                <option :value="MEMBERSHIP_ROLES.PLAYER">
-                  {{ MEMBERSHIP_ROLE_LABELS[MEMBERSHIP_ROLES.PLAYER] }}
-                </option>
-                <option :value="MEMBERSHIP_ROLES.CAPTAIN">
-                  {{ MEMBERSHIP_ROLE_LABELS[MEMBERSHIP_ROLES.CAPTAIN] }}
-                </option>
-                <option :value="MEMBERSHIP_ROLES.COACH">
-                  {{ MEMBERSHIP_ROLE_LABELS[MEMBERSHIP_ROLES.COACH] }}
-                </option>
-                <option :value="MEMBERSHIP_ROLES.MANAGER">
-                  {{ MEMBERSHIP_ROLE_LABELS[MEMBERSHIP_ROLES.MANAGER] }}
+                <option
+                  v-for="(key, value) in MEMBERSHIP_ROLE_KEYS"
+                  :key="value"
+                  :value="Number(value)"
+                >
+                  {{ t(`roles.${key}`) }}
                 </option>
               </select>
             </div>
@@ -239,14 +238,14 @@ const closeModal = () => {
 
       <!-- Footer -->
       <div :class="styles.modalFooter">
-        <button @click="closeModal" :class="styles.btnSecondary">Cancel</button>
+        <button @click="closeModal" :class="styles.btnSecondary">{{ t('common.cancel') }}</button>
         <button
           @click="submitForm"
           :disabled="!isFormValid || isSubmitting"
           :class="styles.btnPrimary"
         >
-          <span v-if="isSubmitting">Saving...</span>
-          <span v-else>Save Changes</span>
+          <span v-if="isSubmitting">{{ t('personModal.saving') }}</span>
+          <span v-else>{{ t('personModal.saveChanges') }}</span>
         </button>
       </div>
     </div>

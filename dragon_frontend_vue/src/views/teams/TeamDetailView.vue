@@ -1,9 +1,10 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useTeamsStore } from '@/stores/teams'
 import { useMembershipStore } from '@/stores/membership'
-import { MEMBERSHIP_ROLE_LABELS, PERSON_SIDE_LABELS } from '@/constants'
+import { MEMBERSHIP_ROLE_KEYS, PERSON_SIDE_KEYS } from '@/constants'
 import AddPersonModal from '@/components/modals/AddPersonModal.vue'
 import styles from '@/assets/styles/team-detail.module.css'
 
@@ -12,6 +13,7 @@ const router = useRouter()
 const route = useRoute()
 const teamsStore = useTeamsStore()
 const membershipStore = useMembershipStore()
+const { t, locale } = useI18n()
 
 // Reactive data
 const team = ref(null)
@@ -121,10 +123,7 @@ const copyToClipboard = async (text) => {
 const deleteTeam = async () => {
   if (!canManage.value || !team.value) return
 
-  const confirmed = confirm(
-    `Delete "${team.value.name}"?\n\n` +
-      `This action cannot be undone and will remove the team and all associated data.`,
-  )
+  const confirmed = confirm(t('teamDetail.deleteConfirm', { name: team.value.name }))
   if (!confirmed) return
 
   try {
@@ -132,18 +131,20 @@ const deleteTeam = async () => {
     if (result.success) {
       router.push('/teams')
     } else {
-      alert(result.error || 'Failed to delete team')
+      alert(result.error || t('teamDetail.deleteFailed'))
     }
   } catch (error) {
     console.error('Delete team error:', error)
-    alert('An unexpected error occurred while deleting the team.')
+    alert(t('teamDetail.deleteUnexpected'))
   }
 }
 
+// Locale-aware date formatting: 'en' / 'tr' are valid BCP 47 tags,
+// so the active locale drives the format directly.
 const formatDate = (dateString) => {
-  if (!dateString) return 'Unknown'
+  if (!dateString) return t('common.unknown')
   const date = new Date(dateString)
-  return date.toLocaleDateString('en-US', {
+  return date.toLocaleDateString(locale.value, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -167,26 +168,25 @@ const editPerson = (membership) => {
 const removePerson = async (membership) => {
   if (!canManage.value) return
 
-  const confirmed = confirm(
-    `Remove "${membership.person.name}" from the team?\n\nThis action cannot be undone.`,
-  )
+  const confirmed = confirm(t('teamDetail.removeConfirm', { name: membership.person.name }))
   if (confirmed) {
     try {
       const result = await membershipStore.removePersonFromTeam(team.value.id, membership.person.id)
       if (result.success) {
         console.log('✅ Person removed from team:', membership.person.name)
       } else {
-        alert(`Failed to remove person: ${result.error}`)
+        alert(t('teamDetail.removeFailed', { error: result.error }))
       }
     } catch (error) {
       console.error('Remove person error:', error)
-      alert('An unexpected error occurred while removing the person.')
+      alert(t('teamDetail.removeUnexpected'))
     }
   }
 }
 
 const getRoleLabel = (role) => {
-  return MEMBERSHIP_ROLE_LABELS[role] || 'Unknown'
+  const key = MEMBERSHIP_ROLE_KEYS[role]
+  return key ? t(`roles.${key}`) : t('common.unknown')
 }
 
 const handlePersonAdded = (membership) => {
@@ -194,8 +194,11 @@ const handlePersonAdded = (membership) => {
   showAddPerson.value = false
 }
 
+// Side labels still come from constants (English-only) until the
+// constants file is available to map into locale keys.
 const getSideLabel = (side) => {
-  return PERSON_SIDE_LABELS[side] || 'Unknown'
+  const key = PERSON_SIDE_KEYS[side]
+  return key ? t(`sides.${key}`) : t('common.unknown')
 }
 
 const handleSearchChange = (event) => {
@@ -223,16 +226,18 @@ onUnmounted(() => {
     <!-- Loading State -->
     <div v-if="teamsStore.isLoading && !team" :class="styles.loadingState">
       <div :class="styles.loadingSpinner"></div>
-      <p>Loading team details...</p>
+      <p>{{ t('teamDetail.loadingDetails') }}</p>
     </div>
 
     <!-- Error State -->
     <div v-else-if="teamsStore.error && !team" :class="styles.errorState">
       <div :class="styles.errorIcon">⚠️</div>
-      <h3>Team Not Found</h3>
+      <h3>{{ t('teamDetail.notFoundTitle') }}</h3>
       <p>{{ teamsStore.error }}</p>
-      <button @click="loadTeam" :class="styles.btnRetry">Try Again</button>
-      <router-link to="/teams" :class="styles.btnSecondary">← Back to Teams</router-link>
+      <button @click="loadTeam" :class="styles.btnRetry">{{ t('common.tryAgain') }}</button>
+      <router-link to="/teams" :class="styles.btnSecondary">
+        ← {{ t('teamDetail.backToTeams') }}
+      </router-link>
     </div>
 
     <!-- Team Details -->
@@ -247,7 +252,7 @@ onUnmounted(() => {
             d="M15 19l-7-7 7-7"
           />
         </svg>
-        Back to Teams
+        {{ t('teamDetail.backToTeams') }}
       </router-link>
 
       <!-- Team Header -->
@@ -259,12 +264,12 @@ onUnmounted(() => {
               <div :class="styles.teamTitleLeft">
                 <h1>{{ team.name }}</h1>
                 <div :class="styles.teamBadges">
-                  <span v-if="isTeamFull" :class="[styles.statusBadge, styles.full]"
-                    >Team Full</span
-                  >
-                  <span v-else-if="isAlmostFull" :class="[styles.statusBadge, styles.almostFull]"
-                    >Almost Full</span
-                  >
+                  <span v-if="isTeamFull" :class="[styles.statusBadge, styles.full]">
+                    {{ t('teamDetail.teamFull') }}
+                  </span>
+                  <span v-else-if="isAlmostFull" :class="[styles.statusBadge, styles.almostFull]">
+                    {{ t('teamDetail.almostFull') }}
+                  </span>
                 </div>
               </div>
 
@@ -278,7 +283,7 @@ onUnmounted(() => {
                       d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                     />
                   </svg>
-                  View Trainings
+                  {{ t('teamDetail.viewTrainings') }}
                 </router-link>
 
                 <!-- edit/delete: only for manager/coach/captain -->
@@ -286,7 +291,7 @@ onUnmounted(() => {
                   <router-link
                     :to="`/teams/${team.id}/edit?from=detail`"
                     :class="styles.actionBtnTeam"
-                    title="Edit Team"
+                    :title="t('teamDetail.editTeam')"
                   >
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
@@ -300,7 +305,7 @@ onUnmounted(() => {
                   <button
                     @click="deleteTeam"
                     :class="[styles.actionBtnTeam, styles.delete]"
-                    title="Delete Team"
+                    :title="t('teamDetail.deleteTeam')"
                   >
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
@@ -319,17 +324,17 @@ onUnmounted(() => {
             <div :class="styles.teamMeta">
               <div :class="styles.teamStats">
                 <div :class="styles.statItem">
-                  <span :class="styles.statLabel">Members</span>
+                  <span :class="styles.statLabel">{{ t('teamDetail.members') }}</span>
                   <span :class="styles.statValue"
                     >{{ currentMemberCount }}/{{ team.max_members || 22 }}</span
                   >
                 </div>
                 <div v-if="team.city" :class="styles.statItem">
-                  <span :class="styles.statLabel">Location</span>
+                  <span :class="styles.statLabel">{{ t('teamDetail.location') }}</span>
                   <span :class="styles.statValue">{{ team.city }}</span>
                 </div>
                 <div :class="styles.statItem">
-                  <span :class="styles.statLabel">Created</span>
+                  <span :class="styles.statLabel">{{ t('teamDetail.created') }}</span>
                   <span :class="styles.statValue">{{ formatDate(team.created_at) }}</span>
                 </div>
               </div>
@@ -337,7 +342,7 @@ onUnmounted(() => {
               <!-- Invite Code (compact) -->
               <div v-if="team.code" :class="styles.inviteBox">
                 <div>
-                  <div :class="styles.inviteLabel">Invite code</div>
+                  <div :class="styles.inviteLabel">{{ t('teamDetail.inviteLabel') }}</div>
                   <div :class="styles.inviteCode">{{ team.code }}</div>
                 </div>
                 <button
@@ -360,7 +365,7 @@ onUnmounted(() => {
                       d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
                     />
                   </svg>
-                  {{ codeCopied ? 'Copied!' : 'Copy' }}
+                  {{ codeCopied ? t('common.copied') : t('teamDetail.copy') }}
                 </button>
               </div>
             </div>
@@ -376,7 +381,9 @@ onUnmounted(() => {
                   :style="{ width: `${memberProgress}%` }"
                 ></div>
               </div>
-              <span :class="styles.progressText">{{ memberProgress.toFixed(0) }}% Full</span>
+              <span :class="styles.progressText">
+                {{ t('teamDetail.percentFull', { percent: memberProgress.toFixed(0) }) }}
+              </span>
             </div>
           </div>
         </div>
@@ -387,7 +394,7 @@ onUnmounted(() => {
         <div :class="styles.sectionContent">
           <!-- Members Header -->
           <div :class="styles.membersHeader">
-            <h2>Team Members</h2>
+            <h2>{{ t('teamDetail.membersTitle') }}</h2>
             <div :class="styles.membersControls">
               <!-- Search -->
               <div :class="styles.searchBox">
@@ -403,7 +410,7 @@ onUnmounted(() => {
                   :value="membershipStore.searchQuery"
                   @input="handleSearchChange"
                   type="text"
-                  placeholder="Search members..."
+                  :placeholder="t('teamDetail.searchPlaceholder')"
                   :class="styles.searchInput"
                 />
               </div>
@@ -414,11 +421,11 @@ onUnmounted(() => {
                 @change="handleRoleFilterChange"
                 :class="styles.roleFilter"
               >
-                <option value="">All Roles</option>
-                <option value="1">Player</option>
-                <option value="2">Captain</option>
-                <option value="3">Coach</option>
-                <option value="4">Manager</option>
+                <option value="">{{ t('teamDetail.allRoles') }}</option>
+                <option value="1">{{ t('roles.player') }}</option>
+                <option value="2">{{ t('roles.captain') }}</option>
+                <option value="3">{{ t('roles.coach') }}</option>
+                <option value="4">{{ t('roles.manager') }}</option>
               </select>
 
               <!-- Add Person lives with the members it affects -->
@@ -436,7 +443,7 @@ onUnmounted(() => {
                     d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                   />
                 </svg>
-                Add Person
+                {{ t('teamDetail.addPerson') }}
               </button>
             </div>
           </div>
@@ -444,15 +451,17 @@ onUnmounted(() => {
           <!-- Members Loading -->
           <div v-if="membershipStore.isLoading" :class="styles.membersLoading">
             <div :class="styles.loadingSpinner"></div>
-            <p>Loading members...</p>
+            <p>{{ t('teamDetail.loadingMembers') }}</p>
           </div>
 
           <!-- Members Error -->
           <div v-else-if="membershipStore.error" :class="styles.errorState">
             <div :class="styles.errorIcon">⚠️</div>
-            <h3>Error Loading Members</h3>
+            <h3>{{ t('teamDetail.membersErrorTitle') }}</h3>
             <p>{{ membershipStore.error }}</p>
-            <button @click="loadMembers" :class="styles.btnRetry">Try Again</button>
+            <button @click="loadMembers" :class="styles.btnRetry">
+              {{ t('common.tryAgain') }}
+            </button>
           </div>
 
           <!-- Empty Members -->
@@ -461,15 +470,15 @@ onUnmounted(() => {
             <h3>
               {{
                 membershipStore.searchQuery || membershipStore.filters.role
-                  ? 'No members found'
-                  : 'No members yet'
+                  ? t('teamDetail.noMembersFound')
+                  : t('teamDetail.noMembersYet')
               }}
             </h3>
             <p>
               {{
                 membershipStore.searchQuery || membershipStore.filters.role
-                  ? 'Try adjusting your search or filter'
-                  : 'Start building your dragon boat team by adding members'
+                  ? t('teamDetail.adjustFilter')
+                  : t('teamDetail.startBuilding')
               }}
             </p>
             <button
@@ -477,7 +486,7 @@ onUnmounted(() => {
               @click="showAddPerson = true"
               :class="styles.btnPrimary"
             >
-              Add First Member
+              {{ t('teamDetail.addFirstMember') }}
             </button>
           </div>
 
@@ -519,7 +528,7 @@ onUnmounted(() => {
                     🧭 {{ getSideLabel(membership.person.side) }}
                   </span>
                   <span v-if="membership.joined_at" :class="styles.detailItem">
-                    📅 Joined {{ formatDate(membership.joined_at) }}
+                    📅 {{ t('teamDetail.joined', { date: formatDate(membership.joined_at) }) }}
                   </span>
                 </div>
               </div>
@@ -528,7 +537,7 @@ onUnmounted(() => {
                 <button
                   @click="editPerson(membership)"
                   :class="[styles.actionBtnMember, styles.edit]"
-                  title="Edit Person"
+                  :title="t('teamDetail.editPerson')"
                 >
                   <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
@@ -542,7 +551,7 @@ onUnmounted(() => {
                 <button
                   @click="removePerson(membership)"
                   :class="[styles.actionBtnMember, styles.delete]"
-                  title="Remove Person"
+                  :title="t('teamDetail.removePerson')"
                 >
                   <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path

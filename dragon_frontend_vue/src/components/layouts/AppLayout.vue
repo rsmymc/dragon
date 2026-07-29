@@ -1,12 +1,15 @@
 <script setup>
 import { ref, computed, watch, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth.js'
+import { setLocale, SUPPORTED_LOCALES } from '@/i18n.js'
 import styles from '@/assets/styles/app-layout.module.css'
 
 const router = useRouter()
 const route = useRoute()
 const auth = useAuthStore()
+const { t, locale } = useI18n()
 
 // UI State
 const sidebarCollapsed = ref(false) // desktop collapse (unchanged)
@@ -15,20 +18,20 @@ const mobileOpen = ref(false) // mobile drawer open/closed
 // Computed properties
 const currentUser = computed(() => auth.person?.name || auth.username)
 
-// Navigation items
+// Navigation items (labelKey is translated reactively in the template)
 const navigationItems = [
   {
-    name: 'My Teams',
+    labelKey: 'layout.myTeams',
     path: '/teams',
     icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10',
   },
   {
-    name: 'Profile',
+    labelKey: 'layout.profile',
     path: '/profile',
     icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z',
   },
   {
-    name: 'Settings',
+    labelKey: 'layout.settings',
     path: '/settings',
     icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z',
   },
@@ -45,6 +48,10 @@ const toggleMobile = () => {
 
 const closeMobile = () => {
   mobileOpen.value = false
+}
+
+const switchLocale = (code) => {
+  setLocale(code)
 }
 
 // Close the drawer whenever the route changes (e.g. after tapping a nav item)
@@ -78,7 +85,7 @@ const handleLogout = async () => {
         type="button"
         :class="styles.hamburger"
         @click="toggleMobile"
-        aria-label="Toggle navigation menu"
+        :aria-label="t('layout.toggleMenu')"
         :aria-expanded="mobileOpen"
       >
         <svg :class="styles.hamburgerIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -98,13 +105,16 @@ const handleLogout = async () => {
 
     <!-- Sidebar -->
     <aside
-      :class="[styles.sidebar, { collapsed: sidebarCollapsed, [styles.mobileOpen]: mobileOpen }]"
+      :class="[
+        styles.sidebar,
+        { [styles.collapsed]: sidebarCollapsed, [styles.mobileOpen]: mobileOpen },
+      ]"
     >
       <!-- Logo -->
       <div :class="styles.sidebarHeader">
         <div :class="styles.logoContainer">
           <img
-            alt="Vue logo"
+            alt="DragonBoat Logo"
             :class="styles.logo"
             src="../../assets/images/logo.png"
             width="196"
@@ -120,30 +130,48 @@ const handleLogout = async () => {
           :key="item.path"
           :to="item.path"
           :class="styles.navItem"
-          :title="sidebarCollapsed ? item.name : ''"
+          :title="sidebarCollapsed ? t(item.labelKey) : ''"
           @click="closeMobile"
         >
           <svg :class="styles.navIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="item.icon" />
           </svg>
-          <span v-if="!sidebarCollapsed" :class="styles.navText">{{ item.name }}</span>
+          <span v-if="!sidebarCollapsed" :class="styles.navText">{{ t(item.labelKey) }}</span>
         </RouterLink>
       </nav>
 
       <!-- User Section -->
       <div :class="styles.sidebarFooter">
-        <div :class="[styles.userSection, { collapsed: sidebarCollapsed }]">
+        <!-- Language Switcher -->
+        <div
+          v-if="!sidebarCollapsed"
+          :class="styles.langSwitcher"
+          role="group"
+          :aria-label="t('layout.language')"
+        >
+          <button
+            v-for="code in SUPPORTED_LOCALES"
+            :key="code"
+            type="button"
+            :class="[styles.langButton, { [styles.langButtonActive]: locale === code }]"
+            @click="switchLocale(code)"
+          >
+            {{ code.toUpperCase() }}
+          </button>
+        </div>
+
+        <div :class="[styles.userSection, { [styles.collapsed]: sidebarCollapsed }]">
           <div :class="styles.userAvatar">
             {{ auth.userInitials }}
           </div>
           <div v-if="!sidebarCollapsed" :class="styles.userInfo">
-            <div :class="styles.userName">{{ currentUser || 'User' }}</div>
+            <div :class="styles.userName">{{ currentUser || t('layout.user') }}</div>
           </div>
         </div>
         <button
           @click="handleLogout"
           :class="styles.logoutButton"
-          :title="sidebarCollapsed ? 'Logout' : ''"
+          :title="sidebarCollapsed ? t('layout.logout') : ''"
         >
           <svg :class="styles.logoutIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
@@ -153,7 +181,7 @@ const handleLogout = async () => {
               d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
             />
           </svg>
-          <span v-if="!sidebarCollapsed">Logout</span>
+          <span v-if="!sidebarCollapsed">{{ t('layout.logout') }}</span>
         </button>
       </div>
     </aside>

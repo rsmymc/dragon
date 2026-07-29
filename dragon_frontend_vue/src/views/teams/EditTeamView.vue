@@ -1,6 +1,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useTeamsStore } from '@/stores/teams'
 import styles from '@/assets/styles/edit-team.module.css'
 
@@ -8,6 +9,7 @@ import styles from '@/assets/styles/edit-team.module.css'
 const router = useRouter()
 const route = useRoute()
 const teamsStore = useTeamsStore()
+const { t } = useI18n()
 
 // Reactive data
 const team = ref(null)
@@ -28,9 +30,12 @@ const isFormValid = computed(() => {
 
 // Where to return to, based on where the user came from (?from=detail|list)
 const backTarget = computed(() =>
-  route.query.from === 'detail' ? `/teams/${route.params.id}` : '/teams',
+  route.query.from === 'detail' ? `/teams/${route.params.id}/trainings` : '/teams',
 )
-const backLabel = computed(() => (route.query.from === 'detail' ? 'Back to Team' : 'Back to Teams'))
+// t() inside a computed stays reactive: the label re-evaluates on locale change
+const backLabel = computed(() =>
+  route.query.from === 'detail' ? t('editTeam.backToTeam') : t('editTeam.backToTeams'),
+)
 
 // Methods
 const loadTeam = async () => {
@@ -72,11 +77,11 @@ const validateForm = () => {
 
   // Name validation
   if (!formData.name.trim()) {
-    errors.name = 'Team name is required'
+    errors.name = t('editTeam.nameRequired')
   } else if (formData.name.length < 2) {
-    errors.name = 'Team name must be at least 2 characters'
+    errors.name = t('editTeam.nameMinLength')
   } else if (formData.name.length > 100) {
-    errors.name = 'Team name must be less than 100 characters'
+    errors.name = t('editTeam.nameMaxLength')
   }
 
   return Object.keys(errors).length === 0
@@ -87,7 +92,7 @@ const handleSubmit = async () => {
 
   // Validate form
   if (!validateForm()) {
-    formError.value = 'Please fix the errors above'
+    formError.value = t('editTeam.fixErrors')
     return
   }
 
@@ -97,11 +102,11 @@ const handleSubmit = async () => {
     if (result.success) {
       router.push(backTarget.value)
     } else {
-      formError.value = result.error || 'Failed to update team'
+      formError.value = result.error || t('editTeam.updateFailed')
     }
   } catch (error) {
     console.error('Update error:', error)
-    formError.value = 'An unexpected error occurred. Please try again.'
+    formError.value = t('common.unexpectedError')
   }
 }
 
@@ -116,16 +121,18 @@ onMounted(() => {
     <!-- Loading State -->
     <div v-if="teamsStore.isLoading && !team" :class="styles.loadingState">
       <div :class="styles.loadingSpinner"></div>
-      <p>Loading team details...</p>
+      <p>{{ t('editTeam.loading') }}</p>
     </div>
 
     <!-- Error State -->
     <div v-else-if="teamsStore.error && !team" :class="styles.errorState">
       <div :class="styles.errorIcon">⚠️</div>
-      <h3>Error Loading Team</h3>
+      <h3>{{ t('editTeam.errorTitle') }}</h3>
       <p>{{ teamsStore.error }}</p>
-      <button @click="loadTeam" :class="styles.btnRetry">Try Again</button>
-      <router-link to="/teams" :class="styles.btnSecondary">← Back to Teams</router-link>
+      <button @click="loadTeam" :class="styles.btnRetry">{{ t('common.tryAgain') }}</button>
+      <router-link to="/teams" :class="styles.btnSecondary">
+        ← {{ t('editTeam.backToTeams') }}
+      </router-link>
     </div>
 
     <!-- Edit Form -->
@@ -144,7 +151,7 @@ onMounted(() => {
             </svg>
             {{ backLabel }}
           </router-link>
-          <h1>Edit Team: {{ team.name }}</h1>
+          <h1>{{ t('editTeam.title', { name: team.name }) }}</h1>
           <!--          <p :class="styles.subtitle">Update your dragon boat team information</p>-->
         </div>
       </div>
@@ -154,14 +161,14 @@ onMounted(() => {
         <!-- Team Name -->
         <div :class="styles.formGroup">
           <label for="name" :class="styles.formLabel">
-            Team Name <span :class="styles.required">*</span>
+            {{ t('editTeam.nameLabel') }} <span :class="styles.required">*</span>
           </label>
           <input
             id="name"
             v-model="formData.name"
             type="text"
             :class="[styles.formInput, { [styles.error]: errors.name }]"
-            placeholder="Enter team name"
+            :placeholder="t('editTeam.namePlaceholder')"
             required
           />
           <span v-if="errors.name" :class="styles.errorMessage">{{ errors.name }}</span>
@@ -170,7 +177,9 @@ onMounted(() => {
         <!-- Team Settings -->
         <div :class="styles.formRow">
           <div :class="styles.formGroup">
-            <label for="max_members" :class="styles.formLabel">Max Members</label>
+            <label for="max_members" :class="styles.formLabel">
+              {{ t('editTeam.maxMembersLabel') }}
+            </label>
             <input
               id="max_members"
               v-model.number="formData.max_members"
@@ -180,16 +189,16 @@ onMounted(() => {
               max="50"
               placeholder="22"
             />
-            <span :class="styles.formHint">Standard dragon boat teams have 22 members</span>
+            <span :class="styles.formHint">{{ t('editTeam.maxMembersHelp') }}</span>
           </div>
           <div :class="styles.formGroup">
-            <label for="city" :class="styles.formLabel">City/Location</label>
+            <label for="city" :class="styles.formLabel">{{ t('editTeam.cityLabel') }}</label>
             <input
               id="city"
               v-model="formData.city"
               type="text"
               :class="styles.formInput"
-              placeholder="Team location"
+              :placeholder="t('editTeam.cityPlaceholder')"
             />
           </div>
         </div>
@@ -202,14 +211,16 @@ onMounted(() => {
 
         <!-- Form Actions -->
         <div :class="styles.formActions">
-          <router-link :to="backTarget" :class="styles.btnCancel">Cancel</router-link>
+          <router-link :to="backTarget" :class="styles.btnCancel">
+            {{ t('common.cancel') }}
+          </router-link>
           <button
             type="submit"
             :class="styles.btnPrimary"
             :disabled="teamsStore.isLoading || !isFormValid"
           >
             <span v-if="teamsStore.isLoading" :class="[styles.loadingSpinner, styles.small]"></span>
-            {{ teamsStore.isLoading ? 'Updating...' : 'Update Team' }}
+            {{ teamsStore.isLoading ? t('editTeam.submitting') : t('editTeam.submit') }}
           </button>
         </div>
       </form>

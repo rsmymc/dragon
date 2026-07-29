@@ -1,14 +1,9 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { usePersonsStore } from '@/stores/persons.js'
 import { useMembershipStore } from '@/stores/membership.js'
-import {
-  MEMBERSHIP_ROLE_LABELS,
-  PERSON_SIDE_LABELS,
-  DEFAULT_FORM_VALUES,
-  MEMBERSHIP_ROLES,
-  PERSON_SIDES,
-} from '@/constants.js'
+import { MEMBERSHIP_ROLE_KEYS, PERSON_SIDE_KEYS, DEFAULT_FORM_VALUES } from '@/constants.js'
 import styles from '@/assets/styles/add-person-to-team.module.css'
 
 // Props
@@ -29,6 +24,7 @@ const emit = defineEmits(['close', 'success'])
 // Stores
 const personsStore = usePersonsStore()
 const membershipStore = useMembershipStore()
+const { t } = useI18n()
 
 // Form data
 const personForm = ref({ ...DEFAULT_FORM_VALUES.PERSON })
@@ -51,22 +47,22 @@ const validateForm = () => {
 
   // Validate name
   if (!personForm.value.name.trim()) {
-    formErrors.value.name = 'Name is required'
+    formErrors.value.name = t('personForm.nameRequired')
   }
 
   // Validate phone (if provided)
   if (personForm.value.phone && !/^[\+]?[\d\s\-\(\)]+$/.test(personForm.value.phone)) {
-    formErrors.value.phone = 'Please enter a valid phone number'
+    formErrors.value.phone = t('personForm.phoneInvalid')
   }
 
   // Validate height (if provided)
   if (personForm.value.height && (personForm.value.height < 100 || personForm.value.height > 250)) {
-    formErrors.value.height = 'Height should be between 100-250 cm'
+    formErrors.value.height = t('personForm.heightRange')
   }
 
   // Validate weight (if provided)
   if (personForm.value.weight && (personForm.value.weight < 30 || personForm.value.weight > 200)) {
-    formErrors.value.weight = 'Weight should be between 30-200 kg'
+    formErrors.value.weight = t('personForm.weightRange')
   }
 
   return Object.keys(formErrors.value).length === 0
@@ -81,7 +77,7 @@ const submitForm = async () => {
     // Step 1: Create the person
     const personResult = await personsStore.createPerson(personForm.value)
     if (!personResult.success) {
-      alert(`Failed to create person: ${personResult.error}`)
+      alert(t('personModal.createFailed', { error: personResult.error }))
       return
     }
 
@@ -95,11 +91,11 @@ const submitForm = async () => {
     if (result.success) {
       emit('success', result.membership)
     } else {
-      alert(`Failed to add person to team: ${result.error}`)
+      alert(t('personModal.addFailed', { error: result.error }))
     }
   } catch (error) {
     console.error('Add person error:', error)
-    alert('An unexpected error occurred while adding the person.')
+    alert(t('personModal.addUnexpected'))
   } finally {
     isSubmitting.value = false
   }
@@ -124,8 +120,8 @@ onMounted(() => {
     <div :class="styles.modalContent" @click.stop>
       <!-- Modal Header -->
       <div :class="styles.modalHeader">
-        <h2>Add Person to {{ teamName }}</h2>
-        <button @click="closeModal" :class="styles.closeBtn" aria-label="Close">
+        <h2>{{ t('personModal.addTitle', { team: teamName }) }}</h2>
+        <button @click="closeModal" :class="styles.closeBtn" :aria-label="t('common.close')">
           <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
@@ -142,17 +138,19 @@ onMounted(() => {
         <form @submit.prevent="submitForm">
           <!-- Person Details -->
           <div :class="styles.formSection">
-            <h3>Person Details</h3>
+            <h3>{{ t('personForm.personDetails') }}</h3>
 
             <!-- Name -->
             <div :class="styles.formGroup">
-              <label for="name">Name <span :class="styles.required">*</span></label>
+              <label for="name">
+                {{ t('personForm.name') }} <span :class="styles.required">*</span>
+              </label>
               <input
                 id="name"
                 v-model="personForm.name"
                 type="text"
                 :class="[styles.formInput, { [styles.error]: formErrors.name }]"
-                placeholder="Enter full name"
+                :placeholder="t('personForm.namePlaceholder')"
                 required
               />
               <span v-if="formErrors.name" :class="styles.errorMessage">{{ formErrors.name }}</span>
@@ -160,23 +158,23 @@ onMounted(() => {
 
             <!-- Phone -->
             <div :class="styles.formGroup">
-              <label for="phone">Phone</label>
+              <label for="phone">{{ t('personForm.phone') }}</label>
               <input
                 id="phone"
                 v-model="personForm.phone"
                 type="tel"
                 :class="[styles.formInput, { [styles.error]: formErrors.phone }]"
-                placeholder="Enter phone number"
+                :placeholder="t('personForm.phonePlaceholder')"
               />
               <span v-if="formErrors.phone" :class="styles.errorMessage">{{
-                formErrors.phone
-              }}</span>
+                  formErrors.phone
+                }}</span>
             </div>
 
             <!-- Height and Weight -->
             <div :class="styles.formRow">
               <div :class="styles.formGroup">
-                <label for="height">Height (cm)</label>
+                <label for="height">{{ t('personForm.height') }}</label>
                 <input
                   id="height"
                   v-model="personForm.height"
@@ -187,12 +185,12 @@ onMounted(() => {
                   max="250"
                 />
                 <span v-if="formErrors.height" :class="styles.errorMessage">{{
-                  formErrors.height
-                }}</span>
+                    formErrors.height
+                  }}</span>
               </div>
 
               <div :class="styles.formGroup">
-                <label for="weight">Weight (kg)</label>
+                <label for="weight">{{ t('personForm.weight') }}</label>
                 <input
                   id="weight"
                   v-model="personForm.weight"
@@ -203,23 +201,21 @@ onMounted(() => {
                   max="200"
                 />
                 <span v-if="formErrors.weight" :class="styles.errorMessage">{{
-                  formErrors.weight
-                }}</span>
+                    formErrors.weight
+                  }}</span>
               </div>
             </div>
 
             <!-- Side Preference -->
             <div :class="styles.formGroup">
-              <label for="side">Side Preference</label>
+              <label for="side">{{ t('personForm.sideLabel') }}</label>
               <select id="side" v-model="personForm.side" :class="styles.formSelect">
-                <option :value="PERSON_SIDES.BOTH">
-                  {{ PERSON_SIDE_LABELS[PERSON_SIDES.BOTH] }}
-                </option>
-                <option :value="PERSON_SIDES.LEFT">
-                  {{ PERSON_SIDE_LABELS[PERSON_SIDES.LEFT] }}
-                </option>
-                <option :value="PERSON_SIDES.RIGHT">
-                  {{ PERSON_SIDE_LABELS[PERSON_SIDES.RIGHT] }}
+                <option
+                  v-for="(key, value) in PERSON_SIDE_KEYS"
+                  :key="value"
+                  :value="Number(value)"
+                >
+                  {{ t(`sides.${key}`) }}
                 </option>
               </select>
             </div>
@@ -227,23 +223,18 @@ onMounted(() => {
 
           <!-- Membership Details -->
           <div :class="styles.formSection">
-            <h3>Membership Details</h3>
+            <h3>{{ t('personModal.membershipDetails') }}</h3>
 
             <!-- Role -->
             <div :class="styles.formGroup">
-              <label for="role">Role</label>
+              <label for="role">{{ t('personModal.roleLabel') }}</label>
               <select id="role" v-model="membershipForm.role" :class="styles.formSelect">
-                <option :value="MEMBERSHIP_ROLES.PLAYER">
-                  {{ MEMBERSHIP_ROLE_LABELS[MEMBERSHIP_ROLES.PLAYER] }}
-                </option>
-                <option :value="MEMBERSHIP_ROLES.CAPTAIN">
-                  {{ MEMBERSHIP_ROLE_LABELS[MEMBERSHIP_ROLES.CAPTAIN] }}
-                </option>
-                <option :value="MEMBERSHIP_ROLES.COACH">
-                  {{ MEMBERSHIP_ROLE_LABELS[MEMBERSHIP_ROLES.COACH] }}
-                </option>
-                <option :value="MEMBERSHIP_ROLES.MANAGER">
-                  {{ MEMBERSHIP_ROLE_LABELS[MEMBERSHIP_ROLES.MANAGER] }}
+                <option
+                  v-for="(key, value) in MEMBERSHIP_ROLE_KEYS"
+                  :key="value"
+                  :value="Number(value)"
+                >
+                  {{ t(`roles.${key}`) }}
                 </option>
               </select>
             </div>
@@ -253,14 +244,14 @@ onMounted(() => {
 
       <!-- Modal Footer -->
       <div :class="styles.modalFooter">
-        <button @click="closeModal" :class="styles.btnSecondary">Cancel</button>
+        <button @click="closeModal" :class="styles.btnSecondary">{{ t('common.cancel') }}</button>
         <button
           @click="submitForm"
           :disabled="!isFormValid || isSubmitting"
           :class="styles.btnPrimary"
         >
-          <span v-if="isSubmitting">Adding...</span>
-          <span v-else>Add to Team</span>
+          <span v-if="isSubmitting">{{ t('personModal.adding') }}</span>
+          <span v-else>{{ t('personModal.addSubmit') }}</span>
         </button>
       </div>
     </div>

@@ -8,6 +8,17 @@ export const MEMBERSHIP_ROLES = {
   MANAGER: 4,
 }
 
+// i18n key fragments per role: components resolve display text via
+// t(`teamDetail.roles.${MEMBERSHIP_ROLE_KEYS[role]}`) at render time.
+export const MEMBERSHIP_ROLE_KEYS = {
+  [MEMBERSHIP_ROLES.PLAYER]: 'player',
+  [MEMBERSHIP_ROLES.CAPTAIN]: 'captain',
+  [MEMBERSHIP_ROLES.COACH]: 'coach',
+  [MEMBERSHIP_ROLES.MANAGER]: 'manager',
+}
+
+// DEPRECATED for display: English-only. Kept until all consumers use
+// MEMBERSHIP_ROLE_KEYS + locale files. Do not use in new code.
 export const MEMBERSHIP_ROLE_LABELS = {
   [MEMBERSHIP_ROLES.PLAYER]: 'Player',
   [MEMBERSHIP_ROLES.CAPTAIN]: 'Captain',
@@ -22,6 +33,16 @@ export const PERSON_SIDES = {
   RIGHT: 2,
 }
 
+// i18n key fragments per side: components resolve display text via
+// t(`teamDetail.sides.${PERSON_SIDE_KEYS[side]}`) at render time.
+export const PERSON_SIDE_KEYS = {
+  [PERSON_SIDES.BOTH]: 'both',
+  [PERSON_SIDES.LEFT]: 'left',
+  [PERSON_SIDES.RIGHT]: 'right',
+}
+
+// DEPRECATED for display: English-only. Kept until all consumers use
+// PERSON_SIDE_KEYS + locale files. Do not use in new code.
 export const PERSON_SIDE_LABELS = {
   [PERSON_SIDES.BOTH]: 'Both Sides',
   [PERSON_SIDES.LEFT]: 'Left Side',
@@ -78,6 +99,9 @@ export const SORT_OPTIONS = {
 }
 
 // Error Messages
+// NOTE: English-only; likely referenced from stores. Translating these means
+// having stores return message KEYS and views resolve them with t() — a
+// separate refactor, tracked as an i18n follow-up.
 export const ERROR_MESSAGES = {
   NETWORK_ERROR: 'Network error. Please check your connection.',
   UNAUTHORIZED: 'You are not authorized to perform this action.',
@@ -89,6 +113,7 @@ export const ERROR_MESSAGES = {
 }
 
 // Success Messages
+// NOTE: same i18n follow-up as ERROR_MESSAGES above.
 export const SUCCESS_MESSAGES = {
   PERSON_CREATED: 'Person created successfully',
   PERSON_UPDATED: 'Person updated successfully',
@@ -169,8 +194,10 @@ export const DEFAULT_FORM_VALUES = {
 // Export all constants as a single object for convenience
 export default {
   MEMBERSHIP_ROLES,
+  MEMBERSHIP_ROLE_KEYS,
   MEMBERSHIP_ROLE_LABELS,
   PERSON_SIDES,
+  PERSON_SIDE_KEYS,
   PERSON_SIDE_LABELS,
   TEAM_STATUS,
   API_STATUS,

@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useTeamsStore } from '@/stores/teams'
 import { useMembershipStore } from '@/stores/membership'
 import styles from '@/assets/styles/team-layout.module.css'
@@ -9,6 +10,7 @@ const route = useRoute()
 const router = useRouter()
 const teamsStore = useTeamsStore()
 const membershipStore = useMembershipStore()
+const { t } = useI18n()
 
 const team = ref(null)
 const codeCopied = ref(false)
@@ -95,10 +97,7 @@ const copyToClipboard = async (text) => {
 const deleteTeam = async () => {
   if (!canManage.value || !team.value) return
 
-  const confirmed = confirm(
-    `Delete "${team.value.name}"?\n\n` +
-      `This action cannot be undone and will remove the team and all associated data.`,
-  )
+  const confirmed = confirm(t('teamDetail.deleteConfirm', { name: team.value.name }))
   if (!confirmed) return
 
   try {
@@ -106,11 +105,11 @@ const deleteTeam = async () => {
     if (result.success) {
       router.push('/teams')
     } else {
-      alert(result.error || 'Failed to delete team')
+      alert(result.error || t('teamDetail.deleteFailed'))
     }
   } catch (error) {
     console.error('Delete team error:', error)
-    alert('An unexpected error occurred while deleting the team.')
+    alert(t('teamDetail.deleteUnexpected'))
   }
 }
 
@@ -131,16 +130,18 @@ onUnmounted(() => {
     <!-- Loading State (team identity) -->
     <div v-if="teamsStore.isLoading && !team" :class="styles.loadingState">
       <div :class="styles.loadingSpinner"></div>
-      <p>Loading team...</p>
+      <p>{{ t('teamDetail.loadingTeam') }}</p>
     </div>
 
     <!-- Error State -->
     <div v-else-if="teamsStore.error && !team" :class="styles.errorState">
       <div :class="styles.errorIcon">⚠️</div>
-      <h3>Team Not Found</h3>
+      <h3>{{ t('teamDetail.notFoundTitle') }}</h3>
       <p>{{ teamsStore.error }}</p>
-      <button @click="loadTeam" :class="styles.btnRetry">Try Again</button>
-      <router-link to="/teams" :class="styles.btnSecondary">← Back to Teams</router-link>
+      <button @click="loadTeam" :class="styles.btnRetry">{{ t('common.tryAgain') }}</button>
+      <router-link to="/teams" :class="styles.btnSecondary">
+        ← {{ t('teamDetail.backToTeams') }}
+      </router-link>
     </div>
 
     <!-- Team shell -->
@@ -155,7 +156,7 @@ onUnmounted(() => {
             d="M15 19l-7-7 7-7"
           />
         </svg>
-        Back to Teams
+        {{ t('teamDetail.backToTeams') }}
       </router-link>
 
       <!-- Header card: identity + summary + tabs (persistent across tabs) -->
@@ -168,7 +169,7 @@ onUnmounted(() => {
             <router-link
               :to="`/teams/${teamId}/edit?from=detail`"
               :class="styles.actionBtnTeam"
-              title="Edit Team"
+              :title="t('teamDetail.editTeam')"
             >
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -182,7 +183,7 @@ onUnmounted(() => {
             <button
               @click="deleteTeam"
               :class="[styles.actionBtnTeam, styles.delete]"
-              title="Delete Team"
+              :title="t('teamDetail.deleteTeam')"
             >
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -200,11 +201,11 @@ onUnmounted(() => {
         <div :class="styles.teamMeta">
           <div :class="styles.teamStats">
             <div :class="styles.statItem">
-              <span :class="styles.statLabel">Members</span>
+              <span :class="styles.statLabel">{{ t('teamDetail.members') }}</span>
               <span :class="styles.statValue">{{ currentMemberCount }}/{{ maxMembers }}</span>
             </div>
             <div v-if="team.city" :class="styles.statItem">
-              <span :class="styles.statLabel">Location</span>
+              <span :class="styles.statLabel">{{ t('teamDetail.location') }}</span>
               <span :class="styles.statValue">{{ team.city }}</span>
             </div>
           </div>
@@ -212,7 +213,7 @@ onUnmounted(() => {
           <button
             v-if="team.code"
             @click="copyTeamCode"
-            :title="codeCopied ? 'Copied!' : 'Copy team code'"
+            :title="codeCopied ? t('common.copied') : t('teamDetail.copyCodeTitle')"
             :class="styles.codeBadge"
             :style="
               codeCopied
@@ -225,7 +226,7 @@ onUnmounted(() => {
             "
           >
             <template v-if="codeCopied">
-              Copied!
+              {{ t('common.copied') }}
               <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -261,12 +262,16 @@ onUnmounted(() => {
                 :style="{ width: `${memberProgress}%` }"
               ></div>
             </div>
-            <span :class="styles.progressText">{{ memberProgress.toFixed(0) }}% Full</span>
+            <span :class="styles.progressText">
+              {{ t('teamDetail.percentFull', { percent: memberProgress.toFixed(0) }) }}
+            </span>
           </div>
-          <span v-if="isTeamFull" :class="[styles.statusBadge, styles.full]">Team Full</span>
-          <span v-else-if="isAlmostFull" :class="[styles.statusBadge, styles.almostFull]"
-            >Almost Full</span
-          >
+          <span v-if="isTeamFull" :class="[styles.statusBadge, styles.full]">
+            {{ t('teamDetail.teamFull') }}
+          </span>
+          <span v-else-if="isAlmostFull" :class="[styles.statusBadge, styles.almostFull]">
+            {{ t('teamDetail.almostFull') }}
+          </span>
         </div>
       </div>
 
@@ -292,7 +297,7 @@ onUnmounted(() => {
               />
             </g>
           </svg>
-          Trainings
+          {{ t('teamDetail.trainings') }}
         </router-link>
         <router-link
           :to="`/teams/${teamId}`"
@@ -306,7 +311,7 @@ onUnmounted(() => {
               d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
             />
           </svg>
-          Members
+          {{ t('teamDetail.members') }}
         </router-link>
       </nav>
       <!-- Active tab renders here -->

@@ -1,11 +1,13 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useTeamsStore } from '@/stores/teams.js'
 import styles from '@/assets/styles/create-team.module.css'
 
 const router = useRouter()
 const teamsStore = useTeamsStore()
+const { t } = useI18n()
 
 // Form data
 const formData = ref({
@@ -25,23 +27,23 @@ const validateForm = () => {
 
   // Team name validation
   if (!formData.value.name.trim()) {
-    newErrors.name = 'Team name is required'
+    newErrors.name = t('createTeam.nameRequired')
   } else if (formData.value.name.length < 3) {
-    newErrors.name = 'Team name must be at least 3 characters'
+    newErrors.name = t('createTeam.nameMinLength')
   } else if (formData.value.name.length > 80) {
-    newErrors.name = 'Team name must be less than 80 characters'
+    newErrors.name = t('createTeam.nameMaxLength')
   }
 
   // City validation (optional but if provided should be reasonable)
   if (formData.value.city && formData.value.city.length > 80) {
-    newErrors.city = 'City name must be less than 80 characters'
+    newErrors.city = t('createTeam.cityMaxLength')
   }
 
   // Max members validation
   if (!formData.value.max_members || formData.value.max_members < 1) {
-    newErrors.max_members = 'Maximum members must be at least 1'
+    newErrors.max_members = t('createTeam.maxMembersMin')
   } else if (formData.value.max_members > 50) {
-    newErrors.max_members = 'Maximum members cannot exceed 50'
+    newErrors.max_members = t('createTeam.maxMembersMax')
   }
 
   errors.value = newErrors
@@ -115,12 +117,12 @@ const isFormValid = computed(() => {
               d="M15 19l-7-7 7-7"
             />
           </svg>
-          Back to Teams
+          {{ t('createTeam.backToTeams') }}
         </button>
-<!--        <div :class="styles.headerContent">
-          <h1 :class="styles.pageTitle">Create New Team</h1>
-          <p :class="styles.pageSubtitle">Add a new dragon boat team to your organization</p>
-        </div>-->
+        <!--        <div :class="styles.headerContent">
+                  <h1 :class="styles.pageTitle">Create New Team</h1>
+                  <p :class="styles.pageSubtitle">Add a new dragon boat team to your organization</p>
+                </div>-->
       </div>
     </div>
 
@@ -135,8 +137,8 @@ const isFormValid = computed(() => {
         />
       </svg>
       <div :class="styles.successContent">
-        <h3>Team Created Successfully!</h3>
-        <p>Redirecting to teams list...</p>
+        <h3>{{ t('createTeam.successTitle') }}</h3>
+        <p>{{ t('createTeam.successRedirect') }}</p>
       </div>
     </div>
 
@@ -145,12 +147,12 @@ const isFormValid = computed(() => {
       <form @submit.prevent="handleSubmit" :class="styles.teamForm">
         <!-- Team Information Section -->
         <div :class="styles.formSection">
-          <h2 :class="styles.sectionTitle">Team Information</h2>
+          <h2 :class="styles.sectionTitle">{{ t('createTeam.sectionTitle') }}</h2>
 
           <!-- Team Name -->
           <div :class="styles.formGroup">
             <label for="team-name" :class="styles.formLabel">
-              Team Name
+              {{ t('createTeam.nameLabel') }}
               <span :class="styles.required">*</span>
             </label>
             <input
@@ -159,8 +161,8 @@ const isFormValid = computed(() => {
               @input="clearError('name')"
               @blur="validateForm"
               type="text"
-              :class="[styles.formInput, { error: errors.name }]"
-              placeholder="e.g., Dragon Warriors"
+              :class="[styles.formInput, { [styles.error]: errors.name }]"
+              :placeholder="t('createTeam.namePlaceholder')"
               maxlength="80"
               required
             />
@@ -169,24 +171,26 @@ const isFormValid = computed(() => {
 
           <!-- City -->
           <div :class="styles.formGroup">
-            <label for="city" :class="styles.formLabel">City (Optional)</label>
+            <label for="city" :class="styles.formLabel">
+              {{ t('createTeam.cityLabel') }} {{ t('common.optional') }}
+            </label>
             <input
               id="city"
               v-model="formData.city"
               @input="clearError('city')"
               type="text"
-              :class="[styles.formInput, { error: errors.city }]"
-              placeholder="e.g., San Francisco"
+              :class="[styles.formInput, { [styles.error]: errors.city }]"
+              :placeholder="t('createTeam.cityPlaceholder')"
               maxlength="80"
             />
-            <p :class="styles.fieldHelp">The city where this team is based</p>
+            <p :class="styles.fieldHelp">{{ t('createTeam.cityHelp') }}</p>
             <p v-if="errors.city" :class="styles.errorMessage">{{ errors.city }}</p>
           </div>
 
           <!-- Max Members -->
           <div :class="styles.formGroup">
             <label for="max-members" :class="styles.formLabel">
-              Maximum Members
+              {{ t('createTeam.maxMembersLabel') }}
               <span :class="styles.required">*</span>
             </label>
             <input
@@ -195,12 +199,16 @@ const isFormValid = computed(() => {
               @input="clearError('max_members')"
               @blur="validateForm"
               type="number"
-              :class="[styles.formInput, styles.numberInput, { error: errors.max_members }]"
+              :class="[
+                styles.formInput,
+                styles.numberInput,
+                { [styles.error]: errors.max_members },
+              ]"
               min="1"
               max="50"
               required
             />
-            <p :class="styles.fieldHelp">Typical dragon boat teams have 20-22 members</p>
+            <p :class="styles.fieldHelp">{{ t('createTeam.maxMembersHelp') }}</p>
             <p v-if="errors.max_members" :class="styles.errorMessage">{{ errors.max_members }}</p>
           </div>
         </div>
@@ -213,7 +221,7 @@ const isFormValid = computed(() => {
             :class="styles.btnSecondary"
             :disabled="isLoading"
           >
-            Cancel
+            {{ t('common.cancel') }}
           </button>
 
           <div :class="styles.actionGroup">
@@ -223,7 +231,7 @@ const isFormValid = computed(() => {
               :class="styles.btnOutline"
               :disabled="isLoading"
             >
-              Reset Form
+              {{ t('createTeam.resetForm') }}
             </button>
 
             <button type="submit" :class="styles.btnPrimary" :disabled="!isFormValid || isLoading">
@@ -242,7 +250,7 @@ const isFormValid = computed(() => {
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 ></path>
               </svg>
-              <span>{{ isLoading ? 'Creating Team...' : 'Create Team' }}</span>
+              <span>{{ isLoading ? t('createTeam.submitting') : t('createTeam.submit') }}</span>
             </button>
           </div>
         </div>

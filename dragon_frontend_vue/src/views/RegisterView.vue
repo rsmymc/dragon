@@ -1,12 +1,14 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
 import { register } from '@/services/auth'
 import styles from '@/assets/styles/login.module.css'
 
 const router = useRouter()
 const auth = useAuthStore()
+const { t } = useI18n()
 
 // Form data
 const username = ref('')
@@ -46,15 +48,15 @@ const isFormValid = computed(() => {
 function validateUsername() {
   const value = username.value.trim()
   if (!value) {
-    errors.value.username = 'Username is required'
+    errors.value.username = t('register.usernameRequired')
     return false
   }
   if (value.length < 3) {
-    errors.value.username = 'Username must be at least 3 characters'
+    errors.value.username = t('register.usernameMinLength')
     return false
   }
   if (/\s/.test(value)) {
-    errors.value.username = 'Username cannot contain spaces'
+    errors.value.username = t('register.usernameNoSpaces')
     return false
   }
   errors.value.username = ''
@@ -63,11 +65,11 @@ function validateUsername() {
 
 function validatePassword() {
   if (!password.value) {
-    errors.value.password = 'Password is required'
+    errors.value.password = t('register.passwordRequired')
     return false
   }
   if (password.value.length < 6) {
-    errors.value.password = 'Password must be at least 6 characters'
+    errors.value.password = t('register.passwordMinLength')
     return false
   }
   errors.value.password = ''
@@ -76,11 +78,11 @@ function validatePassword() {
 
 function validateConfirmPassword() {
   if (!confirmPassword.value) {
-    errors.value.confirmPassword = 'Please confirm your password'
+    errors.value.confirmPassword = t('register.confirmPasswordRequired')
     return false
   }
   if (confirmPassword.value !== password.value) {
-    errors.value.confirmPassword = 'Passwords do not match'
+    errors.value.confirmPassword = t('register.passwordsDoNotMatch')
     return false
   }
   errors.value.confirmPassword = ''
@@ -89,7 +91,7 @@ function validateConfirmPassword() {
 
 function validateName() {
   if (!name.value.trim()) {
-    errors.value.name = 'Name is required'
+    errors.value.name = t('register.nameRequired')
     return false
   }
   errors.value.name = ''
@@ -100,7 +102,7 @@ function validateName() {
 function validateEmail() {
   const value = email.value.trim()
   if (value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-    errors.value.email = 'Please enter a valid email address'
+    errors.value.email = t('register.emailInvalid')
     return false
   }
   errors.value.email = ''
@@ -110,7 +112,7 @@ function validateEmail() {
 function validatePhone() {
   const value = phone.value.trim()
   if (value && !/^[+\d][\d\s()-]{5,}$/.test(value)) {
-    errors.value.phone = 'Please enter a valid phone number'
+    errors.value.phone = t('register.phoneInvalid')
     return false
   }
   errors.value.phone = ''
@@ -186,14 +188,14 @@ async function onSubmit() {
     if (e.response?.status === 400) {
       const matched = applyServerErrors(e.response.data)
       if (!matched) {
-        errors.value.general = 'Registration failed. Please check your details and try again.'
+        errors.value.general = t('register.registrationFailed')
       }
     } else if (e.response?.status === 429) {
-      errors.value.general = 'Too many attempts. Please try again later.'
+      errors.value.general = t('register.tooManyAttempts')
     } else if (e.response?.data?.message) {
       errors.value.general = e.response.data.message
     } else {
-      errors.value.general = 'Registration failed. Please check your connection and try again.'
+      errors.value.general = t('register.connectionFailed')
     }
   } finally {
     loading.value = false
@@ -210,14 +212,12 @@ async function onSubmit() {
           <img alt="DragonBoat Logo" src="../assets/images/logo.png" width="128" height="128" />
           <h1 :class="styles.appTitle">DragonBoat Manager</h1>
         </div>
-<!--        <h2>Create Account</h2>
-        <p>Sign up to manage your dragon boat teams</p>-->
       </div>
 
       <form @submit.prevent="onSubmit" :class="styles.loginForm">
         <!-- Name Field -->
         <div :class="styles.formGroup">
-          <label for="name">Name</label>
+          <label for="name">{{ t('register.name') }}</label>
           <div :class="styles.inputContainer">
             <input
               id="name"
@@ -227,8 +227,8 @@ async function onSubmit() {
               type="text"
               autocomplete="name"
               required
-              :class="{ error: errors.name }"
-              placeholder="Enter your name"
+              :class="{ [styles.error]: errors.name }"
+              :placeholder="t('register.namePlaceholder')"
             />
             <div v-if="name && !errors.name" :class="styles.inputSuccess">
               <svg
@@ -251,7 +251,7 @@ async function onSubmit() {
 
         <!-- Username Field -->
         <div :class="styles.formGroup">
-          <label for="username">Username</label>
+          <label for="username">{{ t('register.username') }}</label>
           <div :class="styles.inputContainer">
             <input
               id="username"
@@ -261,8 +261,8 @@ async function onSubmit() {
               type="text"
               autocomplete="username"
               required
-              :class="{ error: errors.username }"
-              placeholder="Choose a username"
+              :class="{ [styles.error]: errors.username }"
+              :placeholder="t('register.usernamePlaceholder')"
             />
             <div v-if="username && !errors.username" :class="styles.inputSuccess">
               <svg
@@ -285,7 +285,7 @@ async function onSubmit() {
 
         <!-- Password Field -->
         <div :class="styles.formGroup">
-          <label for="password">Password</label>
+          <label for="password">{{ t('register.password') }}</label>
           <div :class="styles.inputContainer">
             <input
               id="password"
@@ -295,8 +295,8 @@ async function onSubmit() {
               :type="showPassword ? 'text' : 'password'"
               autocomplete="new-password"
               required
-              :class="{ error: errors.password }"
-              placeholder="Create a password"
+              :class="{ [styles.error]: errors.password }"
+              :placeholder="t('register.passwordPlaceholder')"
             />
             <button type="button" @click="togglePasswordVisibility" :class="styles.passwordToggle">
               <svg
@@ -340,7 +340,7 @@ async function onSubmit() {
 
         <!-- Confirm Password Field -->
         <div :class="styles.formGroup">
-          <label for="confirmPassword">Confirm Password</label>
+          <label for="confirmPassword">{{ t('register.confirmPassword') }}</label>
           <div :class="styles.inputContainer">
             <input
               id="confirmPassword"
@@ -350,8 +350,8 @@ async function onSubmit() {
               :type="showPassword ? 'text' : 'password'"
               autocomplete="new-password"
               required
-              :class="{ error: errors.confirmPassword }"
-              placeholder="Re-enter your password"
+              :class="{ [styles.error]: errors.confirmPassword }"
+              :placeholder="t('register.confirmPasswordPlaceholder')"
             />
           </div>
           <p v-if="errors.confirmPassword" :class="styles.errorMessage">
@@ -361,7 +361,10 @@ async function onSubmit() {
 
         <!-- Email Field (optional) -->
         <div :class="styles.formGroup">
-          <label for="email">Email <span :class="styles.optionalTag">(optional)</span></label>
+          <label for="email"
+            >{{ t('register.email') }}
+            <span :class="styles.optionalTag">{{ t('common.optional') }}</span></label
+          >
           <div :class="styles.inputContainer">
             <input
               id="email"
@@ -370,8 +373,8 @@ async function onSubmit() {
               @blur="validateEmail"
               type="email"
               autocomplete="email"
-              :class="{ error: errors.email }"
-              placeholder="Enter your email"
+              :class="{ [styles.error]: errors.email }"
+              :placeholder="t('register.emailPlaceholder')"
             />
           </div>
           <p v-if="errors.email" :class="styles.errorMessage">{{ errors.email }}</p>
@@ -379,7 +382,10 @@ async function onSubmit() {
 
         <!-- Phone Field (optional) -->
         <div :class="styles.formGroup">
-          <label for="phone">Phone <span :class="styles.optionalTag">(optional)</span></label>
+          <label for="phone"
+            >{{ t('register.phone') }}
+            <span :class="styles.optionalTag">{{ t('common.optional') }}</span></label
+          >
           <div :class="styles.inputContainer">
             <input
               id="phone"
@@ -388,8 +394,8 @@ async function onSubmit() {
               @blur="validatePhone"
               type="tel"
               autocomplete="tel"
-              :class="{ error: errors.phone }"
-              placeholder="Enter your phone number"
+              :class="{ [styles.error]: errors.phone }"
+              :placeholder="t('register.phonePlaceholder')"
             />
           </div>
           <p v-if="errors.phone" :class="styles.errorMessage">{{ errors.phone }}</p>
@@ -411,7 +417,7 @@ async function onSubmit() {
         <button
           type="submit"
           :disabled="!isFormValid"
-          :class="[styles.loginButton, { loading: loading }]"
+          :class="[styles.loginButton, { [styles.loading]: loading }]"
         >
           <svg v-if="loading" :class="styles.loadingSpinner" fill="none" viewBox="0 0 24 24">
             <circle
@@ -428,15 +434,15 @@ async function onSubmit() {
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
             ></path>
           </svg>
-          <span>{{ loading ? 'Creating account...' : 'Sign Up' }}</span>
+          <span>{{ loading ? t('register.submitting') : t('register.submit') }}</span>
         </button>
       </form>
 
       <!-- Sign in link -->
       <div :class="styles.loginFooter">
         <p>
-          Already have an account?
-          <RouterLink to="/login">Sign in</RouterLink>
+          {{ t('register.haveAccount') }}
+          <RouterLink to="/login">{{ t('register.signIn') }}</RouterLink>
         </p>
       </div>
     </div>

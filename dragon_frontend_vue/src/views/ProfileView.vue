@@ -1,12 +1,14 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
 import { usePersonsStore } from '@/stores/persons'
-import { PERSON_SIDE_LABELS } from '@/constants'
+import { PERSON_SIDE_KEYS } from '@/constants'
 import styles from '@/assets/styles/profile.module.css'
 
 const authStore = useAuthStore()
 const personsStore = usePersonsStore()
+const { t } = useI18n()
 
 const isLoading = ref(true)
 const loadError = ref('')
@@ -41,7 +43,7 @@ const loadProfile = async () => {
   try {
     const personId = authStore.myPersonId
     if (!personId) {
-      loadError.value = 'No profile is linked to your account yet.'
+      loadError.value = t('profile.noProfile')
       return
     }
 
@@ -54,7 +56,7 @@ const loadProfile = async () => {
     form.side = p.side ?? ''
   } catch (error) {
     console.error('Failed to load profile:', error)
-    loadError.value = 'Failed to load your profile. Please try again.'
+    loadError.value = t('profile.loadFailed')
   } finally {
     isLoading.value = false
   }
@@ -68,19 +70,19 @@ const validate = () => {
   let ok = true
 
   if (!form.name.trim()) {
-    errors.name = 'Name is required'
+    errors.name = t('personForm.nameRequired')
     ok = false
   }
   if (form.phone && !/^[+]?[\d\s\-()]+$/.test(form.phone)) {
-    errors.phone = 'Please enter a valid phone number'
+    errors.phone = t('personForm.phoneInvalid')
     ok = false
   }
   if (form.height && (form.height < 100 || form.height > 250)) {
-    errors.height = 'Height should be between 100-250 cm'
+    errors.height = t('personForm.heightRange')
     ok = false
   }
   if (form.weight && (form.weight < 30 || form.weight > 200)) {
-    errors.weight = 'Weight should be between 30-200 kg'
+    errors.weight = t('personForm.weightRange')
     ok = false
   }
 
@@ -124,14 +126,14 @@ const handleSubmit = async () => {
 
     const result = await personsStore.updatePerson(person.value.id, changes)
     if (result && result.success === false) {
-      throw new Error(result.error || 'Failed to save changes')
+      throw new Error(result.error || t('profile.saveFailed'))
     }
 
     person.value = { ...person.value, ...changes }
     justSaved.value = true
   } catch (error) {
     console.error('Failed to update profile:', error)
-    submitError.value = error.message || 'Failed to save changes. Please try again.'
+    submitError.value = error.message || t('profile.saveFailedRetry')
   } finally {
     isSubmitting.value = false
   }
@@ -143,21 +145,21 @@ onMounted(loadProfile)
 <template>
   <div :class="styles.editPersonView">
     <div :class="styles.header">
-      <h1 :class="styles.title">My Profile</h1>
+      <h1 :class="styles.title">{{ t('profile.title') }}</h1>
     </div>
 
     <!-- Loading -->
     <div v-if="isLoading" :class="styles.loading">
       <div :class="styles.spinner"></div>
-      <p>Loading your profile...</p>
+      <p>{{ t('profile.loading') }}</p>
     </div>
 
     <!-- Load error -->
     <div v-else-if="loadError" :class="styles.errorContainer">
       <div :class="styles.errorMessage">
-        <h3>Couldn't load profile</h3>
+        <h3>{{ t('profile.loadErrorTitle') }}</h3>
         <p>{{ loadError }}</p>
-        <button @click="loadProfile" :class="styles.retryBtn">Try Again</button>
+        <button @click="loadProfile" :class="styles.retryBtn">{{ t('common.tryAgain') }}</button>
       </div>
     </div>
 
@@ -166,40 +168,40 @@ onMounted(loadProfile)
       <form @submit.prevent="handleSubmit" :class="styles.editForm">
         <div :class="styles.formGroup">
           <label for="name" :class="styles.formLabel">
-            Name <span :class="styles.required">*</span>
+            {{ t('personForm.name') }} <span :class="styles.required">*</span>
           </label>
           <input
             id="name"
             v-model="form.name"
             type="text"
             :class="[styles.formInput, { [styles.error]: errors.name }]"
-            placeholder="Your full name"
+            :placeholder="t('profile.namePlaceholder')"
             :disabled="isSubmitting"
           />
           <span v-if="errors.name" :class="styles.fieldError">{{ errors.name }}</span>
         </div>
 
         <div :class="styles.formGroup">
-          <label for="phone" :class="styles.formLabel">Phone</label>
+          <label for="phone" :class="styles.formLabel">{{ t('personForm.phone') }}</label>
           <input
             id="phone"
             v-model="form.phone"
             type="tel"
             :class="[styles.formInput, { [styles.error]: errors.phone }]"
-            placeholder="Your phone number"
+            :placeholder="t('profile.phonePlaceholder')"
             :disabled="isSubmitting"
           />
           <span v-if="errors.phone" :class="styles.fieldError">{{ errors.phone }}</span>
         </div>
 
         <div :class="styles.formGroup">
-          <label for="height" :class="styles.formLabel">Height (cm)</label>
+          <label for="height" :class="styles.formLabel">{{ t('personForm.height') }}</label>
           <input
             id="height"
             v-model="form.height"
             type="number"
             :class="[styles.formInput, { [styles.error]: errors.height }]"
-            placeholder="e.g. 175"
+            :placeholder="t('profile.heightPlaceholder')"
             min="100"
             max="250"
             :disabled="isSubmitting"
@@ -208,13 +210,13 @@ onMounted(loadProfile)
         </div>
 
         <div :class="styles.formGroup">
-          <label for="weight" :class="styles.formLabel">Weight (kg)</label>
+          <label for="weight" :class="styles.formLabel">{{ t('personForm.weight') }}</label>
           <input
             id="weight"
             v-model="form.weight"
             type="number"
             :class="[styles.formInput, { [styles.error]: errors.weight }]"
-            placeholder="e.g. 72"
+            :placeholder="t('profile.weightPlaceholder')"
             min="30"
             max="200"
             :disabled="isSubmitting"
@@ -223,14 +225,10 @@ onMounted(loadProfile)
         </div>
 
         <div :class="styles.formGroup">
-          <label for="side" :class="styles.formLabel">Preferred Side</label>
+          <label for="side" :class="styles.formLabel">{{ t('profile.preferredSide') }}</label>
           <select id="side" v-model="form.side" :class="styles.formInput" :disabled="isSubmitting">
-            <option
-              v-for="(label, value) in PERSON_SIDE_LABELS"
-              :key="value"
-              :value="Number(value)"
-            >
-              {{ label }}
+            <option v-for="(key, value) in PERSON_SIDE_KEYS" :key="value" :value="Number(value)">
+              {{ t(`sides.${key}`) }}
             </option>
           </select>
         </div>
@@ -248,14 +246,14 @@ onMounted(loadProfile)
               font-weight: 600;
             "
           >
-            Saved ✓
+            {{ t('profile.saved') }} ✓
           </span>
           <button type="submit" :class="styles.saveBtn" :disabled="isSubmitting || !isValid">
             <span v-if="isSubmitting" :class="styles.btnLoading">
               <span :class="styles.btnSpinner"></span>
-              Saving...
+              {{ t('profile.saving') }}
             </span>
-            <span v-else>Save Changes</span>
+            <span v-else>{{ t('profile.saveChanges') }}</span>
           </button>
         </div>
       </form>
