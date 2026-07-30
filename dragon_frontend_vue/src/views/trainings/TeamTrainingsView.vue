@@ -67,11 +67,14 @@ const loadTrainings = async () => {
 
 const getLocationCoordinates = (locationId) => {
   const location = locationsStore.getLocationById(locationId)
-  if (!location) return 'N/A'
-  return {
-    text: `${location.lat?.toFixed(4)}, ${location.lon?.toFixed(4)}`,
-    url: `https://www.google.com/maps/@${location.lat},${location.lon},15z`,
+  if (!location) return null
+  if (location.lat != null && location.lon != null) {
+    return `https://www.google.com/maps/search/?api=1&query=${location.lat},${location.lon}`
   }
+  if (location.name) {
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location.name)}`
+  }
+  return null
 }
 
 // Locale-aware formatting: 'en' / 'tr' are valid BCP 47 tags, so the active
@@ -263,7 +266,7 @@ onMounted(() => {
         <!-- Location (name links to the map coordinates) -->
         <a
           v-if="getLocationCoordinates(training.location.id) !== 'N/A'"
-          :href="getLocationCoordinates(training.location.id).url"
+          :href="getLocationCoordinates(training.location.id)"
           target="_blank"
           rel="noopener noreferrer"
           :class="styles.trainingLocation"
