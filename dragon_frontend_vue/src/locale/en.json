@@ -69,7 +69,7 @@
   },
   "layout": {
     "myTeams": "My Teams",
-    "profile": "Profile",
+    "profile": "My Profile",
     "settings": "Settings",
     "logout": "Logout",
     "toggleMenu": "Toggle navigation menu",
@@ -84,7 +84,6 @@
     "errorTitle": "Error Loading Teams",
     "emptyTitle": "No Teams Found",
     "emptySearch": "No teams match your search criteria",
-    "emptyHint": "Get started by creating your first dragon boat team",
     "createFirst": "Create Your First Team",
     "copyCodeTitle": "Copy team code",
     "copyFailed": "Could not copy code",

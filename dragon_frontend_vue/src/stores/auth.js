@@ -23,10 +23,11 @@ export const useAuthStore = defineStore('auth', {
   },
 
   actions: {
-    setTokens({ access, refresh }, rememberMe = false, username) {
+    setTokens({ access, refresh , user, person }, rememberMe = false, username) {
       this.access = access || null
       this.refresh = refresh || null
       this.username = username || null
+      this.person = person || {}
 
       // Choose storage based on rememberMe
       const storage = rememberMe ? localStorage : sessionStorage

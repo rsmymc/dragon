@@ -341,7 +341,6 @@ const actionsStyle = {
         </svg>
         <h3>{{ t('teams.emptyTitle') }}</h3>
         <p v-if="searchQuery">{{ t('teams.emptySearch') }}</p>
-        <p v-else>{{ t('teams.emptyHint') }}</p>
         <button @click="createTeam" :class="styles.btnPrimary">
           {{ t('teams.createFirst') }}
         </button>

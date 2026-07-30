@@ -620,12 +620,12 @@ onMounted(() => {
                   training.location?.name || t('common.unknown')
                 }}</span>
               </div>
-              <div :class="styles.statItem">
+<!--              <div :class="styles.statItem">
                 <span :class="styles.statLabel">{{ t('trainingDetail.team') }}</span>
                 <span :class="styles.statValue">{{
                   training.team?.name || t('common.unknown')
                 }}</span>
-              </div>
+              </div>-->
             </div>
           </div>
         </div>
@@ -705,9 +705,9 @@ onMounted(() => {
           <div :class="styles.lineupInterface">
             <!-- Left Panel: Available Members -->
             <div :class="styles.membersPanel">
-              <div :class="styles.panelHeader">
+<!--              <div :class="styles.panelHeader">
                 <h3>{{ t('trainingDetail.availableMembers') }}</h3>
-              </div>
+              </div>-->
 
               <!-- Filters -->
               <div :class="styles.panelFilters">
