@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n'
 import { useTrainingsStore } from '@/stores/trainings'
 import { useLocationsStore } from '@/stores/locations'
 import { useTeamsStore } from '@/stores/teams'
+import { useAttendanceStore } from '@/stores/attendance'
 import CreateTrainingModal from '@/components/modals/CreateTrainingModal.vue'
 import EditTrainingModal from '@/components/modals/EditTrainingModal.vue'
 import styles from '@/assets/styles/team-trainings.module.css'
@@ -13,12 +14,14 @@ const route = useRoute()
 const trainingsStore = useTrainingsStore()
 const locationsStore = useLocationsStore()
 const teamsStore = useTeamsStore()
+const attendanceStore = useAttendanceStore()
 const { t, locale } = useI18n()
 
 // Reactive state
 const timeFilter = ref('upcoming')
 const showCreateModal = ref(false)
 const editingTraining = ref(null)
+const savingTrainingId = ref(null)
 
 // Param comes from the parent team layout route (/teams/:id)
 const teamId = computed(() => route.params.id)
@@ -60,8 +63,44 @@ const loadTrainings = async () => {
   try {
     await trainingsStore.fetchTrainingsByTeam(teamId.value)
     await locationsStore.fetchLocationsByTeam(teamId.value)
+    loadMyAttendance()
   } catch (error) {
     console.error('Failed to load trainings:', error)
+  }
+}
+
+// One lightweight request per training (not the full team roster), fetched
+// in parallel and cached in the store keyed by training id.
+const loadMyAttendance = () => {
+  const all = trainingsStore.getTrainingsByTeam(teamId.value)
+  all.forEach((training) => {
+    if (attendanceStore.myStatusByTraining[training.id] === undefined) {
+      attendanceStore.fetchMyStatus(training.id).catch(() => {})
+    }
+  })
+}
+
+// true / false / null (not recorded) / undefined (not fetched yet)
+const myAttendance = (trainingId) => attendanceStore.myStatusByTraining[trainingId]
+
+const myAttendanceClass = (trainingId) => {
+  const v = myAttendance(trainingId)
+  if (v === true) return styles.present
+  if (v === false) return styles.absent
+  return ''
+}
+
+const toggleMyAttendance = async (training) => {
+  if (savingTrainingId.value) return
+
+  const current = myAttendance(training.id)
+  const next = current === true ? false : true
+
+  savingTrainingId.value = training.id
+  try {
+    await attendanceStore.markMine(training.id, next)
+  } finally {
+    savingTrainingId.value = null
   }
 }
 
@@ -304,6 +343,20 @@ onMounted(() => {
             />
           </svg>
           <span>{{ training.location.name }}</span>
+        </div>
+
+        <!-- My attendance: self-toggle, bottom-left of the card -->
+        <div :class="styles.cardFooter">
+          <button
+            :class="[styles.attToggle, myAttendanceClass(training.id)]"
+            :disabled="savingTrainingId === training.id"
+            role="switch"
+            :aria-checked="myAttendance(training.id) === true"
+            :title="t('trainingDetail.toggleAttendance')"
+            @click.stop.prevent="toggleMyAttendance(training)"
+          >
+            <span :class="styles.attKnob"></span>
+          </button>
         </div>
       </router-link>
     </div>

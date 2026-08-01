@@ -18,6 +18,11 @@ const attendanceService = {
     const { data } = await api.post(`/training/${trainingId}/attendance/me/`, { attended })
     return data
   },
+
+  async getMyAttendance(trainingId) {
+    const { data } = await api.get(`/training/${trainingId}/attendance/me/`)
+    return data
+  },
 }
 
 export default attendanceService

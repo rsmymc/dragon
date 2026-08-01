@@ -3,30 +3,24 @@ import attendanceService from '@/services/attendance'
 
 export const useAttendanceStore = defineStore('attendance', {
   state: () => ({
-    roster: [], // merged roster for the currently-open training
+    roster: [], // merged roster for the currently-open training (detail page only)
     trainingId: null, // which training the roster belongs to
+    myStatusByTraining: {},
     isLoading: false,
     isSaving: false,
     error: null,
   }),
 
   getters: {
-    // Rows the coach has actually marked (attended !== null)
     recordedRows: (state) => state.roster.filter((r) => r.attended !== null),
-
-    // Rows not yet recorded (third state)
     unrecordedRows: (state) => state.roster.filter((r) => r.attended === null),
-
     presentCount: (state) => state.roster.filter((r) => r.attended === true).length,
     absentCount: (state) => state.roster.filter((r) => r.attended === false).length,
-
-    // Current user's own row, looked up by their membership id
     myRow: (state) => (membershipId) =>
       state.roster.find((r) => r.membership === membershipId) || null,
   },
 
   actions: {
-    // Load the roster for one training (refetch on open — no caching)
     async fetchRoster(trainingId) {
       this.isLoading = true
       this.error = null
@@ -47,7 +41,20 @@ export const useAttendanceStore = defineStore('attendance', {
       }
     },
 
-    // Coach/captain/manager: bulk-save marks, then refetch to reflect truth
+    // Lightweight: just my own status for one training. Safe to call for
+    // many trainings at once (e.g. a trainings list) since it never touches
+    // `roster`/`trainingId`.
+    async fetchMyStatus(trainingId) {
+      try {
+        const result = await attendanceService.getMyAttendance(trainingId)
+        this.myStatusByTraining[trainingId] = result.attended
+        return result.attended
+      } catch (error) {
+        console.error('Error fetching my attendance status:', error)
+        throw error
+      }
+    },
+
     async saveMarks(trainingId, marks) {
       this.isSaving = true
       this.error = null
@@ -56,8 +63,6 @@ export const useAttendanceStore = defineStore('attendance', {
         console.log(`Saving ${marks.length} marks for training ${trainingId}...`)
         const result = await attendanceService.markAttendance(trainingId, marks)
         console.log('Marks saved:', result.updated, 'skipped:', result.skipped)
-
-        // Refetch so store reflects exactly what the server stored
         await this.fetchRoster(trainingId)
         return { success: true, result }
       } catch (error) {
@@ -69,7 +74,6 @@ export const useAttendanceStore = defineStore('attendance', {
       }
     },
 
-    // Any member: mark own attendance, then patch the local row
     async markMine(trainingId, attended) {
       this.isSaving = true
       this.error = null
@@ -78,11 +82,13 @@ export const useAttendanceStore = defineStore('attendance', {
         console.log(`Marking my attendance (${attended}) for training ${trainingId}...`)
         const result = await attendanceService.markMyAttendance(trainingId, attended)
 
-        // Patch the local roster row for my membership, if present
         const idx = this.roster.findIndex((r) => r.membership === result.membership)
         if (idx >= 0) {
           this.roster[idx] = { ...this.roster[idx], attended: result.attended }
         }
+
+        // Keep the list-view cache in sync too, regardless of which UI called this.
+        this.myStatusByTraining[trainingId] = result.attended
 
         console.log('My attendance marked:', result.attended)
         return { success: true, result }

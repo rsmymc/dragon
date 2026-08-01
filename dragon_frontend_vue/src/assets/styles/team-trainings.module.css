@@ -243,6 +243,66 @@
   flex-shrink: 0;
 }
 
+/* My-attendance self-toggle, pinned to the bottom-left of the card */
+.cardFooter {
+  display: flex;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 0.5rem;
+}
+
+.attToggle {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  width: 38px;
+  min-width: 38px;
+  height: 22px;
+  min-height: 22px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  background: var(--color-border);
+  opacity: 0.7; /* recede while unmarked so it doesn't compete with card content */
+  transition:
+    background 0.15s ease,
+    opacity 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.attToggle.present,
+.attToggle.absent {
+  opacity: 1; /* a recorded state is full-strength */
+}
+
+.attToggle.present {
+  background: var(--color-success);
+}
+
+.attToggle.absent {
+  background: var(--color-danger);
+}
+
+.attToggle:disabled {
+  cursor: default;
+}
+
+.attKnob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.15s ease;
+}
+
+.attToggle.present .attKnob {
+  transform: translateX(16px);
+}
+
 @keyframes spin {
   0% {
     transform: rotate(0deg);
