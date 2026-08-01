@@ -75,7 +75,7 @@
 }
 
 .teamName {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: var(--color-primary);
   margin: 0;
@@ -252,10 +252,10 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.5rem 1.5rem;
-  min-height: 44px;
+  padding: 0.5rem 0.75rem;
+  min-height: 34px;
   border-radius: 9px;
-  font-size: 0.9375rem;
+  font-size: 0.7375rem;
   font-weight: 600;
   color: var(--color-text-muted);
   text-decoration: none;

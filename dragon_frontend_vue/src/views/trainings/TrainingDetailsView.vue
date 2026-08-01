@@ -45,29 +45,10 @@ const isPastTraining = computed(() => {
   return new Date(training.value.start_at) <= new Date()
 })
 
-const isToday = computed(() => {
-  if (!training.value) return false
-  const date = new Date(training.value.start_at)
-  const today = new Date()
-  return date.toDateString() === today.toDateString()
-})
-
-const isTomorrow = computed(() => {
-  if (!training.value) return false
-  const date = new Date(training.value.start_at)
-  const tomorrow = new Date()
-  tomorrow.setDate(tomorrow.getDate() + 1)
-  return date.toDateString() === tomorrow.toDateString()
-})
-
-const assignedSeatsCount = computed(() => {
-  return localLineupSeats.value.filter((seat) => seat.person).length
-})
-
 const availableMembers = computed(() => {
   const assignedPersonIds = localLineupSeats.value
-    .filter((seat) => seat.person)
-    .map((seat) => seat.person.id)
+      .filter((seat) => seat.person)
+      .map((seat) => seat.person.id)
   return members.value.filter((member) => !assignedPersonIds.includes(member.id))
 })
 
@@ -117,11 +98,11 @@ const locationMapUrl = computed(() => {
 
 // Watch for changes
 watch(
-  localLineupSeats,
-  () => {
-    checkForUnsavedChanges()
-  },
-  { deep: true },
+    localLineupSeats,
+    () => {
+      checkForUnsavedChanges()
+    },
+    { deep: true },
 )
 
 // Methods
@@ -178,23 +159,23 @@ const initializeLocalState = () => {
 
 const checkForUnsavedChanges = () => {
   const currentState = JSON.stringify(
-    localLineupSeats.value
-      .map((seat) => ({
-        side: seat.side,
-        seat_number: seat.seat_number,
-        person_id: seat.person?.id || null,
-      }))
-      .sort((a, b) => `${a.side}${a.seat_number}`.localeCompare(`${b.side}${b.seat_number}`)),
+      localLineupSeats.value
+          .map((seat) => ({
+            side: seat.side,
+            seat_number: seat.seat_number,
+            person_id: seat.person?.id || null,
+          }))
+          .sort((a, b) => `${a.side}${a.seat_number}`.localeCompare(`${b.side}${b.seat_number}`)),
   )
 
   const originalState = JSON.stringify(
-    originalSeatsSnapshot.value
-      .map((seat) => ({
-        side: seat.side,
-        seat_number: seat.seat_number,
-        person_id: seat.person?.id || null,
-      }))
-      .sort((a, b) => `${a.side}${a.seat_number}`.localeCompare(`${b.side}${b.seat_number}`)),
+      originalSeatsSnapshot.value
+          .map((seat) => ({
+            side: seat.side,
+            seat_number: seat.seat_number,
+            person_id: seat.person?.id || null,
+          }))
+          .sort((a, b) => `${a.side}${a.seat_number}`.localeCompare(`${b.side}${b.seat_number}`)),
   )
 
   hasUnsavedChanges.value = currentState !== originalState
@@ -228,10 +209,10 @@ const hasLocalSeatChange = (side, seatNumber) => {
   if (!hasUnsavedChanges.value) return false
 
   const currentSeat = localLineupSeats.value.find(
-    (s) => s.side === side && s.seat_number === seatNumber,
+      (s) => s.side === side && s.seat_number === seatNumber,
   )
   const originalSeat = originalSeatsSnapshot.value.find(
-    (s) => s.side === side && s.seat_number === seatNumber,
+      (s) => s.side === side && s.seat_number === seatNumber,
   )
 
   const currentPersonId = currentSeat?.person?.id || null
@@ -323,11 +304,11 @@ const assignSeatLocally = (side, seatNumber, personId) => {
   if (!person) return
 
   localLineupSeats.value = localLineupSeats.value.map((seat) =>
-    seat.person?.id === personId ? { ...seat, person: null } : seat,
+      seat.person?.id === personId ? { ...seat, person: null } : seat,
   )
 
   const existingIndex = localLineupSeats.value.findIndex(
-    (s) => s.side === side && s.seat_number === seatNumber,
+      (s) => s.side === side && s.seat_number === seatNumber,
   )
 
   if (existingIndex >= 0) {
@@ -346,7 +327,7 @@ const assignSeatLocally = (side, seatNumber, personId) => {
 
 const removeSeatAssignment = (side, seatNumber) => {
   const seatIndex = localLineupSeats.value.findIndex(
-    (s) => s.side === side && s.seat_number === seatNumber,
+      (s) => s.side === side && s.seat_number === seatNumber,
   )
   if (seatIndex >= 0) {
     localLineupSeats.value[seatIndex] = {
@@ -414,7 +395,7 @@ const syncLocalChangesToServer = async () => {
   const seatsToAssign = localLineupSeats.value.filter((seat) => seat.person)
 
   const assignmentPromises = seatsToAssign.map((seat) =>
-    lineupsStore.assignSeat(lineup.value.id, seat.side, seat.seat_number, seat.person.id),
+      lineupsStore.assignSeat(lineup.value.id, seat.side, seat.seat_number, seat.person.id),
   )
 
   await Promise.all(assignmentPromises)
@@ -438,11 +419,11 @@ const formatTrainingDateTime = (dateString) => {
 
 const getInitials = (name) => {
   return name
-    .split(' ')
-    .map((word) => word[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2)
+      .split(' ')
+      .map((word) => word[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2)
 }
 
 const getSideLabel = (side) => {
@@ -575,58 +556,44 @@ onMounted(() => {
     <!-- Training Details -->
     <div v-else-if="training" :class="styles.trainingDetailContainer">
       <!-- Header -->
-      <div :class="styles.header">
-        <div :class="styles.headerContent">
-          <router-link :to="`/teams/${training.team.id}/trainings`" :class="styles.backLink">
-            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-            {{ t('trainingDetail.backToTrainings') }}
-          </router-link>
+      <router-link :to="`/teams/${training.team.id}/trainings`" :class="styles.backLink">
+        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M15 19l-7-7 7-7"
+          />
+        </svg>
+        {{ t('trainingDetail.backToTrainings') }}
+      </router-link>
 
-          <div :class="styles.trainingInfo">
-            <div :class="styles.trainingTitle">
-              <div :class="styles.trainingBadges">
-                <span v-if="isPastTraining" :class="[styles.statusBadge, styles.past]">{{
-                  t('trainings.completed')
-                }}</span>
-              </div>
-            </div>
+      <div :class="styles.trainingHeaderCard">
+        <div v-if="isPastTraining" :class="styles.trainingBadges">
+          <span :class="[styles.statusBadge, styles.past]">{{ t('trainings.completed') }}</span>
+        </div>
 
-            <div :class="styles.trainingStats">
-              <div :class="styles.statItem">
-                <span :class="styles.statLabel">{{ t('trainingDetail.when') }}</span>
-                <span :class="styles.statValue">{{
-                  formatTrainingDateTime(training.start_at)
-                }}</span>
-              </div>
-              <div :class="styles.statItem">
-                <span :class="styles.statLabel">{{ t('trainingDetail.location') }}</span>
-                <a
-                  v-if="locationMapUrl"
-                  :href="locationMapUrl"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  :class="[styles.statValue, styles.locationLink]"
-                >
-                  {{ training.location?.name || t('common.unknown') }}
-                </a>
-                <span v-else :class="styles.statValue">{{
-                  training.location?.name || t('common.unknown')
-                }}</span>
-              </div>
-<!--              <div :class="styles.statItem">
-                <span :class="styles.statLabel">{{ t('trainingDetail.team') }}</span>
-                <span :class="styles.statValue">{{
-                  training.team?.name || t('common.unknown')
-                }}</span>
-              </div>-->
-            </div>
+        <div :class="styles.trainingStats">
+          <div :class="styles.headerStatItem">
+            <span :class="styles.headerStatLabel">{{ t('trainingDetail.when') }}</span>
+            <span :class="styles.headerStatValue">{{
+                formatTrainingDateTime(training.start_at)
+              }}</span>
+          </div>
+          <div :class="styles.headerStatItem">
+            <span :class="styles.headerStatLabel">{{ t('trainingDetail.location') }}</span>
+            <a
+                v-if="locationMapUrl"
+                :href="locationMapUrl"
+                target="_blank"
+                rel="noopener noreferrer"
+                :class="[styles.headerStatValue, styles.locationLink]"
+            >
+              {{ training.location?.name || t('common.unknown') }}
+            </a>
+            <span v-else :class="styles.headerStatValue">{{
+                training.location?.name || t('common.unknown')
+              }}</span>
           </div>
         </div>
       </div>
@@ -640,25 +607,25 @@ onMounted(() => {
               <div :class="styles.lineupTitleRow">
                 <!-- Draft / Published pill -->
                 <span v-if="lineup?.state === 2" :class="[styles.lineupPill, styles.published]">{{
-                  t('trainingDetail.published')
-                }}</span>
+                    t('trainingDetail.published')
+                  }}</span>
                 <span v-else :class="[styles.lineupPill, styles.draft]">{{
-                  t('trainingDetail.draft')
-                }}</span>
+                    t('trainingDetail.draft')
+                  }}</span>
 
                 <!-- Instructions tooltip -->
                 <span
-                  :class="styles.infoTip"
-                  tabindex="0"
-                  :data-tip="dragTip"
-                  :aria-label="t('trainingDetail.howToBuild')"
+                    :class="styles.infoTip"
+                    tabindex="0"
+                    :data-tip="dragTip"
+                    :aria-label="t('trainingDetail.howToBuild')"
                 >
                   <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                     />
                   </svg>
                 </span>
@@ -667,33 +634,33 @@ onMounted(() => {
 
             <div :class="styles.lineupActions">
               <button
-                v-if="hasUnsavedChanges"
-                @click="discardChanges"
-                :class="styles.btnGhost"
-                :disabled="isUpdatingLineup"
+                  v-if="hasUnsavedChanges"
+                  @click="discardChanges"
+                  :class="styles.btnGhost"
+                  :disabled="isUpdatingLineup"
               >
                 {{ t('trainingDetail.discard') }}
               </button>
               <button
-                v-if="hasUnsavedChanges"
-                @click="saveDraft"
-                :class="styles.btnSecondary"
-                :disabled="isUpdatingLineup"
+                  v-if="hasUnsavedChanges"
+                  @click="saveDraft"
+                  :class="styles.btnSecondary"
+                  :disabled="isUpdatingLineup"
               >
                 {{ t('trainingDetail.saveDraft') }}
               </button>
               <button
-                v-if="lineup && (lineup.state === 1 || hasUnsavedChanges)"
-                @click="publishLineup"
-                :class="styles.btnPublish"
-                :disabled="isUpdatingLineup"
+                  v-if="lineup && (lineup.state === 1 || hasUnsavedChanges)"
+                  @click="publishLineup"
+                  :class="styles.btnPublish"
+                  :disabled="isUpdatingLineup"
               >
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
                   />
                 </svg>
                 {{ t('trainingDetail.publish') }}
@@ -705,9 +672,9 @@ onMounted(() => {
           <div :class="styles.lineupInterface">
             <!-- Left Panel: Available Members -->
             <div :class="styles.membersPanel">
-<!--              <div :class="styles.panelHeader">
-                <h3>{{ t('trainingDetail.availableMembers') }}</h3>
-              </div>-->
+              <!--              <div :class="styles.panelHeader">
+                              <h3>{{ t('trainingDetail.availableMembers') }}</h3>
+                            </div>-->
 
               <!-- Filters -->
               <div :class="styles.panelFilters">
@@ -717,11 +684,11 @@ onMounted(() => {
                 </label>
                 <div :class="styles.sideChips">
                   <button
-                    v-for="sf in sideFilters"
-                    :key="String(sf.value)"
-                    type="button"
-                    @click="sideFilter = sf.value"
-                    :class="[styles.sideChip, { [styles.sideChipActive]: sideFilter === sf.value }]"
+                      v-for="sf in sideFilters"
+                      :key="String(sf.value)"
+                      type="button"
+                      @click="sideFilter = sf.value"
+                      :class="[styles.sideChip, { [styles.sideChipActive]: sideFilter === sf.value }]"
                   >
                     {{ t(sf.labelKey) }}
                   </button>
@@ -731,40 +698,40 @@ onMounted(() => {
               <div :class="styles.membersScroll">
                 <!-- Available Members -->
                 <div
-                  v-if="filteredAvailableMembers.length > 0"
-                  :class="styles.availableMembersList"
+                    v-if="filteredAvailableMembers.length > 0"
+                    :class="styles.availableMembersList"
                 >
                   <div
-                    v-for="member in filteredAvailableMembers"
-                    :key="member.id"
-                    :class="[
+                      v-for="member in filteredAvailableMembers"
+                      :key="member.id"
+                      :class="[
                       styles.memberCard,
                       'draggable',
                       { dragging: dragActive && draggedMember?.id === member.id },
                     ]"
-                    draggable="true"
-                    @dragstart="handleDragStart($event, member)"
-                    @dragend="handleDragEnd"
+                      draggable="true"
+                      @dragstart="handleDragStart($event, member)"
+                      @dragend="handleDragEnd"
                   >
-                    <div :class="styles.memberAvatar">
+<!--                    <div :class="styles.memberAvatar">
                       <img
-                        v-if="member.profile_picture_url"
-                        :src="member.profile_picture_url"
-                        :alt="member.name"
-                        :class="styles.avatarImage"
+                          v-if="member.profile_picture_url"
+                          :src="member.profile_picture_url"
+                          :alt="member.name"
+                          :class="styles.avatarImage"
                       />
                       <div v-else :class="styles.avatarInitial">
                         {{ getInitials(member.name) }}
                       </div>
-                    </div>
+                    </div>-->
                     <div :class="styles.memberInfo">
                       <h4 :class="styles.memberName">{{ member.name }}</h4>
                       <div :class="styles.memberStats">
                         <span v-if="member.weight" :class="styles.statChip"
-                          >{{ member.weight }}kg</span
+                        >{{ member.weight }}kg</span
                         >
                         <span v-if="member.height" :class="styles.statChip"
-                          >{{ member.height }}cm</span
+                        >{{ member.height }}cm</span
                         >
                         <span :class="[styles.statChip, styles.sideStat, sideClass(member.side)]">
                           {{ getSideLabel(member.side) }}
@@ -773,19 +740,19 @@ onMounted(() => {
                     </div>
                     <!-- Attendance toggle -->
                     <button
-                      type="button"
-                      class="att-toggle"
-                      :class="attendanceClass(member.id)"
-                      :disabled="!canEditAttendance(member.id) || savingPersonId === member.id"
-                      :title="
+                        type="button"
+                        class="att-toggle"
+                        :class="attendanceClass(member.id)"
+                        :disabled="!canEditAttendance(member.id) || savingPersonId === member.id"
+                        :title="
                         canEditAttendance(member.id)
                           ? t('trainingDetail.toggleAttendance')
                           : t('trainingDetail.viewOnly')
                       "
-                      role="switch"
-                      :aria-checked="attendanceForPerson(member.id) === true"
-                      @click.stop="toggleAttendance(member.id)"
-                      @dragstart.prevent.stop
+                        role="switch"
+                        :aria-checked="attendanceForPerson(member.id) === true"
+                        @click.stop="toggleAttendance(member.id)"
+                        @dragstart.prevent.stop
                     >
                       <span class="att-knob"></span>
                     </button>
@@ -800,8 +767,8 @@ onMounted(() => {
                   <p>
                     {{
                       availableMembers.length === 0
-                        ? t('trainingDetail.allInLineup')
-                        : t('trainingDetail.noFilterMatch')
+                          ? t('trainingDetail.allInLineup')
+                          : t('trainingDetail.noFilterMatch')
                     }}
                   </p>
                 </div>
@@ -815,39 +782,39 @@ onMounted(() => {
                   <!-- Left/right weight balance (aligned under the columns) -->
                   <div :class="styles.balanceBar">
                     <span
-                      :class="[
+                        :class="[
                         styles.balanceValue,
                         { [styles.balanceHeavier]: boatBalance.heavier === 'L' },
                       ]"
-                      >{{ boatBalance.left }} kg</span
+                    >{{ boatBalance.left }} kg</span
                     >
                     <span :class="styles.balanceDiff">{{
-                      boatBalance.diff === 0 ? '=' : `Δ${boatBalance.diff}`
-                    }}</span>
+                        boatBalance.diff === 0 ? '=' : `Δ${boatBalance.diff}`
+                      }}</span>
                     <span
-                      :class="[
+                        :class="[
                         styles.balanceValue,
                         { [styles.balanceHeavier]: boatBalance.heavier === 'R' },
                       ]"
-                      >{{ boatBalance.right }} kg</span
+                    >{{ boatBalance.right }} kg</span
                     >
                   </div>
 
                   <!-- Legend aligned over the seat columns -->
                   <div :class="styles.boatLegend">
                     <span :class="[styles.legendItem, styles.port]">{{
-                      t('trainingDetail.port')
-                    }}</span>
+                        t('trainingDetail.port')
+                      }}</span>
                     <span></span>
                     <span :class="[styles.legendItem, styles.starboard]">{{
-                      t('trainingDetail.starboard')
-                    }}</span>
+                        t('trainingDetail.starboard')
+                      }}</span>
                   </div>
 
                   <!-- Drummer (front) -->
                   <div :class="styles.specialSection">
                     <div
-                      :class="[
+                        :class="[
                         styles.specialSeat,
                         {
                           [styles.occupied]: getSeatPerson('D', 1),
@@ -855,40 +822,40 @@ onMounted(() => {
                           [styles.localChange]: hasLocalSeatChange('D', 1),
                         },
                       ]"
-                      @dragover.prevent
-                      @dragenter.prevent="handleDragEnter"
-                      @dragleave.prevent="handleDragLeave"
-                      @drop="handleSeatDrop($event, 'D', 1)"
+                        @dragover.prevent
+                        @dragenter.prevent="handleDragEnter"
+                        @dragleave.prevent="handleDragLeave"
+                        @drop="handleSeatDrop($event, 'D', 1)"
                     >
                       <div
-                        v-if="getSeatPerson('D', 1)"
-                        :class="[
+                          v-if="getSeatPerson('D', 1)"
+                          :class="[
                           styles.seatPerson,
                           { dragging: dragActive && draggedFromSeat === 'D1' },
                         ]"
-                        draggable="true"
-                        @dragstart="handleSeatDragStart($event, getSeatPerson('D', 1), 'D', 1)"
-                        @dragend="handleDragEnd"
+                          draggable="true"
+                          @dragstart="handleSeatDragStart($event, getSeatPerson('D', 1), 'D', 1)"
+                          @dragend="handleDragEnd"
                       >
                         <span :class="styles.posIcon">🥁</span>
                         <div :class="styles.personName">{{ getSeatPerson('D', 1).name }}</div>
                         <button
-                          @click="removeSeatAssignment('D', 1)"
-                          :class="styles.removeBtn"
-                          :title="t('trainingDetail.removeFromLineup')"
+                            @click="removeSeatAssignment('D', 1)"
+                            :class="styles.removeBtn"
+                            :title="t('trainingDetail.removeFromLineup')"
                         >
                           <svg
-                            width="12"
-                            height="12"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
+                              width="12"
+                              height="12"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
                           >
                             <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2.5"
-                              d="M6 18L18 6M6 6l12 12"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2.5"
+                                d="M6 18L18 6M6 6l12 12"
                             />
                           </svg>
                         </button>
@@ -905,14 +872,14 @@ onMounted(() => {
                     <!-- Seat Rows -->
                     <div :class="styles.seatRows">
                       <div
-                        v-for="seatNum in maxSeatNumber"
-                        :key="seatNum"
-                        :class="styles.seatRow"
-                        :data-row="seatNum"
+                          v-for="seatNum in maxSeatNumber"
+                          :key="seatNum"
+                          :class="styles.seatRow"
+                          :data-row="seatNum"
                       >
                         <!-- Left Seat (Port) -->
                         <div
-                          :class="[
+                            :class="[
                             styles.boatSeat,
                             {
                               [styles.occupied]: getSeatPerson('L', seatNum),
@@ -922,22 +889,22 @@ onMounted(() => {
                               [styles.wrongSide]: isWrongSide('L', seatNum),
                             },
                           ]"
-                          @dragover.prevent
-                          @dragenter.prevent="handleDragEnter"
-                          @dragleave.prevent="handleDragLeave"
-                          @drop="handleSeatDrop($event, 'L', seatNum)"
+                            @dragover.prevent
+                            @dragenter.prevent="handleDragEnter"
+                            @dragleave.prevent="handleDragLeave"
+                            @drop="handleSeatDrop($event, 'L', seatNum)"
                         >
                           <div
-                            v-if="getSeatPerson('L', seatNum)"
-                            :class="[
+                              v-if="getSeatPerson('L', seatNum)"
+                              :class="[
                               styles.seatPerson,
                               { dragging: dragActive && draggedFromSeat === `L${seatNum}` },
                             ]"
-                            draggable="true"
-                            @dragstart="
+                              draggable="true"
+                              @dragstart="
                               handleSeatDragStart($event, getSeatPerson('L', seatNum), 'L', seatNum)
                             "
-                            @dragend="handleDragEnd"
+                              @dragend="handleDragEnd"
                           >
                             <div :class="styles.personDetails">
                               <div :class="styles.personName">
@@ -946,22 +913,22 @@ onMounted(() => {
                               <div :class="styles.seatLabel">L{{ seatNum }}</div>
                             </div>
                             <button
-                              @click="removeSeatAssignment('L', seatNum)"
-                              :class="styles.removeBtn"
-                              :title="t('trainingDetail.removeFromLineup')"
+                                @click="removeSeatAssignment('L', seatNum)"
+                                :class="styles.removeBtn"
+                                :title="t('trainingDetail.removeFromLineup')"
                             >
                               <svg
-                                width="12"
-                                height="12"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
+                                  width="12"
+                                  height="12"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
                               >
                                 <path
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  stroke-width="2.5"
-                                  d="M6 18L18 6M6 6l12 12"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2.5"
+                                    d="M6 18L18 6M6 6l12 12"
                                 />
                               </svg>
                             </button>
@@ -977,7 +944,7 @@ onMounted(() => {
 
                         <!-- Right Seat (Starboard) -->
                         <div
-                          :class="[
+                            :class="[
                             styles.boatSeat,
                             {
                               [styles.occupied]: getSeatPerson('R', seatNum),
@@ -987,22 +954,22 @@ onMounted(() => {
                               [styles.wrongSide]: isWrongSide('R', seatNum),
                             },
                           ]"
-                          @dragover.prevent
-                          @dragenter.prevent="handleDragEnter"
-                          @dragleave.prevent="handleDragLeave"
-                          @drop="handleSeatDrop($event, 'R', seatNum)"
+                            @dragover.prevent
+                            @dragenter.prevent="handleDragEnter"
+                            @dragleave.prevent="handleDragLeave"
+                            @drop="handleSeatDrop($event, 'R', seatNum)"
                         >
                           <div
-                            v-if="getSeatPerson('R', seatNum)"
-                            :class="[
+                              v-if="getSeatPerson('R', seatNum)"
+                              :class="[
                               styles.seatPerson,
                               { dragging: dragActive && draggedFromSeat === `R${seatNum}` },
                             ]"
-                            draggable="true"
-                            @dragstart="
+                              draggable="true"
+                              @dragstart="
                               handleSeatDragStart($event, getSeatPerson('R', seatNum), 'R', seatNum)
                             "
-                            @dragend="handleDragEnd"
+                              @dragend="handleDragEnd"
                           >
                             <div :class="styles.personDetails">
                               <div :class="styles.personName">
@@ -1011,22 +978,22 @@ onMounted(() => {
                               <div :class="styles.seatLabel">R{{ seatNum }}</div>
                             </div>
                             <button
-                              @click="removeSeatAssignment('R', seatNum)"
-                              :class="styles.removeBtn"
-                              :title="t('trainingDetail.removeFromLineup')"
+                                @click="removeSeatAssignment('R', seatNum)"
+                                :class="styles.removeBtn"
+                                :title="t('trainingDetail.removeFromLineup')"
                             >
                               <svg
-                                width="12"
-                                height="12"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
+                                  width="12"
+                                  height="12"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
                               >
                                 <path
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  stroke-width="2.5"
-                                  d="M6 18L18 6M6 6l12 12"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2.5"
+                                    d="M6 18L18 6M6 6l12 12"
                                 />
                               </svg>
                             </button>
@@ -1043,7 +1010,7 @@ onMounted(() => {
                   <!-- Steerer (back) -->
                   <div :class="styles.specialSection">
                     <div
-                      :class="[
+                        :class="[
                         styles.specialSeat,
                         {
                           [styles.occupied]: getSeatPerson('S', 1),
@@ -1051,40 +1018,40 @@ onMounted(() => {
                           [styles.localChange]: hasLocalSeatChange('S', 1),
                         },
                       ]"
-                      @dragover.prevent
-                      @dragenter.prevent="handleDragEnter"
-                      @dragleave.prevent="handleDragLeave"
-                      @drop="handleSeatDrop($event, 'S', 1)"
+                        @dragover.prevent
+                        @dragenter.prevent="handleDragEnter"
+                        @dragleave.prevent="handleDragLeave"
+                        @drop="handleSeatDrop($event, 'S', 1)"
                     >
                       <div
-                        v-if="getSeatPerson('S', 1)"
-                        :class="[
+                          v-if="getSeatPerson('S', 1)"
+                          :class="[
                           styles.seatPerson,
                           { dragging: dragActive && draggedFromSeat === 'S1' },
                         ]"
-                        draggable="true"
-                        @dragstart="handleSeatDragStart($event, getSeatPerson('S', 1), 'S', 1)"
-                        @dragend="handleDragEnd"
+                          draggable="true"
+                          @dragstart="handleSeatDragStart($event, getSeatPerson('S', 1), 'S', 1)"
+                          @dragend="handleDragEnd"
                       >
                         <span :class="styles.posIcon">🧭</span>
                         <div :class="styles.personName">{{ getSeatPerson('S', 1).name }}</div>
                         <button
-                          @click="removeSeatAssignment('S', 1)"
-                          :class="styles.removeBtn"
-                          :title="t('trainingDetail.removeFromLineup')"
+                            @click="removeSeatAssignment('S', 1)"
+                            :class="styles.removeBtn"
+                            :title="t('trainingDetail.removeFromLineup')"
                         >
                           <svg
-                            width="12"
-                            height="12"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
+                              width="12"
+                              height="12"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
                           >
                             <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2.5"
-                              d="M6 18L18 6M6 6l12 12"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2.5"
+                                d="M6 18L18 6M6 6l12 12"
                             />
                           </svg>
                         </button>
@@ -1120,8 +1087,8 @@ onMounted(() => {
   background: var(--color-border);
   opacity: 0.7; /* recede while unmarked so it doesn't fight the drag UI */
   transition:
-    background 0.15s ease,
-    opacity 0.15s ease;
+      background 0.15s ease,
+      opacity 0.15s ease;
 }
 .att-toggle.present,
 .att-toggle.absent {
