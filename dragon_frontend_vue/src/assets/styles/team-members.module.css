@@ -1,7 +1,7 @@
 .membersTab {
   /* renders inside the layout's container */
-  overflow-x: hidden;
 }
+
 /* Toolbar: search grows, Add Person sits beside it */
 .membersToolbar {
   display: flex;
@@ -46,9 +46,12 @@
 /* Role filter chips */
 .filterChips {
   display: flex;
-  flex-wrap: wrap;
   gap: 0.5rem;
   margin-bottom: 1.5rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 2px;
 }
 
 .filterChips::-webkit-scrollbar {
@@ -57,7 +60,18 @@
 
 .chip {
   flex-shrink: 0;
-  /* ...unchanged... */
+  padding: 0.075rem 0.275rem;
+  min-height: 30px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-body);
+  font-size: 0.7125rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .chipActive {
@@ -342,11 +356,7 @@
     display: none;
   }
 
-  .membersToolbar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    align-items: center;
-    margin-bottom: 1rem;
+  .membersToolbar .btnPrimary {
+    padding: 0.625rem;
   }
 }
