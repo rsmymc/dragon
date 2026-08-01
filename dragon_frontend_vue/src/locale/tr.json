@@ -186,7 +186,7 @@
     "submitting": "Güncelleniyor..."
   },
   "roles": {
-    "player": "Oyuncu",
+    "player": "Kürekçi",
     "captain": "Kaptan",
     "coach": "Antrenör",
     "manager": "Yönetici"
@@ -248,7 +248,7 @@
   "teamMembers": {
     "filters": {
       "all": "Tümü",
-      "players": "Oyuncular",
+      "players": "Kürekçiler",
       "captains": "Kaptanlar",
       "coaches": "Antrenörler",
       "managers": "Yöneticiler"

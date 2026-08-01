@@ -186,7 +186,7 @@
     "submitting": "Updating..."
   },
   "roles": {
-    "player": "Player",
+    "player": "Paddle",
     "captain": "Captain",
     "coach": "Coach",
     "manager": "Manager"
@@ -248,7 +248,7 @@
   "teamMembers": {
     "filters": {
       "all": "All",
-      "players": "Players",
+      "players": "Paddles",
       "captains": "Captains",
       "coaches": "Coaches",
       "managers": "Managers"
