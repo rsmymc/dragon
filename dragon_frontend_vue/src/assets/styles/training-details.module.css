@@ -334,6 +334,9 @@
   width: fit-content;
   max-width: 100%;
   margin: 0 auto;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .membersPanel {
   flex: 0 0 350px;
@@ -438,6 +441,9 @@
   transition: all 0.2s ease;
   cursor: grab;
   position: relative;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .memberCard:hover {
   border-color: var(--color-primary);
@@ -770,6 +776,9 @@
   cursor: grab;
   border-radius: 12px;
   transition: all 0.2s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .seatPerson:hover {
   background: rgba(59, 130, 246, 0.1);
