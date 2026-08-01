@@ -70,11 +70,22 @@
 .logoContainer {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.75rem;
 }
 
 .logo {
-  /* No styles needed - already defined inline */
+  /* Light outline + soft glow so the dragon reads clearly against the
+     blue sidebar gradient, even where the artwork's own color is close
+     in value to the background. Stacked 1px drop-shadows fake a stroke
+     around the transparent PNG's silhouette; the last one adds a soft
+     halo for extra separation. */
+  filter:
+    drop-shadow(1px 0 0 rgba(255, 255, 255, 0.55))
+    drop-shadow(-1px 0 0 rgba(255, 255, 255, 0.55))
+    drop-shadow(0 1px 0 rgba(255, 255, 255, 0.55))
+    drop-shadow(0 -1px 0 rgba(255, 255, 255, 0.55))
+    drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
 }
 
 .appName {

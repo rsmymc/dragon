@@ -139,6 +139,17 @@
   gap: 0.5rem;
 }
 
+/* Height + Weight sit side by side on one line */
+.formRow {
+  display: flex;
+  gap: 1rem;
+}
+
+.formRow .formGroup {
+  flex: 1;
+  min-width: 0;
+}
+
 .formLabel {
   font-weight: 600;
   color: var(--color-text-body);

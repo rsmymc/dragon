@@ -194,34 +194,36 @@ onMounted(loadProfile)
           <span v-if="errors.phone" :class="styles.fieldError">{{ errors.phone }}</span>
         </div>
 
-        <div :class="styles.formGroup">
-          <label for="height" :class="styles.formLabel">{{ t('personForm.height') }}</label>
-          <input
-            id="height"
-            v-model="form.height"
-            type="number"
-            :class="[styles.formInput, { [styles.error]: errors.height }]"
-            :placeholder="t('profile.heightPlaceholder')"
-            min="100"
-            max="250"
-            :disabled="isSubmitting"
-          />
-          <span v-if="errors.height" :class="styles.fieldError">{{ errors.height }}</span>
-        </div>
+        <div :class="styles.formRow">
+          <div :class="styles.formGroup">
+            <label for="height" :class="styles.formLabel">{{ t('personForm.height') }}</label>
+            <input
+              id="height"
+              v-model="form.height"
+              type="number"
+              :class="[styles.formInput, { [styles.error]: errors.height }]"
+              :placeholder="t('profile.heightPlaceholder')"
+              min="100"
+              max="250"
+              :disabled="isSubmitting"
+            />
+            <span v-if="errors.height" :class="styles.fieldError">{{ errors.height }}</span>
+          </div>
 
-        <div :class="styles.formGroup">
-          <label for="weight" :class="styles.formLabel">{{ t('personForm.weight') }}</label>
-          <input
-            id="weight"
-            v-model="form.weight"
-            type="number"
-            :class="[styles.formInput, { [styles.error]: errors.weight }]"
-            :placeholder="t('profile.weightPlaceholder')"
-            min="30"
-            max="200"
-            :disabled="isSubmitting"
-          />
-          <span v-if="errors.weight" :class="styles.fieldError">{{ errors.weight }}</span>
+          <div :class="styles.formGroup">
+            <label for="weight" :class="styles.formLabel">{{ t('personForm.weight') }}</label>
+            <input
+              id="weight"
+              v-model="form.weight"
+              type="number"
+              :class="[styles.formInput, { [styles.error]: errors.weight }]"
+              :placeholder="t('profile.weightPlaceholder')"
+              min="30"
+              max="200"
+              :disabled="isSubmitting"
+            />
+            <span v-if="errors.weight" :class="styles.fieldError">{{ errors.weight }}</span>
+          </div>
         </div>
 
         <div :class="styles.formGroup">

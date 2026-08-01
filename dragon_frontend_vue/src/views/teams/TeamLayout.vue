@@ -281,20 +281,16 @@ onUnmounted(() => {
           :to="`/teams/${teamId}/trainings`"
           :class="[styles.tab, { [styles.tabActive]: isTrainingsActive }]"
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-            <g transform="rotate(45 12 12)">
-              <rect x="11.2" y="2.5" width="1.6" height="12" rx="0.8" />
-              <circle cx="12" cy="2.6" r="1.5" />
-              <path
-                d="M12 12c-2.6 0-3.7 2.9-3.7 5.4 0 2.1 1.6 3.9 3.7 3.9s3.7-1.8 3.7-3.9c0-2.5-1.1-5.4-3.7-5.4z"
-              />
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+            <g transform="rotate(55 12 12)">
+              <circle cx="12" cy="3.6" r="1.4" />
+              <rect x="11" y="4.8" width="2" height="8.6" rx="1" />
+              <ellipse cx="12" cy="17.6" rx="3.4" ry="4.4" />
             </g>
-            <g transform="rotate(-45 12 12)">
-              <rect x="11.2" y="2.5" width="1.6" height="12" rx="0.8" />
-              <circle cx="12" cy="2.6" r="1.5" />
-              <path
-                d="M12 12c-2.6 0-3.7 2.9-3.7 5.4 0 2.1 1.6 3.9 3.7 3.9s3.7-1.8 3.7-3.9c0-2.5-1.1-5.4-3.7-5.4z"
-              />
+            <g transform="rotate(-55 12 12)">
+              <circle cx="12" cy="3.6" r="1.4" />
+              <rect x="11" y="4.8" width="2" height="8.6" rx="1" />
+              <ellipse cx="12" cy="17.6" rx="3.4" ry="4.4" />
             </g>
           </svg>
           {{ t('teamDetail.trainings') }}
@@ -303,13 +299,20 @@ onUnmounted(() => {
           :to="`/teams/${teamId}`"
           :class="[styles.tab, { [styles.tabActive]: isMembersActive }]"
         >
-          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
-            />
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="8.5" cy="8" r="3" />
+            <path d="M3 20c0-3.3 2.5-6 5.5-6s5.5 2.7 5.5 6" />
+            <circle cx="16" cy="8.5" r="2.4" />
+            <path d="M14.5 14.2c.6-.15 1.2-.2 1.8-.2 2.8 0 5.2 2.5 5.2 5.7" />
           </svg>
           {{ t('teamDetail.members') }}
         </router-link>
