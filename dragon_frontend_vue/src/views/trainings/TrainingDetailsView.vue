@@ -713,36 +713,10 @@ onMounted(() => {
                       @dragstart="handleDragStart($event, member)"
                       @dragend="handleDragEnd"
                   >
-<!--                    <div :class="styles.memberAvatar">
-                      <img
-                          v-if="member.profile_picture_url"
-                          :src="member.profile_picture_url"
-                          :alt="member.name"
-                          :class="styles.avatarImage"
-                      />
-                      <div v-else :class="styles.avatarInitial">
-                        {{ getInitials(member.name) }}
-                      </div>
-                    </div>-->
-                    <div :class="styles.memberInfo">
-                      <h4 :class="styles.memberName">{{ member.name }}</h4>
-                      <div :class="styles.memberStats">
-                        <span v-if="member.weight" :class="styles.statChip"
-                        >{{ member.weight }}kg</span
-                        >
-                        <span v-if="member.height" :class="styles.statChip"
-                        >{{ member.height }}cm</span
-                        >
-                        <span :class="[styles.statChip, styles.sideStat, sideClass(member.side)]">
-                          {{ getSideLabel(member.side) }}
-                        </span>
-                      </div>
-                    </div>
                     <!-- Attendance toggle -->
                     <button
                         type="button"
-                        class="att-toggle"
-                        :class="attendanceClass(member.id)"
+                        :class="[styles.attToggleArea, 'att-toggle', attendanceClass(member.id)]"
                         :disabled="!canEditAttendance(member.id) || savingPersonId === member.id"
                         :title="
                         canEditAttendance(member.id)
@@ -756,6 +730,20 @@ onMounted(() => {
                     >
                       <span class="att-knob"></span>
                     </button>
+
+                    <h4 :class="styles.memberName">{{ member.name }}</h4>
+
+                    <div :class="styles.memberStats">
+                      <span v-if="member.weight" :class="styles.statChip"
+                      >{{ member.weight }}kg</span
+                      >
+                      <span v-if="member.height" :class="styles.statChip"
+                      >{{ member.height }}cm</span
+                      >
+                      <span :class="[styles.statChip, styles.sideStat, sideClass(member.side)]">
+                        {{ getSideLabel(member.side) }}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
@@ -1115,5 +1103,22 @@ onMounted(() => {
 }
 .att-toggle.present .att-knob {
   transform: translateX(16px);
+}
+@media (max-width: 768px) {
+  .att-toggle {
+    width: 30px;
+    min-width: 30px;
+    height: 18px;
+    min-height: 18px;
+  }
+  .att-knob {
+    top: 2px;
+    left: 2px;
+    width: 12px;
+    height: 12px;
+  }
+  .att-toggle.present .att-knob {
+    transform: translateX(12px);
+  }
 }
 </style>
