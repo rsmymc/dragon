@@ -1021,7 +1021,13 @@ onMounted(() => {
                           @dragstart="handleSeatDragStart($event, getSeatPerson('S', 1), 'S', 1)"
                           @dragend="handleDragEnd"
                       >
-                        <span :class="styles.posIcon">🧭</span>
+                        <span :class="styles.posIcon">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                            <circle cx="12" cy="12" r="9" />
+                            <circle cx="12" cy="12" r="2.25" fill="currentColor" stroke="none" />
+                            <path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8" />
+                          </svg>
+                        </span>
                         <div :class="styles.personName">{{ getSeatPerson('S', 1).name }}</div>
                         <button
                             @click="removeSeatAssignment('S', 1)"
@@ -1045,7 +1051,13 @@ onMounted(() => {
                         </button>
                       </div>
                       <div v-else :class="styles.emptySpecial">
-                        <span :class="styles.posIcon">🧭</span>
+                        <span :class="styles.posIcon">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                            <circle cx="12" cy="12" r="9" />
+                            <circle cx="12" cy="12" r="2.25" fill="currentColor" stroke="none" />
+                            <path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8" />
+                          </svg>
+                        </span>
                         <span :class="styles.posLabel">{{ t('trainingDetail.steerer') }}</span>
                       </div>
                     </div>
