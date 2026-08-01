@@ -75,7 +75,7 @@
 }
 
 .teamName {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--color-primary);
   margin: 0;
@@ -135,13 +135,13 @@
 }
 
 .statLabel {
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   color: var(--color-text-muted);
   font-weight: 500;
 }
 
 .statValue {
-  font-size: 1rem;
+  font-size: 0.875rem;
   font-weight: 700;
   color: var(--color-primary);
 }
@@ -151,14 +151,14 @@
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  padding: 0.375rem 0.625rem;
-  min-height: 36px;
-  font-size: 0.8125rem;
+  padding: 0.25rem 0.5rem;
+  min-height: 32px;
+  font-size: 0.75rem;
   font-family: monospace;
   font-weight: 700;
   letter-spacing: 1px;
   color: var(--color-text-body);
-  background: var(--color-surface); /* white chip stands out on the grey panel */
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 0.5rem;
   cursor: pointer;
@@ -169,7 +169,6 @@
     border-color 0.2s ease;
   -webkit-tap-highlight-color: transparent;
 }
-
 /* Progress row */
 .progressRow {
   display: flex;
@@ -212,14 +211,15 @@
 
 .progressText {
   font-weight: 600;
+  font-size: 0.875rem;
   color: var(--color-text-body);
   min-width: 60px;
 }
 
 .statusBadge {
-  padding: 0.25rem 0.75rem;
+  padding: 0.25rem 0.625rem;
   border-radius: 20px;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -363,7 +363,7 @@
   }
 
   .teamName {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
   }
 
   .teamStats {
@@ -371,11 +371,11 @@
   }
 
   .tabStrip {
-    display: flex; /* full width on mobile */
+    display: flex;
   }
 
   .tab {
-    flex: 1; /* tabs share the width evenly on mobile */
+    flex: 1;
     padding: 0.5rem 0.75rem;
   }
 }
