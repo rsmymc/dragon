@@ -189,7 +189,7 @@
     "player": "Oyuncu",
     "captain": "Kaptan",
     "coach": "Antrenör",
-    "manager": "Menajer"
+    "manager": "Yönetici"
   },
   "sides": {
     "both": "Her İki Taraf",
@@ -251,7 +251,7 @@
       "players": "Oyuncular",
       "captains": "Kaptanlar",
       "coaches": "Antrenörler",
-      "managers": "Menajerler"
+      "managers": "Yöneticiler"
     }
   },
   "trainings": {
