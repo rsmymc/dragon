@@ -107,28 +107,21 @@ def mark_attendance(request):
         status=status.HTTP_200_OK,
     )
 
-
-@api_view(["POST"])
+@api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
-def mark_my_attendance(request, training_id):
-    """A logged-in member marks their OWN attendance for one training.
+def my_attendance(request, training_id):
+    """GET: return the caller's own attendance status for one training.
+    POST: mark the caller's own attendance for one training.
 
-    Payload: { "attended": bool }
-    The membership is derived from request.user — never from the payload —
-    so a member can only ever touch their own row.
+    Both derive the membership from request.user — never from the payload —
+    so a member can only ever read or write their own row.
     """
-    attended = request.data.get("attended")
-    if not isinstance(attended, bool):
-        return Response(
-            {"detail": "Field 'attended' (boolean) is required."},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-
     training = get_object_or_404(Training, pk=training_id)
 
-    # Resolve the caller's person, then their membership on THIS training's team.
     person = getattr(request.user, "person", None)
     if person is None:
+        if request.method == "GET":
+            return Response({"attended": None})
         return Response(
             {"detail": "No person linked to this account."},
             status=status.HTTP_403_FORBIDDEN,
@@ -139,10 +132,25 @@ def mark_my_attendance(request, training_id):
         .filter(person=person, team=training.team)
         .first()
     )
+
+    if request.method == "GET":
+        if membership is None:
+            return Response({"attended": None})
+        row = Attendance.objects.filter(training=training, membership=membership).first()
+        return Response({"attended": row.attended if row else None})
+
+    # POST
     if membership is None:
         return Response(
             {"detail": "You are not a member of this team."},
             status=status.HTTP_403_FORBIDDEN,
+        )
+
+    attended = request.data.get("attended")
+    if not isinstance(attended, bool):
+        return Response(
+            {"detail": "Field 'attended' (boolean) is required."},
+            status=status.HTTP_400_BAD_REQUEST,
         )
 
     obj, _ = Attendance.objects.update_or_create(

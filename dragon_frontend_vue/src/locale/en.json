@@ -268,6 +268,7 @@
     "emptyUpcomingTitle": "No upcoming trainings",
     "emptyPastTitle": "No past trainings",
     "emptyAllTitle": "No trainings yet",
+    "myAttendance": "My Attendance",
     "filters": {
       "upcoming": "Upcoming ({count})",
       "past": "Past ({count})",

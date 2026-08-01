@@ -268,6 +268,7 @@
     "emptyUpcomingTitle": "Yaklaşan antrenman yok",
     "emptyPastTitle": "Geçmiş antrenman yok",
     "emptyAllTitle": "Henüz antrenman yok",
+    "myAttendance": "Katılım durumum",
     "filters": {
       "upcoming": "Yaklaşan ({count})",
       "past": "Geçmiş ({count})",

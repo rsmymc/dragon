@@ -173,11 +173,6 @@
   color: var(--color-primary);
 }
 
-.trainingTime {
-  color: var(--color-text-muted);
-  font-size: 0.875rem;
-}
-
 /* Right side of header: badge + icon actions */
 .headerRight {
   display: flex;
@@ -226,7 +221,7 @@
   color: var(--color-text-muted);
 }
 
-/* Location: tappable link to the map coordinates */
+/* Location: icon + name, sized to its own content (not stretched) */
 .trainingLocation {
   display: flex;
   align-items: center;
@@ -234,8 +229,9 @@
   font-weight: 600;
   color: var(--color-text-strong);
   font-size: 0.9375rem;
-  text-decoration: none;
   overflow-wrap: anywhere;
+  min-width: 0;
+  flex: 0 1 auto;
 }
 
 .trainingLocation svg {
@@ -243,12 +239,35 @@
   flex-shrink: 0;
 }
 
-/* My-attendance self-toggle, pinned to the bottom-left of the card */
+/* Only the name text is a link; width hugs the text itself */
+.locationLink {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Footer row: location (left, content-width) + my-attendance (right) */
 .cardFooter {
   display: flex;
   align-items: center;
+  gap: 0.625rem;
   margin-top: auto;
   padding-top: 0.5rem;
+}
+
+/* Attendance group: label + toggle, pinned to the far right of the footer */
+.attGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.attLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  white-space: nowrap;
 }
 
 .attToggle {
@@ -330,7 +349,7 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
 
-  a.trainingLocation:hover span {
+  .locationLink:hover {
     text-decoration: underline;
   }
 

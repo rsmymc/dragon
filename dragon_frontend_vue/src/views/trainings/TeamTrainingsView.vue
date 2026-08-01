@@ -260,8 +260,10 @@ onMounted(() => {
         <!-- Header: date/time + badge + actions -->
         <div :class="styles.trainingHeader">
           <div :class="styles.trainingDateTime">
-            <div :class="styles.trainingDate">{{ formatTrainingDate(training.start_at) }}</div>
-            <div :class="styles.trainingTime">{{ formatTrainingTime(training.start_at) }}</div>
+            <div :class="styles.trainingDate">
+              {{ formatTrainingDate(training.start_at) }}
+              {{ formatTrainingTime(training.start_at) }}
+            </div>
           </div>
 
           <div :class="styles.headerRight">
@@ -302,61 +304,51 @@ onMounted(() => {
           </div>
         </div>
 
-        <!-- Location (name links to the map coordinates) -->
-        <a
-          v-if="getLocationCoordinates(training.location.id) !== 'N/A'"
-          :href="getLocationCoordinates(training.location.id)"
-          target="_blank"
-          rel="noopener noreferrer"
-          :class="styles.trainingLocation"
-          @click.stop
-        >
-          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-            />
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-            />
-          </svg>
-          <span>{{ training.location.name }}</span>
-        </a>
-        <div v-else :class="styles.trainingLocation">
-          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-            />
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-            />
-          </svg>
-          <span>{{ training.location.name }}</span>
-        </div>
-
-        <!-- My attendance: self-toggle, bottom-left of the card -->
+        <!-- Footer row: location (left) + my-attendance label & toggle (right) -->
         <div :class="styles.cardFooter">
-          <button
-            :class="[styles.attToggle, myAttendanceClass(training.id)]"
-            :disabled="savingTrainingId === training.id"
-            role="switch"
-            :aria-checked="myAttendance(training.id) === true"
-            :title="t('trainingDetail.toggleAttendance')"
-            @click.stop.prevent="toggleMyAttendance(training)"
-          >
-            <span :class="styles.attKnob"></span>
-          </button>
+          <!-- Location: icon is static, only the name text is a clickable link to the map coordinates -->
+          <div :class="styles.trainingLocation">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+              />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+            </svg>
+            <a
+              v-if="getLocationCoordinates(training.location.id) !== 'N/A'"
+              :href="getLocationCoordinates(training.location.id)"
+              target="_blank"
+              rel="noopener noreferrer"
+              :class="styles.locationLink"
+              @click.stop
+            >
+              {{ training.location.name }}
+            </a>
+            <span v-else>{{ training.location.name }}</span>
+          </div>
+
+          <!-- My attendance: label + toggle, pinned to the right -->
+          <div :class="styles.attGroup">
+            <span :class="styles.attLabel">{{ t('trainings.myAttendance') }}</span>
+            <button
+              :class="[styles.attToggle, myAttendanceClass(training.id)]"
+              :disabled="savingTrainingId === training.id"
+              role="switch"
+              :aria-checked="myAttendance(training.id) === true"
+              :title="t('trainings.toggleMyAttendance')"
+              @click.stop.prevent="toggleMyAttendance(training)"
+            >
+              <span :class="styles.attKnob"></span>
+            </button>
+          </div>
         </div>
       </router-link>
     </div>
