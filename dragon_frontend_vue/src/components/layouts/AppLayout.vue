@@ -160,14 +160,14 @@ const handleLogout = async () => {
           </button>
         </div>
 
-        <div :class="[styles.userSection, { [styles.collapsed]: sidebarCollapsed }]">
+<!--        <div :class="[styles.userSection, { [styles.collapsed]: sidebarCollapsed }]">
           <div :class="styles.userAvatar">
             {{ auth.userInitials }}
           </div>
           <div v-if="!sidebarCollapsed" :class="styles.userInfo">
             <div :class="styles.userName">{{ currentUser || t('layout.user') }}</div>
           </div>
-        </div>
+        </div>-->
         <button
           @click="handleLogout"
           :class="styles.logoutButton"
