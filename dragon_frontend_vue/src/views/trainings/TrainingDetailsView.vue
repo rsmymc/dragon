@@ -898,7 +898,13 @@ onMounted(() => {
                               <div :class="styles.personName">
                                 {{ getSeatPerson('L', seatNum).name }}
                               </div>
-                              <div :class="styles.seatLabel">L{{ seatNum }}</div>
+                              <div :class="styles.seatLabel">
+                                {{
+                                  getSeatPerson('L', seatNum).weight
+                                      ? `${getSeatPerson('L', seatNum).weight}kg`
+                                      : `L${seatNum}`
+                                }}
+                              </div>
                             </div>
                             <button
                                 @click="removeSeatAssignment('L', seatNum)"
@@ -963,7 +969,13 @@ onMounted(() => {
                               <div :class="styles.personName">
                                 {{ getSeatPerson('R', seatNum).name }}
                               </div>
-                              <div :class="styles.seatLabel">R{{ seatNum }}</div>
+                              <div :class="styles.seatLabel">
+                                {{
+                                  getSeatPerson('R', seatNum).weight
+                                      ? `${getSeatPerson('R', seatNum).weight}kg`
+                                      : `R${seatNum}`
+                                }}
+                              </div>
                             </div>
                             <button
                                 @click="removeSeatAssignment('R', seatNum)"

@@ -961,6 +961,7 @@
   .lineupInterface {
     flex-direction: row;
     align-items: stretch;
+    width: 100%;
   }
   .membersPanel {
     flex: 0 0 116px;
@@ -1053,6 +1054,15 @@
     min-width: 140px;
     max-width: 200px;
     min-height: 34px;
+    overflow: hidden;
+  }
+  .specialSeat .personName {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 88px;
+    font-size: 0.75rem;
+    margin: 0;
   }
   .emptySpecial {
     padding: 0.3rem 0.5rem;
