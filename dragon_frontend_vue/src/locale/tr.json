@@ -213,7 +213,7 @@
   },
   "personModal": {
     "addTitle": "{team} Takımına Kişi Ekle",
-    "membershipDetails": "Üyelik Bilgileri",
+    "membershipDetails": "Rol Bilgileri",
     "roleLabel": "Rol",
     "addSubmit": "Takıma Ekle",
     "adding": "Ekleniyor...",
